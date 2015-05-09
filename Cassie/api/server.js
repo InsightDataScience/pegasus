@@ -14,21 +14,121 @@ app.use(function(req, res, next) {
 });
 app.set('json spaces', 2);
 
+var server = app.listen(3000, function() {
+    console.log('Listening on port %d', server.address().port);
+});
+
+function toUTCDayString(dateObj){
+    var dayString = dateObj.getUTCFullYear() + '-' +
+                    String('00' + (dateObj.getUTCMonth()+1)).slice(-2) + '-' +
+                    String('00' + dateObj.getUTCDate()).slice(-2);
+    return dayString
+}
+
+function fetch_daterange(startDate, endDate, fields, res) {
+    var res_arr = []
+    var tempDate = startDate
+
+    // get days in UTC
+    var startDay = toUTCDayString(startDate)
+    var endDay = toUTCDayString(endDate)
+
+    function autoPagedQuery() {
+        if (startDay >= endDay){
+            client.eachRow( getRecordsSinceDate, [startDay, startDate, endDate], {autoPage: true},
+                            function(n, row) {
+                                var json_record = JSON.parse(row.record)
+                                json_record["ts"] = row.t
+                                if (fields[0] == 'all'){
+                                    res_arr.push(json_record)
+                                } else {
+                                    json_trunc_record = {}
+                                    for (var i=0; i<fields.length; i++) {
+                                        json_trunc_record[fields[i]] = json_record[fields[i]]
+                                    }
+                                    json_trunc_record["ts"] = row.t
+                                    res_arr.push(json_trunc_record)
+                                }
+                            },
+                            function(err, result) {
+                                if (err) {
+                                    res.status(404).send({ msg : 'Error!' });
+                                } else {
+                                    console.log("Fetched " + res_arr.length + " records")
+                                    res.json(res_arr)
+                                }
+                            });
+        } else {
+            client.eachRow( getRecordsSinceDate, [startDay, startDate, endDate], {autoPage:true},
+                            function(n, row) {
+                                var json_record = JSON.parse(row.record)
+                                json_record["ts"] = row.t
+                                if (fields[0] == 'all'){
+                                    res_arr.push(json_record)
+                                } else {
+                                    json_trunc_record = {}
+                                    for (var i=0; i<fields.length; i++) {
+                                        json_trunc_record[fields[i]] = json_record[fields[i]]
+                                    }
+                                    json_trunc_record["ts"] = row.t
+                                    res_arr.push(json_trunc_record)
+                                }
+                            },
+                            function(err, result) {
+                                if (err) {
+                                    res.status(404).send({ msg : 'Error!' });
+                                } else {
+                                    tempDate = new Date(tempDate.getTime() + 24*60*60*1000)
+                                    startDay = toUTCDayString(tempDate)
+                                    autoPagedQuery()
+                                }
+                            });
+        }
+    }
+
+    autoPagedQuery()
+
+}
+
+var getRecordsSinceDate = 'SELECT t, record FROM execed.fashion WHERE date=? AND t>? AND t<? ALLOW FILTERING;';
+
+process.on('uncaughtException', function (err) {
+  console.error(err);
+  console.log("Node NOT Exiting...");
+});
+
 app.get('/metadata', function(req, res) {
     res.send(client.hosts.slice(0).map(function (node) {
         return { address: node.address, rack: node.rack, datacenter: node.datacenter }
     }));
 });
 
-var server = app.listen(3000, function() {
-    console.log('Listening on port %d', server.address().port);
+app.get('/fashion/schema', function(req, res) {
+    res.send({
+    "time": 1431194100235,
+    "action": "hate",
+    "registration_time": 1431193829286,
+    "category": "underwear",
+    "gender": "women",
+    "from_recommended": "false",
+    "subcategory": "bra",
+    "product_id": "561760",
+    "store": "Macy's",
+    "product_likes": 0,
+    "product_loves": 0,
+    "product_hates": 4,
+    "product_total": 4,
+    "user_action_count": 5136,
+    "user_age": 21,
+    "user_last_action_time": 1434486024313,
+    "user_birthdate": 733104000000,
+    "user": "Candelaria Saffron",
+    "user_gender": "women",
+    "ts": "2015-05-09T17:55:00.235Z"
+  });
 });
 
-
-
-var getRecordsSinceDate = 'SELECT t, record FROM execed.fashion WHERE token(date)>=token(?) AND t>? AND t<? ALLOW FILTERING;';
-
-app.get('/since/:start/:country/:city', function(req, res) {
+app.get('/fashion/since/:start/:country/:city/:fields', function(req, res) {
 
     // parse string input to Date object
     var inputDate = new Date(Date.parse(req.params.start))
@@ -47,37 +147,17 @@ app.get('/since/:start/:country/:city', function(req, res) {
     } else {
     	var tz_offset = moment().tz(tzone)._offset
 
-    	// get start date in UTC time
+    	// get start/end date in UTC time
     	var startDate = new Date(inputDate.getTime() - tz_offset*60*1000)
-
-    	// get start day in UTC
-    	var startDay = startDate.getUTCFullYear() + '-' +
-        	                 String('00' + (startDate.getUTCMonth()+1)).slice(-2) + '-' +
-                	         String('00' + startDate.getUTCDate()).slice(-2);
-
-    	// get end date in UTC time
    	var endDate = new Date()
 
-    	// get end day in UTC
-    	var endDay = endDate.getUTCFullYear() + '-' +
-        	             String('00' + (endDate.getUTCMonth()+1)).slice(-2) + '-' +
-             		     String('00' + endDate.getUTCDate()).slice(-2);  
+        var fields = req.params.fields.split('&')
 
-    	// query cassandra for all records since start date
-	client.execute(getRecordsSinceDate, 
-	   	       [startDay, startDate, endDate], 
-		       {prepare: true}, 
-		       function(err, result) {
-  		           if (err) {
-            		       res.status(404).send({ msg: 'Records not found.' });
-        	           } else {
-            		       res.json(result);
-        	           }
-    		       });
+        fetch_daterange(startDate, endDate, fields, res)
     } 
 });
 
-app.get('/between/:start/:end/:country/:city', function(req, res) {
+app.get('/fashion/between/:start/:end/:country/:city/:fields', function(req, res) {
 
     // parse string input to Date object
     var inputStartDate = new Date(Date.parse(req.params.start))
@@ -101,64 +181,29 @@ app.get('/between/:start/:end/:country/:city', function(req, res) {
         var startDate = new Date(inputStartDate.getTime() - tz_offset*60*1000)
         var endDate = new Date(inputEndDate.getTime() - tz_offset*60*1000)
 
-        // get days in UTC
-        var startDay = startDate.getUTCFullYear() + '-' +
-                                 String('00' + (startDate.getUTCMonth()+1)).slice(-2) + '-' +
-                                 String('00' + startDate.getUTCDate()).slice(-2);
-
-        var endDay = endDate.getUTCFullYear() + '-' +
-                             String('00' + (endDate.getUTCMonth()+1)).slice(-2) + '-' +
-                             String('00' + endDate.getUTCDate()).slice(-2);
-
-        // query cassandra for all records between start and end date
-        client.execute(getRecordsSinceDate,
-                       [startDay, startDate, endDate],
-                       {prepare: true},
-                       function(err, result) {
-                           if (err) {
-                               res.status(404).send({ msg: 'Records not found.' });
-                           } else {
-                               res.json(result);
-                           }
-                       });
+        var fields = req.params.fields.split('&')
+        
+        fetch_daterange(startDate, endDate, fields, res)
     }
 });
 
-app.get('/last/:num/:timeinc', function(req, res) {
+app.get('/fashion/last/:num/:timeinc/:fields', function(req, res) {
 
     var num = parseInt(req.params.num);
 
-    var toMilliMult = { weeks: 7*24*60*60*1000, 
-                        days: 24*60*60*1000, 
-                        hours: 60*60*1000, 
-                        minutes: 60*1000, 
-                        seconds: 1000}; 
+    var toMilliMult = { weeks: 7*24*60*60*1000,
+                        days: 24*60*60*1000,
+                        hours: 60*60*1000,
+                        minutes: 60*1000,
+                        seconds: 1000};
 
-    // get end date in UTC time
+    // get dates in UTC time
     var endDate = new Date();
-
-    // get start date in UTC time
     var startDate = new Date(endDate.getTime() - num*toMilliMult[req.params.timeinc])
 
-    // get days in UTC
-    var startDay = startDate.getUTCFullYear() + '-' +
-                             String('00' + (startDate.getUTCMonth()+1)).slice(-2) + '-' +
-                             String('00' + startDate.getUTCDate()).slice(-2);
+    var fields = req.params.fields.split('&')
 
-    var endDay = endDate.getUTCFullYear() + '-' +
-                         String('00' + (endDate.getUTCMonth()+1)).slice(-2) + '-' +
-                         String('00' + endDate.getUTCDate()).slice(-2);
-
-    // query cassandra for all records since start date
-    client.execute(getRecordsSinceDate,
-                   [startDay, startDate, endDate],
-                   {prepare: true},
-                   function(err, result) {
-                       if (err) {
-                           res.status(404).send({ msg: 'Records not found.' });
-                       } else {
-                           res.json(result);
-                       }
-                   });
+    fetch_daterange(startDate, endDate, fields, res)
 });
+
 
