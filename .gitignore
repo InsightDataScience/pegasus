@@ -1,5 +1,7 @@
 Stream/.twitter
 Stream/temp_file
+Devs/public_dns
+Devs/private_dns
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
