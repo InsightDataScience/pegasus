@@ -31,8 +31,15 @@ aws_secret_access_key = XXXXX+XXXX
 ```
 ##### 3. Clone repository
 * Place in home folder
-* Move into the ClusterUtilities folder
+* Move into the ClusterUtilities/Devs folder
 ```
 localuser@LOCAL_NAME:~$ git clone https://github.com/InsightDataScience/ClusterUtilities.git
-localuser@LOCAL_NAME:~$ cd ClusterUtilities
+localuser@LOCAL_NAME:~$ cd ClusterUtilities/Devs
 ```
+
+Spark with IPython Installation
+```
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+```
+
+Go to **localhost:7777** on your machine to access the IPython Server on the Spark Master.
