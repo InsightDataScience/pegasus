@@ -1,7 +1,4 @@
 ##### 1. Spin up AWS Instances
-- t2.medium instances with Ubuntu Server 14.04 LTS (HVM), SSD Volume
-- One of the instances will act as your Spark Master and the other nodes will be Spark Workers
-
 ![AWSConsole] (/images/AWSConsole.png)
 ![EC2Dashboard] (/images/EC2Dashboard.png)
 ![ChooseAMI] (/images/ChooseAMI.png)
@@ -13,11 +10,10 @@
 
 Save your AWS .pem key to ~/.ssh
 * Create one if you don't have one associated with your AWS account
-* Be sure to change permissions for the pem-key
+* Change permissions for the pem-key
 ```
-localuser@LOCAL_NAME:~$ chmod 600 ~/.ssh/personal.pem
+localuser@LOCAL_NAME:~$ chmod 600 ~/.ssh/<personal.pem>
 ```
-
 ##### 2. Install the boto package for python
 This will allow you to programatically interface with your AWS account
 ```
