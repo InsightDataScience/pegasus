@@ -33,6 +33,6 @@ aws_secret_access_key = XXXXX+XXXX
 * Place in home folder
 * Move into the ClusterUtilities folder
 ```
-localuser@LOCAL_NAME:~$ git clone https://github.com/aouyang1/ClusterConfig.git
+localuser@LOCAL_NAME:~$ git clone https://github.com/InsightDataScience/ClusterUtilities.git
 localuser@LOCAL_NAME:~$ cd ClusterUtilities
 ```
