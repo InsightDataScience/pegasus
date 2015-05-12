@@ -37,7 +37,7 @@ localuser@LOCAL_NAME:~$ git clone https://github.com/InsightDataScience/ClusterU
 localuser@LOCAL_NAME:~$ cd ClusterUtilities/Devs
 ```
 
-Spark with IPython Installation
+# Spark with IPython Installation
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
