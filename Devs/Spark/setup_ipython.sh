@@ -11,7 +11,7 @@ echo -e "\nexport AWS_SECRET_ACCESS_KEY=$2" | cat >> ~/.profile
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
-EXECMEM=$(echo "0.70 * $TOTMEM" | bc -l)
+EXECMEM=$(echo "0.90 * ($TOTMEM - 1000)" | bc -l)
 
 tmux new-session -s ipython_notebook -n bash -d
 
