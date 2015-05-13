@@ -20,7 +20,7 @@ aws_secret_access_key = XXXXX+XXXX
 ![ChooseInstance] (/images/ChooseInstance.png)
 ![InstanceDetails] (/images/InstanceDetails.png)
 
-### Nothing here needs changing unless you wish the change the default storage size per instance
+### Nothing here needs changing unless you wish to change the default storage size per instance
 ![AddStorage] (/images/AddStorage.png)
 
 ### Give a unique name for your instances otherwise they'll be lost among your other instances
