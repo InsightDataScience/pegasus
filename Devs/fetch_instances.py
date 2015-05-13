@@ -20,7 +20,7 @@ def write_dns(dns_tup):
     f_pub = open('public_dns','w')
 
     for pair in dns_tup:
-        print pair
+        print(pair)
         f_priv.write(pair[0] + "\n")
         f_pub.write(pair[1] + "\n")
 
