@@ -48,3 +48,8 @@ localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<persona
 ```
 
 Go to **localhost:7777** on your machine to access the IPython Server on the Spark Master.
+
+# Kafka on Zookeeper Installation
+```
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_kafka.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+```
