@@ -7,7 +7,7 @@ Create a .boto file in your home directory
 ```
 localuser@LOCAL_NAME:~$ touch ~/.boto
 ```
-Insert the following into .boto with your AWS credentials
+Insert the following into .boto with your AWS credentials. These credentials will be used to access you AWS cluster as well as AWS's S3 storage.
 ```
 [Credentials]
 aws_access_key_id = XXXXXX
