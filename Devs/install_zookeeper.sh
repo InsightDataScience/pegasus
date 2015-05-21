@@ -17,6 +17,7 @@ CLUSTERNAME=$3
 
 python fetch_instances.py $REGION $CLUSTERNAME
 
-cd Kafka
+cd Zookeeper
 
-./setup_kafka_cluster.sh $PEMLOC
+./setup_zookeeper_cluster.sh $PEMLOC
+

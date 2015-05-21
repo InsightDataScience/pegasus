@@ -17,6 +17,9 @@ CLUSTERNAME=$3
 
 python fetch_instances.py $REGION $CLUSTERNAME
 
-cd Kafka
+./setup_passwordless_ssh.sh $PEMLOC
 
-./setup_kafka_cluster.sh $PEMLOC
+cd Hadoop
+
+./setup_hadoop_cluster.sh $PEMLOC
+

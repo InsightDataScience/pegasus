@@ -17,7 +17,7 @@ fi
 DNS=()
 while read line; do
     DNS+=($line)
-done < public_dns
+done < ../public_dns
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
