@@ -49,11 +49,13 @@ localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_zookeeper.sh ~/.ssh/<per
 ```
 
 # Kafka Installation
+Requires Zookeeper installation
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_kafka.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
 
 # Spark with IPython Installation
+Requires a distributed files system such as HDFS(Hadoop) or S3
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
@@ -66,6 +68,7 @@ localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_hadoop.sh ~/.ssh/<person
 ```
 
 # Pig Installation
+Requires Hadoop installation
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_pig.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
