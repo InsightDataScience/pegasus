@@ -42,6 +42,12 @@ localuser@LOCAL_NAME:~$ chmod 600 ~/.ssh/<personal.pem>
 localuser@LOCAL_NAME:~$ git clone https://github.com/InsightDataScience/ClusterUtilities.git
 localuser@LOCAL_NAME:~$ cd ClusterUtilities/Devs
 ```
+
+# Kafka on Zookeeper Installation
+```
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_kafka.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+```
+
 # Spark with IPython Installation
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<personal.pem> <region> <cluster-name>
@@ -49,7 +55,17 @@ localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_spark.sh ~/.ssh/<persona
 
 Go to **localhost:7777** on your machine to access the IPython Server on the Spark Master.
 
-# Kafka on Zookeeper Installation
+# Hadoop
 ```
-localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_kafka.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_hadoop.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+```
+
+# Pig
+```
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_pig.sh ~/.ssh/<personal.pem> <region> <cluster-name>
+```
+
+# Elasticsearch
+```
+localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_elasticsearch.sh ~/.ssh/<personal.pem> <region> <cluster-name> <ec2-security-group>
 ```
