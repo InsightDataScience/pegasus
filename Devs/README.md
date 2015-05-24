@@ -43,7 +43,7 @@ localuser@LOCAL_NAME:~$ git clone https://github.com/InsightDataScience/ClusterU
 localuser@LOCAL_NAME:~$ cd ClusterUtilities/Devs
 ```
 
-Zookeeper Installation
+# Zookeeper Installation
 ```
 localuser@LOCAL_HAME:~/ClusterUtilities/Devs$ ./install_zookeeper.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
