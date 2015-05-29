@@ -84,3 +84,8 @@ $ ./install_pig.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
 $ ./install_elasticsearch.sh ~/.ssh/<personal.pem> <region> <cluster-name> <ec2-security-group>
 ```
+
+## Cassandra Installation
+```
+$ ./install_cassandra.sh ~/.ssh/<personal.pem> <region> <cluster-name> <cassandra-cluster-name>
+```
