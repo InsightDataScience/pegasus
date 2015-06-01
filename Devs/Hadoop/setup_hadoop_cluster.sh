@@ -38,10 +38,10 @@ while read line; do
 done < ../public_dns
 
 # Install Hadoop master and slaves
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < setup_hadoop.sh $MASTER_NAME &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < setup_hadoop.sh $MASTER_DNS &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_hadoop.sh $MASTER_NAME &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_hadoop.sh $MASTER_DNS &
 done
 
 wait
