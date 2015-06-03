@@ -2,8 +2,6 @@
 
 . ~/.profile
 
-sudo chown -R ubuntu $HADOOP_HOME
-
 hdfs namenode -format
 
 # These commands must be explicity entered on the Namenode due to the hosts not being added correctly to known hosts in ~/.ssh
