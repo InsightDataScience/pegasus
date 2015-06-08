@@ -2,6 +2,7 @@
 
 # first argument is the brokerid and all after are MASTER_DNS and SLAVE_DNS
 ID=$1; shift
+PUBLIC_DNS=$1; shift
 DNS=( "$@" )
 
 sudo apt-get update
@@ -13,6 +14,7 @@ sudo tar zxvf ~/Downloads/kafka_2.9.1-0.8.2.1.tgz -C /usr/local
 sudo mv /usr/local/kafka_2.9.1-0.8.2.1 /usr/local/kafka
 
 sudo sed -i 's@broker.id=0@broker.id='"$ID"'@g' /usr/local/kafka/config/server.properties
+sudo sed -i 's@#advertised.host.name=<hostname routable by clients>@advertised.host.name='"$PUBLIC_DNS"'@g' /usr/local/kafka/config/server.properties
 
 ZK_SERVERS=""
 for dns in ${DNS[@]}
