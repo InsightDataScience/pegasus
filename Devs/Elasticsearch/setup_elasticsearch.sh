@@ -21,10 +21,10 @@ echo -e "\nexport ELASTICSEARCH_HOME=/usr/local/elasticsearch\nexport PATH=\$PAT
 
 sudo $ELASTICSEARCH_HOME/bin/plugin install elasticsearch/elasticsearch-cloud-aws/2.5.0
 
-sed -i '1pdiscovery.ec2.groups: '"$EC2_GROUP"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
-sed -i '1pdiscovery.ec2.type: ec2' $ELASTICSEARCH_HOME/config/elasticsearch.yml
-sed -i '1pcloud.aws.region: '"$REGION"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
-sed -i '1pcloud.aws.secret_key: '"$AWS_SECRET_KEY"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
-sed -i '1pcloud.aws.access_key: '"$AWS_ACCESS_KEY"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i discovery.ec2.groups: '"$EC2_GROUP"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i discovery.type: ec2' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i cloud.aws.region: '"$REGION"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i cloud.aws.secret_key: '"$AWS_SECRET_KEY"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i cloud.aws.access_key: '"$AWS_ACCESS_KEY"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 
-sudo $ELASTICSEARCH_HOME/bin/elasticsearch &
+#sudo $ELASTICSEARCH_HOME/bin/elasticsearch &
