@@ -6,7 +6,7 @@ import random
 import time
 from datetime import datetime
 
-cluster = Cluster(['52.24.158.196'])
+cluster = Cluster(['52.26.108.225'])
 
 session = cluster.connect()
 
@@ -48,7 +48,7 @@ for curr_data in data:
 # playback records in order along and repeat when finished
 count = 0
 while True:
-    curr_data = data[count % len(data)]
+    curr_data = random.choice(data)
     record = json.loads(curr_data)
 
     td_user_last_action_time = record["user_last_action_time"]-record["time"]

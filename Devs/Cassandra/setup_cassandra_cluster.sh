@@ -29,10 +29,10 @@ NODE_DNS=()
 while read line; do
     NODE_DNS+=($line)
 done < ../public_dns
-if [ 1 == 2 ]; then
+
 # Install and configure nodes for cassandra
 IP_CNT=0
-for dns in "${NODE_DNS[@]}"
+for dns in "${NODE_DNS[@]}";
 do
     echo $dns
     ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_cassandra.sh $CLUSTER_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
@@ -41,20 +41,9 @@ done
 wait
 
 # Start each cassandra node
-for dns in "${NODE_DNS[@]}"
+for dns in "${NODE_DNS[@]}";
 do
     echo $dns
     ssh -i $PEMLOC ubuntu@$dns '/usr/local/cassandra/bin/cassandra'
 done
-
-# install datastax opscenter
-ssh -i $PEMLOC ubuntu@$SEED_DNS 'bash -s' < setup_opscenter.sh $SEED_DNS
-fi
-# install datastax agent on each node
-for dns in "${NODE_DNS[@]}"
-do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_agent.sh $SEED_DNS 
-done
-
 echo "Cassandra setup complete!"
-

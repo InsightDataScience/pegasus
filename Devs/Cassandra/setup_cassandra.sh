@@ -13,7 +13,7 @@ curl -L http://downloads.datastax.com/community/dsc.tar.gz | tar xz -C ~/Downloa
 
 sudo mv ~/Downloads/dsc-cassandra-* /usr/local/cassandra
 
-echo -e "\nexport CASSANDRA_HOME=/usr/local/cassandra\nexport PATH=\$PATH:\$CASSANDRA_HOME/bin" > ~/.profile
+echo -e "\nexport CASSANDRA_HOME=/usr/local/cassandra\nexport PATH=\$PATH:\$CASSANDRA_HOME/bin" >> ~/.profile
 
 . ~/.profile
 
