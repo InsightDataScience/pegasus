@@ -35,6 +35,6 @@ done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'start-hbase.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/hbase/bin/start-hbase.sh'
 
 echo "HBase setup complete!"

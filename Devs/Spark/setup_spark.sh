@@ -8,9 +8,10 @@ wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads
 sudo dpkg -i ~/Downloads/sbt-*
 sudo apt-get install sbt
 
-wget http://www.webhostingjams.com/mirror/apache/spark/spark-1.4.0/spark-1.4.0.tgz -P ~/Downloads
+wget http://mirror.metrocast.net/apache/spark/spark-1.4.0/spark-1.4.0-bin-hadoop2.6.tgz -P ~/Downloads
 sudo tar zxvf ~/Downloads/spark-* -C /usr/local
 sudo mv /usr/local/spark-* /usr/local/spark
+sudo chown -R ubuntu /usr/local/spark
 
 echo -e "\nexport SPARK_HOME=/usr/local/spark\nexport PATH=\$PATH:\$SPARK_HOME/bin" | cat >> ~/.profile
 . ~/.profile
