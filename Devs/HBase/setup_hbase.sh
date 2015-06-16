@@ -36,7 +36,7 @@ sudo sed -i 's@# export HBASE_MANAGES_ZK=true@export HBASE_MANAGES_ZK=false@g' $
 
 sudo sed -i 's@# export JAVA_HOME=/usr/java/jdk1.6.0/@export JAVA_HOME=/usr@g' $HBASE_HOME/conf/hbase-env.sh
 
-# setup RegionServers
+# setup RegionServers on all nodes except the first one
 REGIONSERVERS=( ${ZK_HOSTNAME[@]:1} )
 sudo mv $HBASE_HOME/conf/regionservers $HBASE_HOME/conf/regionservers.backup
 
@@ -44,6 +44,7 @@ for RS in ${REGIONSERVERS[@]}; do
     sudo bash -c 'echo '"$RS"' >> '"$HBASE_HOME"'/conf/regionservers'
 done
 
+# setup BackupMasters to the second node in the node list
 sudo bash -c 'echo '"${ZK_HOSTNAME[1]}"' >> '"$HBASE_HOME"'/conf/backup-masters'
 
 sudo chown -R ubuntu $HBASE_HOME
