@@ -19,5 +19,5 @@ python fetch_instances.py $REGION $CLUSTERNAME
 
 MASTER_DNS=$(sed -n '1p' public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Pig/setup_hive.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hive/setup_hive.sh
 

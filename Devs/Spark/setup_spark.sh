@@ -8,7 +8,7 @@ wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads
 sudo dpkg -i ~/Downloads/sbt-*
 sudo apt-get install sbt
 
-wget http://mirror.metrocast.net/apache/spark/spark-1.4.0/spark-1.4.0-bin-hadoop2.6.tgz -P ~/Downloads
+wget http://d3kbcqa49mib13.cloudfront.net/spark-1.3.1-bin-hadoop2.6.tgz -P ~/Downloads
 sudo tar zxvf ~/Downloads/spark-* -C /usr/local
 sudo mv /usr/local/spark-* /usr/local/spark
 sudo chown -R ubuntu /usr/local/spark
