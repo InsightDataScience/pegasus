@@ -1,18 +1,27 @@
 import boto.ec2
 import argparse
+import json
 
 def get_ec2_instances(region, instance_name):
     ec2_conn = boto.ec2.connect_to_region(region)
     instances = ec2_conn.get_only_instances(filters={"instance-state-name":"running", "tag:Name":instance_name})
 
     dns = []
+    instance_type = {}
     for i in instances:
         priv_name = str(i.private_dns_name).split(".")[0]
         pub_name = str(i.public_dns_name)
         dns.append((priv_name, pub_name))
 
+        if i.instance_type in instance_type:
+            instance_type[i.instance_type] += 1
+        else:
+            instance_type[i.instance_type] = 1
+
     dns.sort()
-    
+
+    print json.dumps(instance_type, indent=2, sort_keys=True)
+
     return dns
 
 def write_dns(dns_tup):
