@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SLAVE_DNS=( "$@" )
-           
+
 sudo apt-get update 
 sudo apt-get --yes --force-yes install ssh rsync
 

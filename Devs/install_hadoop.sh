@@ -21,5 +21,5 @@ python fetch_instances.py $REGION $CLUSTERNAME
 
 cd Hadoop
 
-./setup_hadoop_cluster.sh $PEMLOC
+./setup_cluster.sh $PEMLOC
 
