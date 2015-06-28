@@ -17,20 +17,20 @@ fi
 HOSTIP=()
 while read line; do
     HOSTIP+=($line)
-done < ../private_dns
+done < private_dns
 
 # import AWS public DNS's
 DNS=()
 while read line; do
     DNS+=($line)
-done < ../public_dns
+done < public_dns
 
 MASTER_DNS=$(head -n 1 ../public_dns)
 
 # Install HBase on master and slaves
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_hbase.sh $MASTER_DNS "${HOSTIP[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < HBase/setup_hbase.sh $MASTER_DNS "${HOSTIP[@]}" &
 done
 
 wait

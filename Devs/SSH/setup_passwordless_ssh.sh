@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from top level
+
 # check input arguments
 if [ "$#" -ne 1 ]; then
     echo "Please specify pem-key location!" && exit 1
@@ -40,10 +42,10 @@ cat ~/.ssh/id_rsa.pub | ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MAS
 
 # Enable passwordless SSH from master to slaves
 scp -o "StrictHostKeyChecking no" -i $PEMLOC $PEMLOC ubuntu@$MASTER_DNS:~/.ssh
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < setup_ssh.sh "${SLAVE_DNS[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < SSH/setup_ssh.sh "${SLAVE_DNS[@]}"
 
 # Add NameNode, DataNodes, and Secondary NameNode to known hosts
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < add_to_known_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_NAME[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < SSH/add_to_known_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_NAME[@]}"
 
 
 

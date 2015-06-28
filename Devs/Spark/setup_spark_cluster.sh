@@ -23,7 +23,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < ../private_dns
+done < private_dns
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -35,7 +35,7 @@ while read line; do
     else
         SLAVE_DNS+=($line)
     fi
-done < ../public_dns
+done < public_dns
 
 # Install and configure Spark on all nodes
 ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < setup_spark.sh $MASTER_DNS &

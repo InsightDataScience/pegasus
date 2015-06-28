@@ -18,6 +18,4 @@ EC2_GROUP=$4
 
 python fetch_instances.py $REGION $CLUSTERNAME
 
-cd Elasticsearch
-
-./setup_elasticsearch_cluster.sh $PEMLOC $REGION $EC2_GROUP
+Elasticsearch/setup_elasticsearch_cluster.sh $PEMLOC $REGION $EC2_GROUP

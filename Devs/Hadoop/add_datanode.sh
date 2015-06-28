@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # check input arguments
-if [ "$#" -ne 3 ]; then
-    echo "Please specify pem-key location, DataNode Public DNS, and DataNode hostname!" && exit 1
+if [ "$#" -ne 1 ]; then
+    echo "Please specify pem-key location!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
-DATANODE_DNS=$2
-DATANODE_HOSTNAME=$3
+DATANODE_DNS=$(head -n 1 ../public_dns)
+DATANODE_HOSTNAME=$(head -n 1 ../private_dns)
 
 # check if pem-key location is valid
 if [ ! -f $PEMLOC ]; then

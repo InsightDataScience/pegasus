@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 1 ]; then
     echo "Please specify pem-key location!" && exit 1
@@ -23,7 +25,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < ../private_dns
+done < private_dns
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -35,27 +37,27 @@ while read line; do
     else
         SLAVE_DNS+=($line)
     fi
-done < ../public_dns
+done < public_dns
 
 # Install Hadoop master and slaves
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < setup_single.sh $MASTER_DNS &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/setup_single.sh $MASTER_DNS &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_single.sh $MASTER_DNS &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Hadoop/setup_single.sh $MASTER_DNS &
 done
 
 wait
 
 # Configure Hadoop master and slaves
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_DNS[@]}" "${SLAVE_NAME[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config_namenode.sh $MASTER_NAME "${SLAVE_NAME[@]}" &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/config_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_DNS[@]}" "${SLAVE_NAME[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/config_namenode.sh $MASTER_NAME "${SLAVE_NAME[@]}" &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config_datanode.sh &
+    ssh -i $PEMLOC ubuntu@$dns 'bash -s' < Hadoop/config_datanode.sh &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < start_hadoop.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/start_hadoop.sh
 
 echo "Hadoop setup complete!"

@@ -20,7 +20,7 @@ NODE_IP=()
 while read line; do
     IP=$(echo $line | tr - . | cut -b 4-)
     NODE_IP+=($IP)
-done < ../private_dns
+done < private_dns
 
 
 # import AWS public DNS's
@@ -28,14 +28,14 @@ SEED_DNS=$(head -n 1 ../public_dns)
 NODE_DNS=()
 while read line; do
     NODE_DNS+=($line)
-done < ../public_dns
+done < public_dns
 
 # Install and configure nodes for cassandra
 IP_CNT=0
 for dns in "${NODE_DNS[@]}";
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_cassandra.sh $CLUSTER_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Cassandra/setup_cassandra.sh $CLUSTER_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
     IP_CNT=$(echo "$IP_CNT+1" | bc)
 done
 wait

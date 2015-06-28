@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 1 ]; then
     echo "Please specify pem-key location!" && exit 1
@@ -17,14 +19,14 @@ fi
 DNS=()
 while read line; do
     DNS+=($line)
-done < ../public_dns
+done < public_dns
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < setup_zookeeper.sh $SERVER_NUM "${DNS[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Zookeeper/setup_zookeeper.sh $SERVER_NUM "${DNS[@]}" &
     SERVER_NUM=$(echo "$SERVER_NUM+1" | bc)
 done
 

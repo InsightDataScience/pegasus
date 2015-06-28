@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# first argument is the region, second is the access_key, third is the secret_key and the rest is an array of all nodes in the cluster
-NODEDNS=$1
+ELASTICSEARCH_DNS=$1
 
 sudo apt-get update
 
@@ -13,6 +12,6 @@ echo -e "\nexport KIBANA_HOME=/usr/local/kibana\nexport PATH=\$PATH:\$KIBANA_HOM
 
 . ~/.profile
 
-sed -i 's@elasticsearch_url: "localhost:9200"@elasticsearch_url: "'"$NODE_DNS"':9200"@g' $KIBANA_HOME/config/kibana.yml
+sed -i 's@elasticsearch_url: "localhost:9200"@elasticsearch_url: "'"$ELASTICSEARCH_DNS"':9200"@g' $KIBANA_HOME/config/kibana.yml
 
 sudo $KIBANA_HOME/bin/kibana &
