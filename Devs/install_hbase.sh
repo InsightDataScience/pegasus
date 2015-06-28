@@ -12,4 +12,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-HBase/setup_hbase_cluster.sh $PEMLOC
+HBase/setup_cluster.sh $PEMLOC

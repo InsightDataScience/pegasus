@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# must be called from the top level
-
 # check input arguments
 if [ "$#" -ne 1 ]; then
     echo "Please specify pem-key location!" && exit 1
@@ -21,15 +19,16 @@ while read line; do
     DNS+=($line)
 done < public_dns
 
-# Install and configure nodes for zookeeper
-SERVER_NUM=1
+# Install and configure nodes for kafka
+BROKER_ID=0
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Zookeeper/setup_zookeeper.sh $SERVER_NUM "${DNS[@]}" &
-    SERVER_NUM=$(echo "$SERVER_NUM+1" | bc)
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Kafka/setup_single.sh $BROKER_ID $dns "${DNS[@]}" &
+    BROKER_ID=$(echo "$BROKER_ID+1" | bc)
 done
 
 wait
 
-echo "Zookeeper setup complete!" 
+echo "Kafka setup complete!"
+

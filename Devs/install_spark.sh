@@ -14,6 +14,6 @@ fi
 
 SSH/setup_passwordless_ssh.sh $PEMLOC
 
-Spark/setup_spark_cluster.sh $PEMLOC
+Spark/setup_cluster.sh $PEMLOC
 
 Spark/start_spark_ipython.sh $PEMLOC $(awk -F"= " 'NR==2 {print $2}' ~/.boto) $(awk -F"= " 'NR==3 {print $2}' ~/.boto)

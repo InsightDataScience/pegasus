@@ -12,5 +12,5 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-Zookeeper/setup_zookeeper_cluster.sh $PEMLOC
+Zookeeper/setup_cluster.sh $PEMLOC
 

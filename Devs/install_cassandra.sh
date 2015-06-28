@@ -13,4 +13,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-Cassandra/setup_cassandra_cluster.sh $PEMLOC $CASSANDRA_NAME
+Cassandra/setup_cluster.sh $PEMLOC $CASSANDRA_NAME

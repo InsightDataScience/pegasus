@@ -12,4 +12,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-Kafka/setup_kafka_cluster.sh $PEMLOC
+Kafka/setup_cluster.sh $PEMLOC

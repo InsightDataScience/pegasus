@@ -27,7 +27,7 @@ done < public_dns
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Elasticsearch/setup_elasticsearch.sh $REGION $AWS_ACCESS_KEY $AWS_SECRET_KEY $EC2_GROUP "${DNS[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Elasticsearch/setup_single.sh $REGION $AWS_ACCESS_KEY $AWS_SECRET_KEY $EC2_GROUP "${DNS[@]}" &
 done
 
 wait

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # check input arguments
-if [ "$#" -ne 4 ]; then
-    echo "Please specify pem-key location, AWS region, AWS cluster name and AWS EC2 security group name" && exit 1
+if [ "$#" -ne 3 ]; then
+    echo "Please specify pem-key location, AWS region, and AWS EC2 security group name" && exit 1
 fi
 
 PEMLOC=$1
@@ -13,9 +13,6 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 REGION=$2
-CLUSTERNAME=$3
-EC2_GROUP=$4
+EC2_GROUP=$3
 
-python fetch_instances.py $REGION $CLUSTERNAME
-
-Elasticsearch/setup_elasticsearch_cluster.sh $PEMLOC $REGION $EC2_GROUP
+Elasticsearch/setup_cluster.sh $PEMLOC $REGION $EC2_GROUP
