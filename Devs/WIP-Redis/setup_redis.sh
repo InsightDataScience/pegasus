@@ -17,9 +17,11 @@ cd $REDIS_HOME
 sudo make distclean
 sudo make
 
+sudo chown -R ubuntu $REDIS_HOME
+
 #sudo sed -i 's@appendonly no@appendonly yes@g' $REDIS_HOME/redis.conf
 #sudo sed -i 's@# cluster-enabled yes@cluster-enabled yes@g' $REDIS_HOME/redis.conf
 #sudo sed -i 's@# cluster-config-file@cluster-config-file@g' $REDIS_HOME/redis.conf
 #sudo sed -i 's@# cluster-node-timeout@cluster-node-timeout@g' $REDIS_HOME/redis.conf
 
-sudo $REDIS_HOME/src/redis-server $REDIS_HOME/redis.conf &
+redis-server redis.conf &
