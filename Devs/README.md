@@ -67,12 +67,6 @@ Go to **localhost:7777** on your machine to access the IPython Server on the Spa
 ```
 $ ./install_hadoop.sh ~/.ssh/<personal.pem> <region> <cluster-name>
 ```
-You will need to SSH into the Namenode and start Hadoop after installation
-```
-$ $HADOOP_HOME/sbin/start-dfs.sh
-$ $HADOOP_HOME/sbin/start-yarn.sh
-$ $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
-```
 
 ## Pig Installation
 Requires Hadoop installation
