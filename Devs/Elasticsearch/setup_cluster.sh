@@ -1,14 +1,15 @@
 #!/bin/bash
 
 # check input arguments
-if [ "$#" -ne 3 ]; then
-    echo "Please specify pem-key location, AWS region and AWS EC2 security group name!" && exit 1
+if [ "$#" -ne 4 ]; then
+    echo "Please specify pem-key location, AWS region, AWS EC2 security group name and the Elasticsearch Cluster Name!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
 REGION=$2
 EC2_GROUP=$3
+ES_NAME=$4
 AWS_ACCESS_KEY=$(awk -F"= " 'NR==2 {print $2}' ~/.boto)
 AWS_SECRET_KEY=$(awk -F"= " 'NR==3 {print $2}' ~/.boto)
 
@@ -27,7 +28,7 @@ done < public_dns
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Elasticsearch/setup_single.sh $REGION $AWS_ACCESS_KEY $AWS_SECRET_KEY $EC2_GROUP "${DNS[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Elasticsearch/setup_single.sh $REGION $AWS_ACCESS_KEY $AWS_SECRET_KEY $EC2_GROUP $ES_NAME &
 done
 
 wait
