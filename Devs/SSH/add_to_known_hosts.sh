@@ -5,9 +5,7 @@ NAMENODE_HOSTNAME=$1; shift
 DATANODE_HOSTNAMES=( "$@" )
 
 # add NameNode to known_hosts
-#NAMENODE_PRIVATE_IP=$(echo $NAMENODE_HOSTNAME | cut -c4- | sed 's@-@.@g')
 ssh-keyscan -H -t ecdsa $NAMENODE_DNS >> ~/.ssh/known_hosts
-#ssh-keyscan -H -t ecdsa $NAMENODE_PRIVATE_IP >> ~/.ssh/known_hosts
 
 # add DataNodes to known_hosts
 for hostname in ${DATANODE_HOSTNAMES[@]}
