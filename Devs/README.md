@@ -13,29 +13,8 @@ Insert the following into .boto with your AWS credentials. These credentials wil
 aws_access_key_id = XXXXXX
 aws_secret_access_key = XXXXX+XXXX
 ```
-# 2. Spin up AWS Instances
-![AWSConsole] (/images/AWSConsole.png)
-![EC2Dashboard] (/images/EC2Dashboard.png)
-![ChooseAMI] (/images/ChooseAMI.png)
-![ChooseInstance] (/images/ChooseInstance.png)
-![InstanceDetails] (/images/InstanceDetails.png)
 
-## Nothing here needs changing unless you wish to change the default storage size per instance
-![AddStorage] (/images/AddStorage.png)
-
-## Give a unique name for your instances otherwise they'll be lost among your other instances
-![TagInstance] (/images/TagInstance.png)
-
-## Setting the security settings to be completely open is not recommended for production, but is simpler for testing purposes
-![SecurityGroup] (/images/SecurityGroup.png)
-
-Save your AWS .pem key to ~/.ssh
-* Create one if you don't have one associated with your AWS account
-* Change permissions for the pem-key
-```
-$ chmod 600 ~/.ssh/<personal.pem>
-```
-# 3. Clone repository
+# 2. Clone repository
 * Place in home folder
 * Move into the ClusterUtilities/Devs folder
 ```
@@ -43,7 +22,7 @@ $ git clone https://github.com/InsightDataScience/ClusterUtilities.git
 $ cd ClusterUtilities/Devs
 ```
 
-# 4. Installation commands
+# 3. Installation commands
 Always run fetch_instances.py to get the instance IPs and hostnames for the next installation
 ```
 python fetch_instances.py <region> <cluster-name>
