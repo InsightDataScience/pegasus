@@ -8,6 +8,7 @@ def get_ec2_instances(region, instance_name):
 
     dns = []
     instance_type = {}
+
     for i in instances:
         priv_name = str(i.private_dns_name).split(".")[0]
         pub_name = str(i.public_dns_name)
@@ -17,6 +18,8 @@ def get_ec2_instances(region, instance_name):
             instance_type[i.instance_type] += 1
         else:
             instance_type[i.instance_type] = 1
+
+        print i.tags['Name']
 
     dns.sort()
 
