@@ -5,7 +5,7 @@ sudo apt-get update
 
 sudo apt-get --yes --force-yes install openjdk-7-jdk
 
-wget http://apache.claz.org/hadoop/core/stable/hadoop-2.6.0.tar.gz -P ~/Downloads
+wget http://apache.arvixe.com/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz -P ~/Downloads
 sudo tar zxvf ~/Downloads/hadoop-2.6.0.tar.gz -C /usr/local
 sudo mv /usr/local/hadoop-2.6.0 /usr/local/hadoop
 
