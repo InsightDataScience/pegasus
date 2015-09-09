@@ -15,5 +15,5 @@ sleep 3
 
 ssh -N -f -L localhost:7778:localhost:7777 ubuntu@$(head -n 1 public_dns)
 
-echo "IPython server is running at localhost:7777!"
+echo "IPython server is running at localhost:7778!"
 
