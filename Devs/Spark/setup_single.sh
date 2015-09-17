@@ -12,7 +12,7 @@ wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads
 sudo dpkg -i ~/Downloads/sbt-*
 sudo apt-get install sbt
 
-wget http://mirror.reverse.net/pub/apache/spark/spark-1.4.1/spark-1.4.1-bin-hadoop2.4.tgz -P ~/Downloads
+wget http://www.us.apache.org/dist/spark/spark-1.4.1/spark-1.4.1-bin-hadoop2.4.tgz -P ~/Downloads
 sudo tar zxvf ~/Downloads/spark-* -C /usr/local
 sudo mv /usr/local/spark-* /usr/local/spark
 sudo chown -R ubuntu /usr/local/spark
@@ -22,7 +22,7 @@ echo -e "\nexport SPARK_HOME=/usr/local/spark\nexport PATH=\$PATH:\$SPARK_HOME/b
 
 cp $SPARK_HOME/conf/spark-env.sh.template $SPARK_HOME/conf/spark-env.sh
 
-OVERSUBSCRIPTION_FACTOR=3
+OVERSUBSCRIPTION_FACTOR=5
 WORKER_CORES=$(echo "$(nproc)*$OVERSUBSCRIPTION_FACTOR" | bc)
 sed -i '6i export JAVA_HOME=/usr' $SPARK_HOME/conf/spark-env.sh
 sed -i '7i export SPARK_PUBLIC_DNS="'$1'"' $SPARK_HOME/conf/spark-env.sh
