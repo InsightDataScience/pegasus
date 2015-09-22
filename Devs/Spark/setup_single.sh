@@ -2,7 +2,7 @@
 
 sudo apt-get update
 
-sudo apt-get --yes --force-yes install openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy gfortran
+sudo apt-get --yes --force-yes install openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran
 
 sudo pip install nose
 
@@ -22,7 +22,7 @@ echo -e "\nexport SPARK_HOME=/usr/local/spark\nexport PATH=\$PATH:\$SPARK_HOME/b
 
 cp $SPARK_HOME/conf/spark-env.sh.template $SPARK_HOME/conf/spark-env.sh
 
-OVERSUBSCRIPTION_FACTOR=5
+OVERSUBSCRIPTION_FACTOR=3
 WORKER_CORES=$(echo "$(nproc)*$OVERSUBSCRIPTION_FACTOR" | bc)
 sed -i '6i export JAVA_HOME=/usr' $SPARK_HOME/conf/spark-env.sh
 sed -i '7i export SPARK_PUBLIC_DNS="'$1'"' $SPARK_HOME/conf/spark-env.sh
