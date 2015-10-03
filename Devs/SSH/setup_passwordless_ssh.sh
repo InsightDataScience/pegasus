@@ -3,12 +3,13 @@
 # must be called from top level
 
 # check input arguments
-if [ "$#" -ne 1 ]; then
-    echo "Please specify pem-key location!" && exit 1
+if [ "$#" -ne 2 ]; then
+    echo "Please specify pem-key location and instance name!" && exit 1
 fi
 
 # get input arguments [pem-key location]
 PEMLOC=$1
+INSTANCE_NAME=$2
 
 # import AWS private DNS names
 FIRST_LINE=true
@@ -20,7 +21,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < private_dns
+done < $INSTANCE_NAME/private_dns
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -32,7 +33,7 @@ while read line; do
     else
         SLAVE_DNS+=($line)
     fi
-done < public_dns
+done < $INSTANCE_NAME/public_dns
 
 # Enable passwordless SSH from local to master
 if ! [ -f ~/.ssh/id_rsa ]; then

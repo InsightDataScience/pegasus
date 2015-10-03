@@ -3,12 +3,13 @@
 # must be called from the top level
 
 # check input arguments
-if [ "$#" -ne 1 ]; then
-    echo "Please specify pem-key location!" && exit 1
+if [ "$#" -ne 2 ]; then
+    echo "Please specify pem-key location and cluster name!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
+INSTANCE_NAME=$2
 
 # check if pem-key location is valid
 if [ ! -f $PEMLOC ]; then
@@ -25,7 +26,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < private_dns
+done < $INSTANCE_NAME/private_dns
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -37,7 +38,7 @@ while read line; do
     else
         SLAVE_DNS+=($line)
     fi
-done < public_dns
+done < $INSTANCE_NAME/public_dns
 
 # Install Hadoop master and slaves
 ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/setup_single.sh $MASTER_DNS &
