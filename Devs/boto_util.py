@@ -23,12 +23,31 @@ class BotoUtil(object):
         for instance in reservation.instances:
             self.conn.create_tags([instance.id], {"Name":tag_name})
 
-        while instance.state == u'pending':
-            print "Instance State: {} {}".format(tag_name, instance.state)
-            time.sleep(5)
-            instance.update()
+        state_running = False
 
-        print "Instance State: {} {}".format(tag_name, instance.state)
+        while not state_running:
+            print "Instance State: {} pending".format(tag_name)
+            time.sleep(5)
+
+            instance_state = []
+            for instance in reservation.instances:
+                instance_state.append(instance.state)
+                instance.update()
+
+            instance_state = all([instance.state==u'running' for instance in reservation.instances])
+
+            statuses = self.conn.get_all_instance_status(instance_ids=[instance.id for instance in reservation.instances])
+            if len(statuses)>0:
+                instance_status = all([status.instance_status.status==u'ok' for status in statuses])
+                system_status = all([status.system_status.status==u'ok' for status in statuses])
+            else:
+                instance_status = False
+                system_status = False
+
+#            print instance_state, instance_status, system_status
+            state_running = instance_status and system_status and instance_state
+
+        print "Instance State: {} running".format(tag_name)
 
 
     def get_ec2_instances(self, instance_name):
