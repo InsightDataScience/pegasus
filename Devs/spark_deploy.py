@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-from boto_util import BotoUtil 
+from boto_util import BotoUtil
 import argparse
 import os
 import time
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     pemkey="insight-cluster"
     BUtil = BotoUtil(args.region)
 
-    BUtil.create_ec2_instance(4, pemkey, ["open"], "t2.medium", args.instance_name)
+    BUtil.create_ec2_instance(4, pemkey, ["open"], "m4.large", args.instance_name)
 
     dns_tup = BUtil.get_ec2_instances(args.instance_name)
     BUtil.write_dns(args.instance_name, dns_tup)
