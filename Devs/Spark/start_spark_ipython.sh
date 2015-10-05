@@ -14,7 +14,7 @@ ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 $INSTANCE_NAME/p
 
 sleep 3
 
-ssh -N -f -L localhost:8888:localhost:7777 ubuntu@$(head -n 1 $INSTANCE_NAME/public_dns)
+ssh -N -f -L localhost:7777:localhost:7777 ubuntu@$(head -n 1 $INSTANCE_NAME/public_dns)
 
-echo "IPython server is running at localhost:8888!"
+echo "IPython server is running at localhost:7777!"
 
