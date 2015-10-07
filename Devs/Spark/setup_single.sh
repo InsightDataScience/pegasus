@@ -1,10 +1,10 @@
 #!/bin/bash
 
-sudo apt-get update
+#sudo apt-get update
 
 sudo apt-get --yes --force-yes install openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran
 
-sudo pip install nose
+sudo pip install nose seaborn
 
 sudo easy_install pymc
 
