@@ -13,21 +13,28 @@ class BotoUtil(object):
                             security_groups, instance_type, tag_name):
 
         image = self.conn.get_all_images("ami-5189a661")
+#        image = self.conn.get_all_images("ami-df6a8b9b")
+
+        dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
+        dev_sda1.size = 400
+        dev_sda1.delete_on_termination = True
+
+        bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
+        bdm['/dev/sda1'] = dev_sda1
+
 
         reservation = image[0].run(min_count=num_instances,
                                    max_count=num_instances,
                                    key_name=key_name,
                                    security_groups=security_groups,
-                                   instance_type=instance_type)
-
-        for instance in reservation.instances:
-            self.conn.create_tags([instance.id], {"Name":tag_name})
+                                   instance_type=instance_type,
+                                   block_device_map=bdm)
 
         state_running = False
 
         while not state_running:
             print "Instance State: {} pending".format(tag_name)
-            time.sleep(5)
+            time.sleep(10)
 
             instance_state = []
             for instance in reservation.instances:
@@ -46,6 +53,9 @@ class BotoUtil(object):
 
 #            print instance_state, instance_status, system_status
             state_running = instance_status and system_status and instance_state
+
+        for instance in reservation.instances:
+            self.conn.create_tags([instance.id], {"Name":tag_name})
 
         print "Instance State: {} running".format(tag_name)
 
