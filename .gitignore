@@ -3,6 +3,8 @@ Stream/temp_file
 Devs/public_dns
 Devs/private_dns
 .DS_Store
+DataLabs
+tmp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -13,6 +13,10 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
+if [ ! -d tmp/$INSTANCE_NAME ]; then
+    echo "cluster does not exist!" && exit 1
+fi
+
 SSH/setup_passwordless_ssh.sh $PEMLOC $INSTANCE_NAME
 
 Hadoop/setup_cluster.sh $PEMLOC $INSTANCE_NAME

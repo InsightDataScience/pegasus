@@ -1,4 +1,5 @@
 #!/bin/bash
-NODE=$1
+CLUSTER_NAME=$1
+NODE=$2
 
-ssh -i $PEMLOC ubuntu@$(sed -n ''"$NODE"'p' public_dns)
+ssh -i $PEMLOC ubuntu@$(sed -n ''"$NODE"'p' tmp/$CLUSTER_NAME/public_dns)

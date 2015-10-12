@@ -23,5 +23,5 @@ if __name__ == '__main__':
 
     os.system("./install_spark.sh %s %s" % ("~/.ssh/{}.pem".format(pemkey), args.instance_name))
 
-    os.system("./create_spark_lab_cred.sh %s %s" % (pemkey, args.instance_name))
+    os.system("./sparklab_create_cred.sh %s %s" % (pemkey, args.instance_name))
 

@@ -10,19 +10,21 @@ class BotoUtil(object):
 
 
     def create_ec2_instance(self, num_instances, key_name,
-                            security_groups, instance_type, tag_name):
+                            security_groups, instance_type, tag_name,
+                            vol_size):
 
+        # current image only valid for oregon AZ
         image = self.conn.get_all_images("ami-5189a661")
-#        image = self.conn.get_all_images("ami-df6a8b9b")
 
+        # set default EBS size
         dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
-        dev_sda1.size = 400
+        dev_sda1.size = vol_size
         dev_sda1.delete_on_termination = True
 
         bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
         bdm['/dev/sda1'] = dev_sda1
 
-
+        # spin up instances
         reservation = image[0].run(min_count=num_instances,
                                    max_count=num_instances,
                                    key_name=key_name,
@@ -30,6 +32,7 @@ class BotoUtil(object):
                                    instance_type=instance_type,
                                    block_device_map=bdm)
 
+        # monitor when instances are ready to SSH
         state_running = False
 
         while not state_running:
@@ -54,6 +57,7 @@ class BotoUtil(object):
 #            print instance_state, instance_status, system_status
             state_running = instance_status and system_status and instance_state
 
+        # give each instance a name
         for instance in reservation.instances:
             self.conn.create_tags([instance.id], {"Name":tag_name})
 
@@ -85,9 +89,9 @@ class BotoUtil(object):
         return dns
 
     def write_dns(self, instance_name, dns_tup):
-        os.makedirs(instance_name)
-        f_priv = open('{}/private_dns'.format(instance_name), 'w')
-        f_pub = open('{}/public_dns'.format(instance_name), 'w')
+        os.makedirs("tmp/{}".format(instance_name))
+        f_priv = open('tmp/{}/private_dns'.format(instance_name), 'w')
+        f_pub = open('tmp/{}/public_dns'.format(instance_name), 'w')
 
         for pair in dns_tup:
             print(pair)

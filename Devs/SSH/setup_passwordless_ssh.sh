@@ -21,7 +21,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < $INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/private_dns
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -33,7 +33,7 @@ while read line; do
     else
         SLAVE_DNS+=($line)
     fi
-done < $INSTANCE_NAME/public_dns
+done < tmp/$INSTANCE_NAME/public_dns
 
 # Enable passwordless SSH from local to master
 if ! [ -f ~/.ssh/id_rsa ]; then
