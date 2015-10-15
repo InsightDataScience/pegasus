@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-from boto_util import BotoUtil
+from boto_util import BotoUtil, InstanceConfig
 import argparse
 
 if __name__ == '__main__':
@@ -17,13 +17,16 @@ if __name__ == '__main__':
     print args
 
     BUtil = BotoUtil(args.region)
-
+    """
     BUtil.create_ec2_instance(num_instances=int(args.num_instances),
                               key_name=args.pem_key,
                               security_groups=[args.security_groups],
                               instance_type=args.instance_type, 
                               tag_name=args.instance_name, 
                               vol_size=int(args.volume_size))
+    """
+    IConf = InstanceConfig(tag_name="sparklab-austin")
+    BUtil.create_ec2_spot(IConf)
 
     dns_tup = BUtil.get_ec2_instances(args.instance_name)
     BUtil.write_dns(args.instance_name, dns_tup)
