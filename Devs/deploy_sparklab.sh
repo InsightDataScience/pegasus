@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts ":r:c:i:n:s:t:e:h" opt; do
+while getopts ":r:c:i:n:s:t:e:p:a:h" opt; do
   case $opt in
     r) REGION=$OPTARG
        echo "                 region: $REGION" ;;
@@ -16,6 +16,10 @@ while getopts ":r:c:i:n:s:t:e:h" opt; do
        echo "          instance type: $INSTANCE_TYPE" ;;
     e) EBS_SIZE=$OPTARG
        echo "default EBS volume size: $EBS_SIZE" ;;
+    p) PRICE=$OPTARG
+       echo "         spot bid price: $PRICE" ;;
+    a) AMI=$OPTARG
+       echo "                    AMI: $AMI" ;;
     h) echo "Use the following options:"
        echo "-r: Region"
        echo "-c: Cluster Name"
@@ -24,6 +28,8 @@ while getopts ":r:c:i:n:s:t:e:h" opt; do
        echo "-s: Security Group Name"
        echo "-t: Instance Type"
        echo "-e: Default EBS Volume Size"
+       echo "-p: Spot Instance Bid Price"
+       echo "-a: AMI to run on instances"
        ;;
     \?) echo "Invalid option: -$OPTARG" >&2
         echo "use -h option for input argument tags"
@@ -36,10 +42,11 @@ done
 # remove tmp directory with instance name
 rm -rf tmp/$CLUSTER_NAME
 
-python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE
+python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
 
 ./install_hadoop.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 ./install_spark.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
+./sparklab_create_cred.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
