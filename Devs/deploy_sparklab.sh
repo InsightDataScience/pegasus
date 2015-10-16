@@ -33,6 +33,9 @@ while getopts ":r:c:i:n:s:t:e:h" opt; do
   esac
 done
 
+# remove tmp directory with instance name
+rm -rf tmp/$CLUSTER_NAME
+
 python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE
 
 ./install_hadoop.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
