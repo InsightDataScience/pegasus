@@ -48,5 +48,9 @@ python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURIT
 
 ./install_spark.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-./sparklab_create_cred.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+./install_hive.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+
+./install_pig.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+
+./sparklab_create_cred.sh $PEM_NAME $CLUSTER_NAME
 
