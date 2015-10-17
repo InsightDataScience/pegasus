@@ -14,6 +14,9 @@ ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NA
 
 sleep 3
 
+TCP_PID=$(lsof -i tcp:7777 | awk '{print $2}' | sed -n 2p)
+kill $TCP_PID
+
 ssh -N -f -L localhost:7777:localhost:7777 ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
 echo "IPython server is running at localhost:7777!"
