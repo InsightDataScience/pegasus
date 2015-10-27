@@ -44,13 +44,17 @@ rm -rf tmp/$CLUSTER_NAME
 
 python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
 
-./install_hadoop.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Env/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-./install_hive.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-./install_pig.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Hadoop/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Pig/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-./install_spark.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Spark/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Spark/setup_ipython.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+Spark/setup_zeppelin.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 ./sparklab_create_cred.sh $PEM_NAME $CLUSTER_NAME
 

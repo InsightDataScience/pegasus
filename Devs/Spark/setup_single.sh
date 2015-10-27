@@ -1,17 +1,5 @@
 #!/bin/bash
 
-sudo apt-get update
-
-sudo apt-get --yes --force-yes install openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran
-
-sudo pip install nose seaborn
-
-sudo easy_install pymc
-
-wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads
-sudo dpkg -i ~/Downloads/sbt-*
-sudo apt-get install sbt
-
 wget http://www.eu.apache.org/dist/spark/spark-1.5.1/spark-1.5.1-bin-hadoop2.4.tgz -P ~/Downloads
 
 sudo tar zxvf ~/Downloads/spark-* -C /usr/local

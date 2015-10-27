@@ -1,11 +1,5 @@
 #!/bin/bash
 
-sudo apt-get purge maven maven2 maven3
-sudo apt-add-repository ppa:andrei-pozolotin/maven3
-sudo apt-get update
-
-sudo apt-get --yes --force-yes install maven3
-
 git clone https://github.com/apache/incubator-zeppelin.git
 sudo mv incubator-zeppelin /usr/local
 sudo mv /usr/local/incubator-zeppelin /usr/local/zeppelin
@@ -19,10 +13,8 @@ cp $ZEPPELIN_HOME/conf/zeppelin-site.xml.template $ZEPPELIN_HOME/conf/zeppelin-s
 
 sudo chown -R ubuntu $ZEPPELIN_HOME
 
-MASTER_NAME=$1
-
 sed -i '18i export JAVA_HOME=/usr' $ZEPPELIN_HOME/conf/zeppelin-env.sh
-sed -i '18i export MASTER=spark://'$MASTER_NAME':7077' $ZEPPELIN_HOME/conf/zeppelin-env.sh
+sed -i '18i export MASTER=spark://'$(hostname)':7077' $ZEPPELIN_HOME/conf/zeppelin-env.sh
 sed -i '18i export SPARK_HOME='$SPARK_HOME'' $ZEPPELIN_HOME/conf/zeppelin-env.sh
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))

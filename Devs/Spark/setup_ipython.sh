@@ -1,15 +1,6 @@
 #!/bin/bash
 
-sudo apt-get update
-
-sudo apt-get --yes --force-yes install python-dev python-pip git
-sudo pip install "ipython[notebook]"
-
 git clone https://github.com/aouyang1/spark_examples.git
-
-echo -e "\nexport AWS_ACCESS_KEY_ID=$1" | cat >> ~/.profile
-echo -e "\nexport AWS_SECRET_ACCESS_KEY=$2" | cat >> ~/.profile
-. ~/.profile
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
