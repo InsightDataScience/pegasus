@@ -1,6 +1,6 @@
 #!/bin/bash
 
-wget http://www.eu.apache.org/dist/spark/spark-1.5.1/spark-1.5.1-bin-hadoop2.4.tgz -P ~/Downloads
+wget http://apache.osuosl.org/spark/spark-1.4.1/spark-1.4.1-bin-hadoop2.4.tgz -P ~/Downloads
 
 sudo tar zxvf ~/Downloads/spark-* -C /usr/local
 sudo mv /usr/local/spark-* /usr/local/spark

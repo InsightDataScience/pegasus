@@ -9,7 +9,7 @@ EBS_SIZE=100
 PRICE=0.02
 AMI=ami-5189a661
 
-CLUSTER_NAMES=(sparklab-test2)
+CLUSTER_NAMES=(sparklab-test1)
 
 for CLUSTER_NAME in ${CLUSTER_NAMES[@]}; do
   echo "spinning up $CLUSTER_NAME..."
