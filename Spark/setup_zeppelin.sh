@@ -9,7 +9,6 @@ echo -e "\nexport PATH=\$PATH:\$ZEPPELIN_HOME/bin" | cat >> ~/.profile
 . ~/.profile
 
 cp $ZEPPELIN_HOME/conf/zeppelin-env.sh.template $ZEPPELIN_HOME/conf/zeppelin-env.sh
-cp $ZEPPELIN_HOME/conf/zeppelin-site.xml.template $ZEPPELIN_HOME/conf/zeppelin-site.xml
 
 sudo chown -R ubuntu $ZEPPELIN_HOME
 

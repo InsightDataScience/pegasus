@@ -26,6 +26,8 @@ class BotoUtil(object):
                           key_name=IC.key_name, security_groups=IC.security_groups,
                           instance_type=IC.instance_type, block_device_map=bdm)
 
+        time.sleep(30)
+
         # monitor spot instances for when they are satisfied
         request_ids = [sir.id for sir in spot_requests]
         self.wait_for_fulfillment(request_ids, copy.deepcopy(request_ids))
