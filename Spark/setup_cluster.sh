@@ -51,4 +51,4 @@ ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Spark/config_workers.sh "${SLAVE_D
 ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
 
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Spark/setup_ipython.sh
-#ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Spark/setup_zeppelin.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Spark/setup_zeppelin.sh

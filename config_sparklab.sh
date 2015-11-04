@@ -53,5 +53,7 @@ Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 Spark/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
+Tachyon/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+
 ./sparklab_create_cred.sh $PEM_NAME $CLUSTER_NAME
 

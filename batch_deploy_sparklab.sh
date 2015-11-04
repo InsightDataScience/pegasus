@@ -7,7 +7,7 @@ SECURITY_GROUP=open
 INSTANCE_TYPE=m4.xlarge
 EBS_SIZE=100
 PRICE=0.06
-AMI=ami-977e69f6
+AMI=ami-f30b1c92
 #AMI=ami-5189a661
 
 CLUSTER_NAMES=(sparklab-test1)

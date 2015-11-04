@@ -3,17 +3,6 @@
 MASTER_HOSTNAME=$1; shift
 WORKER_HOSTNAMES=( "$@" )
 
-sudo apt-get update
-
-sudo apt-get --yes --force-yes install openjdk-7-jdk
-
-wget https://github.com/amplab/tachyon/releases/download/v0.7.1/tachyon-0.7.1-bin.tar.gz -P ~/Downloads
-sudo tar zxvf ~/Downloads/tachyon-* -C /usr/local
-sudo mv /usr/local/tachyon-* /usr/local/tachyon
-
-sudo chown -R ubuntu /usr/local/tachyon
-
-echo -e "\nexport TACHYON_HOME=/usr/local/tachyon\nexport PATH=\$PATH:\$TACHYON_HOME/bin" | cat >> ~/.profile
 . ~/.profile
 
 cp $TACHYON_HOME/conf/tachyon-env.sh.template $TACHYON_HOME/conf/tachyon-env.sh

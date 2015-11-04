@@ -9,7 +9,7 @@
         "secret_key": "{{user `aws_secret_key`}}",
         "region": "us-west-2",
         "source_ami": "ami-5189a661",
-        "instance_type": "t2.micro",
+        "instance_type": "m4.large",
         "ssh_username": "ubuntu",
         "ami_name": "packer-spark {{timestamp}}"
     }],
@@ -21,7 +21,8 @@
         "./setup_hive.sh",
         "./setup_pig.sh",
         "./setup_spark.sh",
-        "./setup_tachyon.sh"
+        "./setup_tachyon.sh",
+        "./setup_zeppelin.sh"
       ],
       "pause_before": "30s"
     }]

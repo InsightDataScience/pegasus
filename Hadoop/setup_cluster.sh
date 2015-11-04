@@ -61,7 +61,7 @@ wait
 
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/format_namenode.sh
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/start_dfs.sh
-#ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/start_yarn.sh
-#ssh -i $PEMLOC ubuntu@$MASTER_DNS '$HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < Hadoop/start_yarn.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver'
 
 echo "Hadoop setup complete!"
