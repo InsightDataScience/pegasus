@@ -35,7 +35,7 @@ done
 
 wait
 
-#ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon format'
-#ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon-start.sh all SudoMount'
+ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon format'
+ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon-start.sh all SudoMount'
 
 echo "Tachyon setup complete!"
