@@ -22,9 +22,12 @@ class BotoUtil(object):
         bdm['/dev/sda1'] = dev_sda1
 
         spot_requests = self.conn.request_spot_instances(price=IC.price,
-                          image_id=IC.image, count=IC.num_instances,
-                          key_name=IC.key_name, security_groups=IC.security_groups,
-                          instance_type=IC.instance_type, block_device_map=bdm)
+                                                         image_id=IC.image,
+                                                         count=IC.num_instances,
+                                                         key_name=IC.key_name,
+                                                         security_groups=IC.security_groups,
+                                                         instance_type=IC.instance_type,
+                                                         block_device_map=bdm)
 
         time.sleep(30)
 
@@ -84,34 +87,32 @@ class BotoUtil(object):
         print "Instance State: {} running".format(IC.tag_name)
 
 
-    def create_ec2_instance(self, num_instances, key_name,
-                            security_groups, instance_type, tag_name,
-                            vol_size):
+    def create_ec2_instance(self, IC):
 
         # current image only valid for oregon AZ
-        image = self.conn.get_all_images("ami-5189a661")
+        image = self.conn.get_all_images(IC.image)
 
         # set default EBS size
         dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
-        dev_sda1.size = vol_size
+        dev_sda1.size = IC.vol_size
         dev_sda1.delete_on_termination = True
 
         bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
         bdm['/dev/sda1'] = dev_sda1
 
         # spin up instances
-        reservation = image[0].run(min_count=num_instances,
-                                   max_count=num_instances,
-                                   key_name=key_name,
-                                   security_groups=security_groups,
-                                   instance_type=instance_type,
+        reservation = image[0].run(min_count=IC.num_instances,
+                                   max_count=IC.num_instances,
+                                   key_name=IC.key_name,
+                                   security_groups=IC.security_groups,
+                                   instance_type=IC.instance_type,
                                    block_device_map=bdm)
 
         # monitor when instances are ready to SSH
         state_running = False
 
         while not state_running:
-            print "Instance State: {} pending".format(tag_name)
+            print "Instance State: {} pending".format(IC.tag_name)
             time.sleep(10)
 
             instance_state = []
@@ -134,9 +135,9 @@ class BotoUtil(object):
 
         # give each instance a name
         for instance in reservation.instances:
-            self.conn.create_tags([instance.id], {"Name":tag_name})
+            self.conn.create_tags([instance.id], {"Name":IC.tag_name})
 
-        print "Instance State: {} running".format(tag_name)
+        print "Instance State: {} running".format(IC.tag_name)
 
 
     def get_ec2_instances(self, instance_name):

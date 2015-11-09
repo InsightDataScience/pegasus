@@ -42,7 +42,8 @@ done
 # remove tmp directory with instance name
 rm -rf tmp/$CLUSTER_NAME
 
-python spin_instances.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
+#python spin_spot.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
+python spin_demand.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $AMI
 
 SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
