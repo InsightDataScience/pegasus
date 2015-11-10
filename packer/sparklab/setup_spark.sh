@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SPARK_VER=1.4.1
+SPARK_VER=1.5.1
 HADOOP_VER=2.4
 
 wget http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$HADOOP_VER.tgz -P ~/Downloads
