@@ -10,7 +10,7 @@ PRICE=0.06
 AMI=ami-f30b1c92
 #AMI=ami-5189a661
 
-CLUSTER_NAMES=(sparklab-test1)
+CLUSTER_NAMES=(sparklab-test2)
 
 for CLUSTER_NAME in ${CLUSTER_NAMES[@]}; do
   echo "spinning up $CLUSTER_NAME..."

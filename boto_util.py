@@ -162,7 +162,7 @@ class BotoUtil(object):
 
         print json.dumps(instance_type, indent=2, sort_keys=True)
 
-        return dns
+        return dns, i.tags['Name']
 
     def wait_for_fulfillment(self, request_ids, pending_request_ids):
         """Loop through all pending request ids waiting for them to be fulfilled.
@@ -183,12 +183,13 @@ class BotoUtil(object):
 
 
     def write_dns(self, instance_name, dns_tup):
-        os.makedirs("tmp/{}".format(instance_name))
+        if not os.path.exists("tmp/{}".format(instance_name)):
+            os.makedirs("tmp/{}".format(instance_name))
+
         f_priv = open('tmp/{}/private_dns'.format(instance_name), 'w')
         f_pub = open('tmp/{}/public_dns'.format(instance_name), 'w')
 
         for pair in dns_tup:
-            print(pair)
             f_priv.write(pair[0] + "\n")
             f_pub.write(pair[1] + "\n")
 

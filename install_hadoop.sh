@@ -19,5 +19,23 @@ fi
 
 SSH/setup_passwordless_ssh.sh $PEMLOC $INSTANCE_NAME
 
-Hadoop/setup_cluster.sh $PEMLOC $INSTANCE_NAME
+install/Env/install_env_cluster.sh $PEMLOC $INSTANCE_NAME
 
+./pass_aws_cred.sh $PEMLOC $INSTANCE_NAME
+
+install/Hadoop/install_hadoop_cluster.sh $PEMLOC $INSTANCE_NAME
+config/Hadoop/setup_cluster.sh $PEMLOC $INSTANCE_NAME
+
+install/Hive/install_hive_cluster.sh $PEMLOC $INSTANCE_NAME
+config/HIVE/setup_cluster.sh $PEMLOC $INSTANCE_NAME
+
+install/Pig/install_pig_cluster.sh $PEMLOC $INSTANCE_NAME
+
+install/Spark/install_spark_cluster.sh $PEMLOC $INSTANCE_NAME
+config/Spark/setup_cluster.sh $PEMLOC $INSTANCE_NAME
+
+install/Tachyon/install_tachyon_cluster.sh $PEMLOC $INSTANCE_NAME
+config/Tachyon/setup_cluster.sh $PEMLOC $INSTANCE_NAME
+
+install/Zeppelin/install_zeppelin_cluster.sh $PEMLOC $INSTANCE_NAME
+config/Zeppelin/setup_cluster.sh $PEMLOC $INSTANCE_NAME

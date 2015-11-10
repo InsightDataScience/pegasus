@@ -49,12 +49,12 @@ SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 ./pass_aws_cred.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-Hadoop/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/Hadoop/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-Spark/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/Spark/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-Tachyon/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/Tachyon/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 ./sparklab_create_cred.sh $PEM_NAME $CLUSTER_NAME
 
