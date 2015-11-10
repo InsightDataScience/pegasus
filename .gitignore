@@ -5,6 +5,7 @@ Devs/private_dns
 .DS_Store
 DataLabs
 tmp
+archive
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

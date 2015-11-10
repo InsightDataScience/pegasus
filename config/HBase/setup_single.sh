@@ -3,17 +3,6 @@
 MASTER_NAME=$1; shift
 ZK_HOSTNAME=( "$@" )
 
-# install and configure hbase
-sudo apt-get update
-
-sudo apt-get --yes --force-yes install openjdk-7-jdk
-
-wget http://mirror.metrocast.net/apache/hbase/stable/hbase-1.0.1.1-bin.tar.gz -P ~/Downloads
-sudo tar zxvf ~/Downloads/hbase-*.tar.gz -C /usr/local
-sudo mv /usr/local/hbase-* /usr/local/hbase
-
-echo -e "\nexport HBASE_HOME=/usr/local/hbase\nexport PATH=\$PATH:\$HBASE_HOME/bin\n" >> ~/.profile
-
 . ~/.profile
 
 # configure hbase-site.xml
@@ -46,6 +35,4 @@ done
 
 # setup BackupMasters to the second node in the node list
 sudo bash -c 'echo '"${ZK_HOSTNAME[1]}"' >> '"$HBASE_HOME"'/conf/backup-masters'
-
-sudo chown -R ubuntu $HBASE_HOME
 
