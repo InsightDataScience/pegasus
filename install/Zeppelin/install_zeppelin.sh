@@ -7,13 +7,14 @@ if [ ! -d /usr/local/zeppelin ]; then
 fi
 
 if ! grep "export ZEPPELIN_HOME" ~/.profile; then
-  echo -e "\nexport ZEPPELIN_HOME=/usr/local/zeppelin" | cat >> ~/.profile
-  echo -e "\nexport PATH=\$PATH:\$ZEPPELIN_HOME/bin" | cat >> ~/.profile
+  echo -e "\nexport ZEPPELIN_HOME=/usr/local/zeppelin\nexport PATH=\$PATH:\$ZEPPELIN_HOME/bin" | cat >> ~/.profile
 
   . ~/.profile
 
   sudo chown -R ubuntu $ZEPPELIN_HOME
 
   cd $ZEPPELIN_HOME
-  sudo mvn clean package -Pspark-1.5 -Dhadoop.version=2.2.0 -Phadoop-2.2 -DskipTests
+  sudo mvn clean package -Pspark-1.5 -Dhadoop.version=2.2.0 -Phadoop-2.2 -DskipTests &
+  wait
+  echo "Zeppelin installed"
 fi

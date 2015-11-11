@@ -14,28 +14,20 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS's
-HOSTIP=()
-while read line; do
-    HOSTIP+=($line)
-done < tmp/$INSTANCE_NAME/private_dns
-
 # import AWS public DNS's
 DNS=()
 while read line; do
     DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-
-# Install HBase on master and slaves
+# Install and configure nodes for elasticsearch
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/HBase/setup_single.sh $MASTER_DNS "${HOSTIP[@]}" &
+    echo $dns
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/Elasticsearch/install_elasticsearch.sh &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HBASE_HOME/bin/start-hbase.sh'
+echo "Elasticsearch installation complete!"
 
-echo "HBase configuration complete!"

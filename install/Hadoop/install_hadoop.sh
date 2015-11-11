@@ -9,8 +9,8 @@ if [ ! -f ~/Downloads/hadoop-$HADOOP_VER.tar.gz ]; then
 fi
 
 if ! grep "export HADOOP_HOME" ~/.profile; then
-  echo -e "\nexport HADOOP_HOME=/usr/local/hadoop\nexport PATH=\$PATH:\$HADOOP_HOME/bin\n" | cat >> ~/.profile
-  echo -e "\nexport HADOOP_CONF_DIR=\$HADOOP_HOME/etc/hadoop\n" | cat >> ~/.profile
+  echo -e "\nexport HADOOP_HOME=/usr/local/hadoop\nexport PATH=\$PATH:\$HADOOP_HOME/bin" | cat >> ~/.profile
+  echo -e "\nexport HADOOP_CONF_DIR=\$HADOOP_HOME/etc/hadoop" | cat >> ~/.profile
 
   . ~/.profile
 

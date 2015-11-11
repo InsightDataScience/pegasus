@@ -27,10 +27,10 @@ SERVER_NUM=1
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < Zookeeper/setup_single.sh $SERVER_NUM "${DNS[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/Zookeeper/install_zookeeper.sh $SERVER_NUM "${DNS[@]}" &
     SERVER_NUM=$(echo "$SERVER_NUM+1" | bc)
 done
 
 wait
 
-echo "Zookeeper setup complete!" 
+echo "Zookeeper installation complete!" 
