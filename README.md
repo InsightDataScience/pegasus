@@ -5,67 +5,84 @@ This will allow you to programatically interface with your AWS account
 ```
 $ sudo pip install boto
 ```
-Create a .boto file in your home directory
+Add your AWS credentials to `~/.profile` and source it
 ```
-$ touch ~/.boto
+export AWS_ACCESS_KEY_ID=XXXX
+export AWS_SECRET_ACCESS_KEY=XXXX
 ```
-Insert the following into .boto with your AWS credentials. These credentials will be used to access you AWS cluster as well as AWS's S3 storage.
 ```
-[Credentials]
-aws_access_key_id = XXXXXX
-aws_secret_access_key = XXXXX+XXXX
+$ . ~/.profile
 ```
-
-# 2. Clone repository
-* Place in home folder
-* Move into the ClusterUtilities/Devs folder
-```
-$ git clone https://github.com/InsightDataScience/ClusterUtilities.git
-$ cd ClusterUtilities/Devs
-```
-
-# 3. Installation commands
+# 2. Installation commands
 Always run fetch_instances.py to get the instance IPs and hostnames for the next installation
 ```
 python fetch_instances.py <region> <cluster-name>
 ```
 
-## Zookeeper Installation
+## Passwordless SSH
 ```
-$ ./install_zookeeper.sh ~/.ssh/<personal.pem>
+$ SSH/setup_passwordless_ssh.sh <pem-key> <cluster-name>
 ```
-
-## Kafka Installation
-Requires Zookeeper installation
+## Environment/Packages on all machines
 ```
-$ ./install_kafka.sh ~/.ssh/<personal.pem>
+$ install/Env/install_env_cluster.sh <pem-key> <cluster-name>
 ```
-
-## Spark with IPython Installation
-Requires a distributed files system such as HDFS(Hadoop) or S3
+## Hadoop installation
 ```
-$ ./install_spark.sh ~/.ssh/<personal.pem>
+$ install/Hadoop/install_hadoop_cluster.sh <pem-key> <cluster-name>
+$ config/Hadoop/setup_cluster.sh <pem-key> <cluster-name>
 ```
-
-Go to **localhost:7777** on your machine to access the IPython Server on the Spark Master.
-
-## Hadoop Installation
+## Hive installation
 ```
-$ ./install_hadoop.sh ~/.ssh/<personal.pem>
+$ install/Hive/install_Hive_cluster.sh <pem-key> <cluster-name>
+$ config/Hive/setup_cluster.sh <pem-key> <cluster-name>
 ```
-
-## Pig Installation
-Requires Hadoop installation
+## Pig installation
 ```
-$ ./install_pig.sh ~/.ssh/<personal.pem>
+$ install/Pig/install_Pig_cluster.sh <pem-key> <cluster-name>
 ```
-
-## Elasticsearch Installation
+## Spark installation
 ```
-$ ./install_elasticsearch.sh ~/.ssh/<personal.pem> <ec2-security-group>
+$ install/Spark/install_Spark_cluster.sh <pem-key> <cluster-name>
+$ config/Spark/setup_cluster.sh <pem-key> <cluster-name>
 ```
-
-## Cassandra Installation
+## Zeppelin installation
 ```
-$ ./install_cassandra.sh ~/.ssh/<personal.pem> <cassandra-cluster-name>
+$ install/Zeppelin/install_Zeppelin_cluster.sh <pem-key> <cluster-name>
+$ config/Zeppelin/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Tachyon installation
+```
+$ install/Tachyon/install_Tachyon_cluster.sh <pem-key> <cluster-name>
+$ config/Tachyon/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Zookeeper installation
+```
+$ install/Zookeeper/install_Zookeeper_cluster.sh <pem-key> <cluster-name>
+$ config/Zookeeper/setup_cluster.sh <pem-key> <cluster-name>
+```
+## HBase installation
+```
+$ install/HBase/install_HBase_cluster.sh <pem-key> <cluster-name>
+$ config/HBase/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Kafka installation
+```
+$ install/Kafka/install_Kafka_cluster.sh <pem-key> <cluster-name>
+$ config/Kafka/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Elasticsearch installation
+```
+$ install/Elasticsearch/install_Elasticsearch_cluster.sh <pem-key> <cluster-name>
+$ config/Elasticsearch/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Kibana installation
+```
+$ install/Kibana/install_Kibana_cluster.sh <pem-key> <cluster-name>
+$ config/Kibana/setup_cluster.sh <pem-key> <cluster-name>
+```
+## Cassandra installation
+```
+$ install/Cassandra/install_Cassandra_cluster.sh <pem-key> <cluster-name>
+$ config/Cassandra/setup_cluster.sh <pem-key> <cluster-name>
 ```
