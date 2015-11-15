@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     BUtil.create_ec2_instance(IConf)
 
-    dns_tup = BUtil.get_ec2_instances(args.instance_name)
+    dns_tup, cluster_name = BUtil.get_ec2_instances(args.instance_name)
     BUtil.write_dns(args.instance_name, dns_tup)
 
 

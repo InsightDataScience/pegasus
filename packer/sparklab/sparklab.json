@@ -16,13 +16,13 @@
     "provisioners": [{
       "type": "shell",
       "scripts": [
-        "./setup_env.sh",
-        "./setup_hadoop.sh",
-        "./setup_hive.sh",
-        "./setup_pig.sh",
-        "./setup_spark.sh",
-        "./setup_tachyon.sh",
-        "./setup_zeppelin.sh"
+        "../../install/Env/install_env.sh",
+        "../../install/Hadoop/install_hadoop.sh",
+        "../../install/Hive/install_hive.sh",
+        "../../install/Pig/install_pig.sh",
+        "../../install/Spark/install_spark.sh",
+        "../../install/Tachyon/install_tachyon.sh",
+        "../../install/Zeppelin/install_zeppelin.sh"
       ],
       "pause_before": "30s"
     }]
