@@ -11,7 +11,7 @@ class BotoUtil(object):
         self.conn = boto.ec2.connect_to_region(region)
         self.s3_conn = boto.connect_s3()
 
-    def create_ec2_spot(self, IC):
+    def create_ec2(self, IC):
 
         # set default EBS size
         dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
@@ -21,32 +21,52 @@ class BotoUtil(object):
         bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
         bdm['/dev/sda1'] = dev_sda1
 
-        spot_requests = self.conn.request_spot_instances(price=IC.price,
-                                                         image_id=IC.image,
-                                                         count=IC.num_instances,
-                                                         key_name=IC.key_name,
-                                                         security_groups=IC.security_groups,
-                                                         instance_type=IC.instance_type,
-                                                         block_device_map=bdm)
+        if IC.purchase_type == 'spot':
+            spot_requests = self.conn.request_spot_instances(price=IC.price,
+                                                             image_id=IC.image,
+                                                             placement=IC.az,
+                                                             count=IC.num_instances,
+                                                             key_name=IC.key_name,
+                                                             security_groups=IC.security_groups,
+                                                             instance_type=IC.instance_type,
+                                                             block_device_map=bdm)
 
-        time.sleep(30)
+            time.sleep(30)
 
-        # monitor spot instances for when they are satisfied
-        request_ids = [sir.id for sir in spot_requests]
-        self.wait_for_fulfillment(request_ids, copy.deepcopy(request_ids))
+            # monitor spot instances for when they are satisfied
+            request_ids = [sir.id for sir in spot_requests]
+            self.wait_for_fulfillment(request_ids, copy.deepcopy(request_ids))
 
-        for req_id in request_ids:
-            self.conn.create_tags([req_id], {"Name":IC.tag_name})
+            for req_id in request_ids:
+                self.conn.create_tags([req_id], {"Name":IC.tag_name})
 
-        # check to see when all instance IDs have been assigned to spot requests
-        fulfilled_spot_requests = self.conn.get_all_spot_instance_requests(request_ids=request_ids)
-        instance_ids = [sir.instance_id for sir in fulfilled_spot_requests]
+            # check to see when all instance IDs have been assigned to spot requests
+            fulfilled_spot_requests = self.conn.get_all_spot_instance_requests(request_ids=request_ids)
+            instance_ids = [sir.instance_id for sir in fulfilled_spot_requests]
 
-        reservations = self.conn.get_all_instances(instance_ids=instance_ids)
+            reservations = self.conn.get_all_instances(instance_ids=instance_ids)
 
-        instances = []
-        for r in reservations:
-            instances.extend(r.instances)
+            instances = []
+            for r in reservations:
+                instances.extend(r.instances)
+
+
+        elif IC.purchase_type == 'on_demand':
+            image = self.conn.get_all_images(IC.image)
+            reservations = image[0].run(placement=IC.az,
+                                        min_count=IC.num_instances,
+                                        max_count=IC.num_instances,
+                                        key_name=IC.key_name,
+                                        security_groups=IC.security_groups,
+                                        instance_type=IC.instance_type,
+                                        block_device_map=bdm)
+
+            instances = reservations.instances
+
+        else:
+            print "invalid purchase type: {}".format(IC.purchase_type)
+            return
+
 
         # monitor when instances are ready to SSH
         state_running = False
@@ -85,60 +105,6 @@ class BotoUtil(object):
             self.conn.create_tags([instance.id], {"Name":IC.tag_name})
 
         print "Instance State: {} running".format(IC.tag_name)
-
-
-    def create_ec2_instance(self, IC):
-
-        # current image only valid for oregon AZ
-        image = self.conn.get_all_images(IC.image)
-
-        # set default EBS size
-        dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
-        dev_sda1.size = IC.vol_size
-        dev_sda1.delete_on_termination = True
-
-        bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
-        bdm['/dev/sda1'] = dev_sda1
-
-        # spin up instances
-        reservation = image[0].run(min_count=IC.num_instances,
-                                   max_count=IC.num_instances,
-                                   key_name=IC.key_name,
-                                   security_groups=IC.security_groups,
-                                   instance_type=IC.instance_type,
-                                   block_device_map=bdm)
-
-        # monitor when instances are ready to SSH
-        state_running = False
-
-        while not state_running:
-            print "Instance State: {} pending".format(IC.tag_name)
-            time.sleep(10)
-
-            instance_state = []
-            for instance in reservation.instances:
-                instance_state.append(instance.state)
-                instance.update()
-
-            instance_state = all([instance.state==u'running' for instance in reservation.instances])
-
-            statuses = self.conn.get_all_instance_status(instance_ids=[instance.id for instance in reservation.instances])
-            if len(statuses)>0:
-                instance_status = all([status.instance_status.status==u'ok' for status in statuses])
-                system_status = all([status.system_status.status==u'ok' for status in statuses])
-            else:
-                instance_status = False
-                system_status = False
-
-#            print instance_state, instance_status, system_status
-            state_running = instance_status and system_status and instance_state
-
-        # give each instance a name
-        for instance in reservation.instances:
-            self.conn.create_tags([instance.id], {"Name":IC.tag_name})
-
-        print "Instance State: {} running".format(IC.tag_name)
-
 
     def get_ec2_instances(self, instance_name):
         instances = self.conn.get_only_instances(filters={"instance-state-name":"running", "tag:Name":"*{}*".format(instance_name)})
@@ -212,6 +178,8 @@ class BotoUtil(object):
 class InstanceConfig(object):
 
     def __init__(self, region='us-west-2',
+                       az='us-west-2a',
+                       purchase_type='on_demand',
                        image='ami-5189a661',
                        price=0.04,
                        num_instances=4,
@@ -221,6 +189,8 @@ class InstanceConfig(object):
                        tag_name='test-cluster',
                        vol_size=100):
         self.region = region
+        self.az = az
+        self.purchase_type= purchase_type
         self.image = image
         self.price = price
         self.num_instances = num_instances

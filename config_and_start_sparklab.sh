@@ -1,9 +1,13 @@
 #!/bin/bash
 
-while getopts ":r:c:i:n:s:t:e:p:a:h" opt; do
+while getopts ":u:r:z:c:i:n:s:t:e:p:a:h" opt; do
   case $opt in
+    u) PURCHASE_TYPE=$OPTARG
+       echo "          purchase type: $PURCHASE_TYPE" ;;
     r) REGION=$OPTARG
        echo "                 region: $REGION" ;;
+    z) AZ=$OPTARG
+       echo "      availability zone: $AZ" ;;
     c) CLUSTER_NAME=$OPTARG
        echo "           cluster name: $CLUSTER_NAME" ;;
     i) PEM_NAME=$OPTARG
@@ -42,8 +46,10 @@ done
 # remove tmp directory with instance name
 rm -rf tmp/$CLUSTER_NAME
 
+python spin_up.py $PURCHASE_TYPE $REGION $AZ $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
+ 
 #python spin_spot.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
-python spin_demand.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $AMI
+#python spin_demand.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $AMI
 
 SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
