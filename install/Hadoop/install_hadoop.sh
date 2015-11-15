@@ -3,7 +3,7 @@
 HADOOP_VER=2.7.1
 
 if [ ! -f ~/Downloads/hadoop-$HADOOP_VER.tar.gz ]; then
-  wget http://mirror.symnds.com/software/Apache/hadoop/common/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz -P ~/Downloads
+  wget https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz -P ~/Downloads
   sudo tar zxvf ~/Downloads/hadoop-*.tar.gz -C /usr/local
   sudo mv /usr/local/hadoop-* /usr/local/hadoop
 fi
