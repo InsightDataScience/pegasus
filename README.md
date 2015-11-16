@@ -1,4 +1,4 @@
-## Project Pegasus - Automating AWS deployment
+## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
 
 # 1. Install the boto package for python
 This will allow you to programatically interface with your AWS account
