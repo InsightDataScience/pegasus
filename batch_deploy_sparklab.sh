@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PURCHASE_TYPE=on_demand
+PURCHASE_TYPE=spot #spot or on_demand
 REGION=us-west-2
-AZ=us-west-2b
+AZ=us-west-2a
 PEM_NAME=insight-cluster
 NUM_INSTANCES=4
 SECURITY_GROUP=open
