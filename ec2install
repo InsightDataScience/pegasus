@@ -20,76 +20,77 @@ fi
 
 case $TECHNOLOGY in
   ENV)
-    echo "Setting up base environment packages on $CLUSTER_NAME" ;;
+    echo "Setting up base environment packages on $CLUSTER_NAME"
+    install/Env/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   SSH)
-    echo "Setting up passwordless SSH on $CLUSTER_NAME" ;;
+    echo "Setting up passwordless SSH on $CLUSTER_NAME"
+    SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
+    ;;
   AWS)
-    echo "Passing AWS credentials to $CLUSTER_NAME" ;;
+    echo "Passing AWS credentials to $CLUSTER_NAME"
+    ./pass_aws_cred.sh $PEMLOC $CLUSTER_NAME
+    ;;
   HADOOP)
-    echo "Installing Hadoop on $CLUSTER_NAME" ;;
+    echo "Installing Hadoop on $CLUSTER_NAME"
+    install/Hadoop/install_hadoop_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Hadoop/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   HIVE)
-    echo "Installing Hive on Master Node in $CLUSTER_NAME" ;;
+    echo "Installing Hive on Master Node in $CLUSTER_NAME"
+    install/Hive/install_hive_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/HIVE/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   PIG)
-    echo " Installing Pig on Master Node in $CLUSTER_NAME" ;;
+    echo " Installing Pig on Master Node in $CLUSTER_NAME"
+    install/Pig/install_pig_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   SPARK)
-    echo "Installing Spark on $CLUSTER_NAME" ;;
+    echo "Installing Spark on $CLUSTER_NAME"
+    install/Spark/install_spark_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   TACHYON)
-    echo "Installing Tachyon on $CLUSTER_NAME" ;;
+    echo "Installing Tachyon on $CLUSTER_NAME"
+    install/Tachyon/install_tachyon_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Tachyon/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   ZOOKEEPER)
-    echo "Installing Zookeeper on $CLUSTER_NAME" ;;
+    echo "Installing Zookeeper on $CLUSTER_NAME"
+    install/Zookeeper/install_zookeeper_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Zookeeper/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   HBASE)
-    echo "Installing HBase on $CLUSTER_NAME" ;;
+    echo "Installing HBase on $CLUSTER_NAME"
+    install/HBase/install_hbase_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/HBase/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   KAFKA)
-    echo "Installing Kafka on $CLUSTER_NAME" ;;
+    echo "Installing Kafka on $CLUSTER_NAME"
+    install/Kafka/install_kafka_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Kafka/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   ELASTICSEARCH)
-    echo "Installing Elasticsearch on $CLUSTER_NAME" ;;
+    echo "Installing Elasticsearch on $CLUSTER_NAME"
+    install/Elasticsearch/install_elasticsearch_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
+    ;;
   CASSANDRA)
-    echo "Installing Cassandra on $CLUSTER_NAME" ;;
+    echo "Installing Cassandra on $CLUSTER_NAME"
+    install/Cassandra/install_cassandra_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Cassandra/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   KIBANA)
-    echo "Installing Kibana on Master Node in $CLUSTER_NAME" ;;
+    echo "Installing Kibana on Master Node in $CLUSTER_NAME"
+    install/Kibana/install_kibana_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Kibana/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   ZEPPELIN)
-    echo "Installing Zeppelin on Master Node in $CLUSTER_NAME" ;;
+    echo "Installing Zeppelin on Master Node in $CLUSTER_NAME"
+    install/Zeppelin/install_zeppelin_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/Zeppelin/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   *)
     echo "Invalid technology to install."; exit 1 ;;
 esac
 
-#SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
-
-#install/Env/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#./pass_aws_cred.sh $PEMLOC $CLUSTER_NAME
-
-#install/Hadoop/install_hadoop_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Hadoop/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Hive/install_hive_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/HIVE/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Pig/install_pig_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Spark/install_spark_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Tachyon/install_tachyon_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Tachyon/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Zookeeper/install_zookeeper_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Zookeeper/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/HBase/install_hbase_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/HBase/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Kafka/install_kafka_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Kafka/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Elasticsearch/install_elasticsearch_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
-
-#install/Kibana/install_kibana_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Kibana/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Zeppelin/install_zeppelin_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Zeppelin/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-
-#install/Cassandra/install_cassandra_cluster.sh $PEMLOC $CLUSTER_NAME
-#config/Cassandra/setup_cluster.sh $PEMLOC $CLUSTER_NAME
