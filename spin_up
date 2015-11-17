@@ -47,22 +47,4 @@ done
 rm -rf tmp/$CLUSTER_NAME
 
 python spin_up.py $PURCHASE_TYPE $REGION $AZ $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
- 
-#python spin_spot.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $PRICE $AMI
-#python spin_demand.py $REGION $CLUSTER_NAME $PEM_NAME $NUM_INSTANCES $SECURITY_GROUP $INSTANCE_TYPE $EBS_SIZE $AMI
-
-SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-./pass_aws_cred.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-config/Hadoop/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-config/Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-config/Spark/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-config/Zeppelin/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-config/Tachyon/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
-
-./sparklab_create_cred.sh $PEM_NAME $CLUSTER_NAME
 

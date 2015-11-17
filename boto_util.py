@@ -162,18 +162,6 @@ class BotoUtil(object):
         f_priv.close()
         f_pub.close()
 
-    def fetch_tech_ver(self, tech_name, version, dest_folder=None):
-        bucket_name = "apache-repo"
-        bucket = self.s3_conn.get_bucket(bucket_name)
-        prefix = os.path.join(tech_name, version, tech_name)
-        keys = bucket.list(prefix=prefix)
-
-        for key in keys:
-            print key.name
-            filename = key.name.split('/')[-1]
-            localpath = os.path.join(dest_folder, filename)
-            if dest_folder:
-                key.get_contents_to_filename(localpath)
 
 class InstanceConfig(object):
 

@@ -9,4 +9,4 @@ TCP_PID=$(lsof -i tcp:$LOCAL_PORT | awk '{print $2}' | sed -n 2p)
 echo $TCP_PID
 kill $TCP_PID
 
-ssh -N -f -L localhost:$LOCAL_PORT:localhost:$REMOTE_PORT ubuntu@$DNS
+ssh -N -f -L localhost:$LOCAL_PORT:localhost:$REMOTE_PORT -i $PEM_KEY ubuntu@$DNS
