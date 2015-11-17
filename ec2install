@@ -21,7 +21,7 @@ fi
 case $TECHNOLOGY in
   ENV)
     echo "Setting up base environment packages on $CLUSTER_NAME"
-    install/Env/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/Environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   SSH)
     echo "Setting up passwordless SSH on $CLUSTER_NAME"
