@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SPARK_VER=1.5.1
+SPARK_VER=1.5.2
 HADOOP_VER=2.4
 
 if [ ! -f ~/Downloads/spark-$SPARK_VER-bin-hadoop$HADOOP_VER.tgz ]; then

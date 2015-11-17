@@ -6,12 +6,13 @@ AZ=us-west-2a
 PEM_NAME=insight-cluster
 NUM_INSTANCES=4
 SECURITY_GROUP=open
-INSTANCE_TYPE=m4.large
+INSTANCE_TYPE=m4.xlarge
 EBS_SIZE=400
 PRICE=0.08
-AMI=ami-f30b1c92
+AMI=ami-299b8a48
+#AMI=ami-f30b1c92
 
-CLUSTER_NAMES=(austin-spark-cluster)
+CLUSTER_NAMES=(austin2-spark-cluster)
 
 for CLUSTER_NAME in ${CLUSTER_NAMES[@]}; do
   echo "spinning up $CLUSTER_NAME..."
