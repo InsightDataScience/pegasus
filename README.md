@@ -13,76 +13,43 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 $ . ~/.profile
 ```
-# 2. Installation commands
-Always run fetch_instances.py to get the instance IPs and hostnames for the next installation
+# 2. Fetching AWS cluster IP information
+Always run fetch_instances.py to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
 ```
 python fetch_instances.py <region> <cluster-name>
 ```
+Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
+# 3. Setting up a newly provisioned AWS cluster
+If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations
 
-## Passwordless SSH
+1. **Environment/Packages on all machines** - installs base packages for python, java, scala on all nodes in the cluster
+2. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS
+3. **AWS Credentials** - places AWS keys onto all machines
 ```
-$ SSH/setup_passwordless_ssh.sh <pem-key> <cluster-name>
+$ ./ec2install <pem-key> <cluster-name> ENV
+$ ./ec2install <pem-key> <cluster-name> SSH
+$ ./ec2install <pem-key> <cluster-name> AWS
 ```
-## Environment/Packages on all machines
+# 4. Start Installing!
 ```
-$ install/Env/install_env_cluster.sh <pem-key> <cluster-name>
+$ ./ec2install <pem-key> <cluster-name> <technology>
 ```
-## Hadoop installation
+The `technology` tag can be any of the following:
+* HADOOP
+  * HIVE  (requires HADOOP)
+  * PIG   (requires HADOOP)
+  * SPARK (requires HADOOP)
+* ZEPPELIN
+* TACHYON
+* ZOOKEEPER
+  *   HBASE (requires ZOOKEEPER)
+  *   KAFKA (requires ZOOKEEPER)
+* ELASTICSEARCH
+  *   KIBANA (requires ELASTICSEARCH)
+* CASSANDRA
+
+# 5. Fully automated deployment
+The `batch_deploy` script allows users to spin up instances and deploy multiple Hadoop/Spark clusters in less than 15 minutes. Users should be familiar with AWS and change the setting accordingly in the script (e.g. Instance Type, AMI, spot vs on_demand, etc.). Once all settings have been set, simply run the script
 ```
-$ install/Hadoop/install_hadoop_cluster.sh <pem-key> <cluster-name>
-$ config/Hadoop/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Hive installation
-```
-$ install/Hive/install_Hive_cluster.sh <pem-key> <cluster-name>
-$ config/Hive/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Pig installation
-```
-$ install/Pig/install_Pig_cluster.sh <pem-key> <cluster-name>
-```
-## Spark installation
-```
-$ install/Spark/install_Spark_cluster.sh <pem-key> <cluster-name>
-$ config/Spark/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Zeppelin installation
-```
-$ install/Zeppelin/install_Zeppelin_cluster.sh <pem-key> <cluster-name>
-$ config/Zeppelin/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Tachyon installation
-```
-$ install/Tachyon/install_Tachyon_cluster.sh <pem-key> <cluster-name>
-$ config/Tachyon/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Zookeeper installation
-```
-$ install/Zookeeper/install_Zookeeper_cluster.sh <pem-key> <cluster-name>
-$ config/Zookeeper/setup_cluster.sh <pem-key> <cluster-name>
-```
-## HBase installation
-```
-$ install/HBase/install_HBase_cluster.sh <pem-key> <cluster-name>
-$ config/HBase/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Kafka installation
-```
-$ install/Kafka/install_Kafka_cluster.sh <pem-key> <cluster-name>
-$ config/Kafka/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Elasticsearch installation
-```
-$ install/Elasticsearch/install_Elasticsearch_cluster.sh <pem-key> <cluster-name>
-$ config/Elasticsearch/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Kibana installation
-```
-$ install/Kibana/install_Kibana_cluster.sh <pem-key> <cluster-name>
-$ config/Kibana/setup_cluster.sh <pem-key> <cluster-name>
-```
-## Cassandra installation
-```
-$ install/Cassandra/install_Cassandra_cluster.sh <pem-key> <cluster-name>
-$ config/Cassandra/setup_cluster.sh <pem-key> <cluster-name>
+$ ./batch_deploy
 ```
