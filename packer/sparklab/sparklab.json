@@ -16,7 +16,7 @@
     "provisioners": [{
       "type": "shell",
       "scripts": [
-        "../../install/Env/install_env.sh",
+        "../../install/Environment/install_env.sh",
         "../../install/Hadoop/install_hadoop.sh",
         "../../install/Hive/install_hive.sh",
         "../../install/Pig/install_pig.sh",

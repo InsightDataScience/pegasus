@@ -14,7 +14,7 @@ if ! grep "export ZEPPELIN_HOME" ~/.profile; then
   sudo chown -R ubuntu $ZEPPELIN_HOME
 
   cd $ZEPPELIN_HOME
-  sudo mvn clean package -Pspark-1.4 -Dhadoop.version=2.2.0 -Phadoop-2.2 -DskipTests &
+  sudo mvn clean package -Pspark-1.5 -Dhadoop.version=2.2.0 -Phadoop-2.2 -DskipTests &
   wait
   echo "Zeppelin installed"
 fi

@@ -2,7 +2,7 @@
 
 DEPLOY_MODE=spin_and_config
 
-CLUSTER_NAMES=(spark-cluster1 spark-cluster2)
+CLUSTER_NAMES=(demo-cluster1 demo-cluster2)
 PEM_NAME=insight-cluster
 PURCHASE_TYPE=spot #spot or on_demand
 REGION=us-west-2
