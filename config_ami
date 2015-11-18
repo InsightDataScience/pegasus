@@ -3,9 +3,9 @@
 PEM_NAME=$1
 CLUSTER_NAME=$2
 
-SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/SSH/setup_passwordless_ssh.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
-./pass_aws_cred ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
+config/pass_aws_cred ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 
 config/Hadoop/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME
 config/Hive/setup_cluster.sh ~/.ssh/$PEM_NAME.pem $CLUSTER_NAME

@@ -37,6 +37,8 @@ class BotoUtil(object):
             request_ids = [sir.id for sir in spot_requests]
             self.wait_for_fulfillment(request_ids, copy.deepcopy(request_ids))
 
+            time.sleep(10)
+
             for req_id in request_ids:
                 self.conn.create_tags([req_id], {"Name":IC.tag_name})
 
@@ -161,6 +163,7 @@ class BotoUtil(object):
 
         f_priv.close()
         f_pub.close()
+
 
 
 class InstanceConfig(object):

@@ -25,7 +25,7 @@ case $TECHNOLOGY in
     ;;
   SSH)
     echo "Setting up passwordless SSH on $CLUSTER_NAME"
-    SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
+    config/SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
     ;;
   AWS)
     echo "Passing AWS credentials to $CLUSTER_NAME"
