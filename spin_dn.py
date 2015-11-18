@@ -22,8 +22,10 @@ if __name__ == '__main__':
         filters = {"ip-address": ip}
         instances = BUtil.conn.get_only_instances(filters=filters)
         if len(instances) > 0:
-            instance_ids.append(instances[0].id)
-            request_ids.append(instances[0].spot_instance_request_id)
+            if instances[0].id is not None:
+                instance_ids.append(instances[0].id)
+            if instances[0].spot_instance_request_id is not None:
+                request_ids.append(instances[0].spot_instance_request_id)
 
     if len(instance_ids) > 0:
         print "{} terminating ...".format(instance_ids)

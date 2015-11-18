@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git clone https://github.com/aouyang1/spark_examples.git
+git clone https://github.com/aouyang1/spark_tutorials.git
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}

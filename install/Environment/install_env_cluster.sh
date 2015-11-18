@@ -25,7 +25,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 # Install environment packages to master and slaves
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/Env/install_env.sh &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/Environment/install_env.sh &
 done
 
 wait

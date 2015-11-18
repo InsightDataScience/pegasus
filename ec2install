@@ -29,7 +29,7 @@ case $TECHNOLOGY in
     ;;
   AWS)
     echo "Passing AWS credentials to $CLUSTER_NAME"
-    ./pass_aws_cred $PEMLOC $CLUSTER_NAME
+    config/pass_aws_cred $PEMLOC $CLUSTER_NAME
     ;;
   HADOOP)
     echo "Installing Hadoop on $CLUSTER_NAME"
