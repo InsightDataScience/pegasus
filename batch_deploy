@@ -1,10 +1,10 @@
 #!/bin/bash
 
-DEPLOY_MODE=config
+DEPLOY_MODE=spin_and_config
 
-CLUSTER_NAMES=(spark-cluster1 spark-cluster2)
+CLUSTER_NAMES=(kevin-spark-cluster)
 PEM_NAME=insight-cluster
-PURCHASE_TYPE=on_demand #spot or on_demand
+PURCHASE_TYPE=spot #spot or on_demand
 REGION=us-west-2
 AZ=us-west-2a
 NUM_INSTANCES=4
