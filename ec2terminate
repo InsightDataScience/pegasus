@@ -27,5 +27,9 @@ case $RESPONSE in
   y)
     python spin_dn.py $REGION $(cat tmp/$CLUSTER_NAME/public_dns)
     ;;
+  *)
+    echo "respond with y or n."
+    exit 1
+    ;;
 esac
 

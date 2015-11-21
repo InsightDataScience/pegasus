@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CLUSTER_NAME=$1
+SRC=$2
+DEST=$3
+
+scp -r -i tmp/$CLUSTER_NAME/*.pem ubuntu@$(head -n 1 tmp/$CLUSTER_NAME/master_public_dns.txt):$SRC $DEST

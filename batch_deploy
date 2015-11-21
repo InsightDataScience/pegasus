@@ -2,7 +2,12 @@
 
 DEPLOY_MODE=spin_and_config
 
-CLUSTER_NAMES=(matt-spark-cluster)
+#CLUSTER_NAMES=(dhaval-spark-cluster felix-spark-cluster mehmet-spark-cluster reid-spark-cluster)
+#CLUSTER_NAMES=(abishek-spark-cluster atul-spark-cluster shelby-spark-cluster shuai-spark-cluster)
+#CLUSTER_NAMES=(reza-spark-cluster nicole-spark-cluster carlos-spark-cluster nahiyan-spark-cluster)
+#CLUSTER_NAMES=(mark-spark-cluster ronak-spark-cluster guang-spark-cluster)
+CLUSTER_NAMES=(austin-spark-cluster)
+
 PEM_NAME=insight-cluster
 PURCHASE_TYPE=spot #spot or on_demand
 REGION=us-west-2
