@@ -17,6 +17,6 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # Install Pig
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/Pig/install_pig.sh &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/Pig/install_pig.sh
 
 echo "Pig installed!"

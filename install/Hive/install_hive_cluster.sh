@@ -17,6 +17,6 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # Install Hive
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/Hive/install_hive.sh &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/Hive/install_hive.sh
 
 echo "Hive installed!"
