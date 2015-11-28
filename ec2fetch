@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# check input arguments
+if [ "$#" -ne 2 ]; then
+    echo "Please specify region and cluster name" && exit 1
+fi
+
+REGION=$1
+CLUSTER_NAME=$2
+
+BLU='\033[0;34m'
+NC='\033[0m'
+
+python fetch_instances.py $REGION $CLUSTER_NAME
+

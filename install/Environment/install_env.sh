@@ -2,7 +2,7 @@
 
 sudo apt-get update
 
-sudo apt-get --yes --force-yes install ssh rsync openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran git
+sudo apt-get --yes --force-yes install ssh rsync openjdk-7-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran git supervisor
 
 # get sbt repository
 wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads

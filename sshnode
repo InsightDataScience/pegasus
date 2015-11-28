@@ -1,6 +1,6 @@
 #!/bin/bash
-CLUSTER_NAME=$1
-PEM_KEY=$2
-NODE=$2
+PEM_KEY=$1
+CLUSTER_NAME=$2
+NODE=$3
 
 ssh -i $PEM_KEY ubuntu@$(sed -n ''"$NODE"'p' tmp/$CLUSTER_NAME/public_dns)
