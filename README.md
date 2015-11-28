@@ -26,27 +26,27 @@ If this is a newly provisioned AWS cluster, always start with at least the follo
 2. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS
 3. **AWS Credentials** - places AWS keys onto all machines
 ```
-$ ./ec2install <pem-key> <cluster-name> ENV
-$ ./ec2install <pem-key> <cluster-name> SSH
-$ ./ec2install <pem-key> <cluster-name> AWS
+$ ./ec2install <pem-key> <cluster-name> environment
+$ ./ec2install <pem-key> <cluster-name> ssh
+$ ./ec2install <pem-key> <cluster-name> aws
 ```
 # 4. Start Installing!
 ```
 $ ./ec2install <pem-key> <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
-* HADOOP
-  * HIVE  (requires HADOOP)
-  * PIG   (requires HADOOP)
-  * SPARK (requires HADOOP)
-* ZEPPELIN
-* TACHYON
-* ZOOKEEPER
-  *   HBASE (requires ZOOKEEPER)
-  *   KAFKA (requires ZOOKEEPER)
-* ELASTICSEARCH
-  *   KIBANA (requires ELASTICSEARCH)
-* CASSANDRA
+* hadoop
+  * hive  (requires hadoop)
+  * pig   (requires hadoop)
+  * spark (requires hadoop)
+* zeppelin
+* tachyon
+* zookeeper
+  *   hbase (requires zookeeper)
+  *   kafka (requires zookeeper)
+* elasticsearch
+  *   kibana (requires elasticsearch)
+* cassandra
 
 # 5. Fully automated deployment
 The `batch_deploy` script allows users to spin up instances and deploy multiple Hadoop/Spark clusters in less than 15 minutes. Users should be familiar with AWS and change the setting accordingly in the script (e.g. Instance Type, AMI, spot vs on_demand, etc.). Once all settings have been set, simply run the script
