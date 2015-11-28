@@ -14,9 +14,9 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 $ . ~/.profile
 ```
 # 2. Fetching AWS cluster IP information
-Always run fetch_instances.py to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
+Always run `ec2fetch` to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
 ```
-python fetch_instances.py <region> <cluster-name>
+$ ./ec2fetch <region> <cluster-name>
 ```
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
 # 3. Setting up a newly provisioned AWS cluster
