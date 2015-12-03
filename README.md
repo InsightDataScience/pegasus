@@ -14,11 +14,11 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 $ . ~/.profile
 ```
 # 2. Fetching AWS cluster IP information
-Always run fetch_instances.py to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
+Always run `ec2fetch` to get the instance DNSs and hostnames for the next installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```
 $ ./ec2fetch <region> <cluster-name>
 ```
-Under the tmp/<cluster-name> folder you will find the public_dns and private_dns files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup. 
+Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup. 
 
 *tmp/\<cluster-name\>/public_dns*
 ```
