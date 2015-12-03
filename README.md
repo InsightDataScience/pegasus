@@ -16,7 +16,7 @@ $ . ~/.profile
 # 2. Fetching AWS cluster IP information
 Always run fetch_instances.py to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
 ```
-python fetch_instances.py <region> <cluster-name>
+$ ./ec2fetch <region> <cluster-name>
 ```
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
 # 3. Setting up a newly provisioned AWS cluster
@@ -30,7 +30,7 @@ $ ./ec2install <pem-key> <cluster-name> environment
 $ ./ec2install <pem-key> <cluster-name> ssh
 $ ./ec2install <pem-key> <cluster-name> aws
 ```
-# 4. Start Installing!
+# 4. Start installing!
 ```
 $ ./ec2install <pem-key> <cluster-name> <technology>
 ```
@@ -47,9 +47,8 @@ The `technology` tag can be any of the following:
 * elasticsearch
   *   kibana (requires elasticsearch)
 * cassandra
-
-# 5. Fully automated deployment
-The `batch_deploy` script allows users to spin up instances and deploy multiple Hadoop/Spark clusters in less than 15 minutes. Users should be familiar with AWS and change the setting accordingly in the script (e.g. Instance Type, AMI, spot vs on_demand, etc.). Once all settings have been set, simply run the script
+# 5. Terminate a cluster
+Tears down an on-demand or spot cluster on AWS
 ```
-$ ./batch_deploy
+$ ./ec2terminate <pem-key> <cluster-name>
 ```
