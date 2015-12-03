@@ -47,6 +47,7 @@ The `technology` tag can be any of the following:
 * elasticsearch
   *   kibana (requires elasticsearch)
 * cassandra
+
 # 5. Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
 ```
