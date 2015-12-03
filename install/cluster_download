@@ -1,13 +1,16 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 3 ]; then
+    echo "Please specify pem-key location, cluster name, and technology!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
 INSTANCE_NAME=$2
+TECHNOLOGY=$3
 
 # check if pem-key location is valid
 if [ ! -f $PEMLOC ]; then
@@ -20,14 +23,12 @@ while read line; do
     DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Install and configure nodes for kafka
+# Install Hadoop master and slaves
 for dns in "${DNS[@]}"
 do
-    echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/Kafka/install_kafka.sh &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/download_tech $TECHNOLOGY &
 done
 
 wait
 
-echo "Kafka instalation complete!"
-
+echo "$TECHNOLOGY installed!"

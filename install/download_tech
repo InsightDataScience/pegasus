@@ -1,16 +1,16 @@
 #!/bin/bash
 
-ELASTICSEARCH_VER=1.5.2
+ELASTICSEARCH_VER=2.1.0
 HADOOP_VER=2.7.1
 HBASE_VER=1.1.2
 HIVE_VER=1.2.1
 KAFKA_VER=0.8.2.2
 KAFKA_SCALA_VER=2.10
-KIBANA_VER=4.0.2
+KIBANA_VER=4.3.0
 PIG_VER=0.15.0
-SPARK_VER=1.5.2
+SPARK_VER=1.4.1
 SPARK_HADOOP_VER=2.4
-TACHYON_VER=0.7.1
+TACHYON_VER=0.8.2
 ZOOKEEPER_VER=3.4.6
 
 CASSANDRA_URL=http://downloads.datastax.com/community/dsc.tar.gz
@@ -32,9 +32,8 @@ if [ "$#" -ne 1 ]; then
 fi
 
 TECHNOLOGY=$1
-
-#TECHNOLOGY_HOME=#(uppercase technology)_HOME
-#TECHNOLOGY_URL=#(uppercase technology)_URL
+TECHNOLOGY_HOME=$(echo $(echo $TECHNOLOGY | tr [a-z] [A-Z])_HOME)
+TECHNOLOGY_URL=$(eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_URL")
 
 check_folder () {
   if [ -d /usr/local/$TECHNOLOGY ]; then
@@ -42,16 +41,17 @@ check_folder () {
   else
     echo "$TECHNOLOGY missing."
     echo "installing $TECHNOLOGY ..."
-    curl_tech()
+    curl_tech
   fi
 }
 
 curl_tech () {
-  curl -L $TECHNOLOGY_URL | sudo tar zxvf -C /usr/local
+  curl -sL $TECHNOLOGY_URL | gunzip | sudo tar xv -C /usr/local
   sudo mv /usr/local/*$TECHNOLOGY* /usr/local/$TECHNOLOGY
-  echo -e "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY\n" | cat >> ~/.profile
-  echo -e "export PATH=\$PATH:$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
-  sudo chown -R ubuntu /usr/local/$TECHNOLOGY
+  echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
+  echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
+  sudo chown -R $USER /usr/local/$TECHNOLOGY
 }
 
 check_folder
+
