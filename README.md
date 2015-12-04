@@ -33,7 +33,6 @@ ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
 ip-172-31-42-254 **WORKER2**
 ip-172-31-44-133 **WORKER3**
->>>>>>> feat_refactor_install
 ```
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
 # 3. Setting up a newly provisioned AWS cluster
