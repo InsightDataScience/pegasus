@@ -47,7 +47,7 @@ case $TECHNOLOGY in
     ;;
   hadoop)
     echo "Installing Hadoop on $CLUSTER_NAME"
-    install/Hadoop/install_hadoop_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Hadoop/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   hive)
@@ -56,7 +56,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo "Installing Hive on Master Node in $CLUSTER_NAME"
-      install/Hive/install_hive_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
       config/Hive/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
@@ -71,7 +71,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo " Installing Pig on Master Node in $CLUSTER_NAME"
-      install/Pig/install_pig_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
       echo "Please install $DEP and then proceed with $TECHNOLOGY"
@@ -85,7 +85,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo "Installing Spark on $CLUSTER_NAME"
-      install/Spark/install_spark_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
       config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
@@ -96,12 +96,12 @@ case $TECHNOLOGY in
     ;;
   tachyon)
     echo "Installing Tachyon on $CLUSTER_NAME"
-    install/Tachyon/install_tachyon_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Tachyon/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   zookeeper)
     echo "Installing Zookeeper on $CLUSTER_NAME"
-    install/Zookeeper/install_zookeeper_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Zookeeper/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   hbase)
@@ -110,7 +110,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo "Installing HBase on $CLUSTER_NAME"
-      install/HBase/install_hbase_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
       config/HBase/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
@@ -125,7 +125,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo "Installing Kafka on $CLUSTER_NAME"
-      install/Kafka/install_kafka_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
       config/Kafka/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
@@ -136,12 +136,12 @@ case $TECHNOLOGY in
     ;;
   elasticsearch)
     echo "Installing Elasticsearch on $CLUSTER_NAME"
-    install/Elasticsearch/install_elasticsearch_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
     ;;
   cassandra)
     echo "Installing Cassandra on $CLUSTER_NAME"
-    install/Cassandra/install_cassandra_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Cassandra/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   kibana)
@@ -150,7 +150,7 @@ case $TECHNOLOGY in
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
       echo "Installing Kibana on Master Node in $CLUSTER_NAME"
-      install/Kibana/install_kibana_cluster.sh $PEMLOC $CLUSTER_NAME
+      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
       config/Kibana/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"

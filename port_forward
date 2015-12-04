@@ -2,8 +2,8 @@
 
 LOCAL_PORT=$1
 REMOTE_PORT=$2
-DNS=$3
-PEM_KEY=$4
+PEM_KEY=$3
+DNS=$4
 
 TCP_PID=$(lsof -i tcp:$LOCAL_PORT | awk '{print $2}' | sed -n 2p)
 echo $TCP_PID

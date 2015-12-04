@@ -1,0 +1,57 @@
+#!/bin/bash
+
+ELASTICSEARCH_VER=2.1.0
+HADOOP_VER=2.7.1
+HBASE_VER=1.1.2
+HIVE_VER=1.2.1
+KAFKA_VER=0.8.2.2
+KAFKA_SCALA_VER=2.10
+KIBANA_VER=4.3.0
+PIG_VER=0.15.0
+SPARK_VER=1.4.1
+SPARK_HADOOP_VER=2.4
+TACHYON_VER=0.8.2
+ZOOKEEPER_VER=3.4.7
+
+CASSANDRA_URL=http://downloads.datastax.com/community/dsc.tar.gz
+ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
+HADOOP_URL=https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz
+HBASE_URL=http://mirror.symnds.com/software/Apache/hbase/stable/hbase-$HBASE_VER-bin.tar.gz
+HIVE_URL=http://apache.mirrors.pair.com/hive/stable/apache-hive-$HIVE_VER-bin.tar.gz
+KAFKA_URL=http://www.interior-dsgn.com/apache/kafka/$KAFKA_VER/kafka_$KAFKA_SCALA_VER-$KAFKA_VER.tgz
+KIBANA_URL=https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VER-linux-x64.tar.gz
+OPSCENTER_URL=http://downloads.datastax.com/community/opscenter.tar.gz
+PIG_URL=http://apache.mirrorcatalogs.com/pig/latest/pig-$PIG_VER.tar.gz
+SPARK_URL=http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
+TACHYON_URL=https://github.com/amplab/tachyon/releases/download/v$TACHYON_VER/tachyon-$TACHYON_VER-bin.tar.gz
+ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/stable/zookeeper-$ZOOKEEPER_VER.tar.gz
+
+if [ "$#" -ne 1 ]; then
+  echo "Provide technology to download!"
+  exit 1
+fi
+
+TECHNOLOGY=$1
+TECHNOLOGY_HOME=$(echo $(echo $TECHNOLOGY | tr [a-z] [A-Z])_HOME)
+TECHNOLOGY_URL=$(eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_URL")
+
+check_folder () {
+  if [ -d /usr/local/$TECHNOLOGY ]; then
+    echo "$TECHNOLOGY installed."
+  else
+    echo "$TECHNOLOGY missing."
+    echo "installing $TECHNOLOGY ..."
+    curl_tech
+  fi
+}
+
+curl_tech () {
+  curl -sL $TECHNOLOGY_URL | gunzip | sudo tar xv -C /usr/local
+  sudo mv /usr/local/*$TECHNOLOGY* /usr/local/$TECHNOLOGY
+  echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
+  echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
+  sudo chown -R $USER /usr/local/$TECHNOLOGY
+}
+
+check_folder
+

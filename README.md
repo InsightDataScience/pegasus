@@ -14,9 +14,26 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 $ . ~/.profile
 ```
 # 2. Fetching AWS cluster IP information
-Always run `ec2fetch` to get the instance IPs and hostnames for the next installation. IPs will be saved into the tmp folder under the specified cluster name
+Always run `ec2fetch` to get the instance DNSs and hostnames for the next installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```
 $ ./ec2fetch <region> <cluster-name>
+```
+Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup. 
+
+*tmp/\<cluster-name\>/public_dns*
+```
+ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
+ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
+ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
+ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
+```
+*tmp/\<cluster-name\>/private_dns*
+```
+ip-172-31-38-105 **MASTER**
+ip-172-31-39-193 **WORKER1**
+ip-172-31-42-254 **WORKER2**
+ip-172-31-44-133 **WORKER3**
+>>>>>>> feat_refactor_install
 ```
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
 # 3. Setting up a newly provisioned AWS cluster
@@ -30,7 +47,7 @@ $ ./ec2install <pem-key> <cluster-name> environment
 $ ./ec2install <pem-key> <cluster-name> ssh
 $ ./ec2install <pem-key> <cluster-name> aws
 ```
-# 4. Start Installing!
+# 4. Start installing!
 ```
 $ ./ec2install <pem-key> <cluster-name> <technology>
 ```
@@ -48,8 +65,8 @@ The `technology` tag can be any of the following:
   *   kibana (requires elasticsearch)
 * cassandra
 
-# 5. Fully automated deployment
-The `batch_deploy` script allows users to spin up instances and deploy multiple Hadoop/Spark clusters in less than 15 minutes. Users should be familiar with AWS and change the setting accordingly in the script (e.g. Instance Type, AMI, spot vs on_demand, etc.). Once all settings have been set, simply run the script
+# 5. Terminate a cluster
+Tears down an on-demand or spot cluster on AWS
 ```
-$ ./batch_deploy
+$ ./ec2terminate <pem-key> <cluster-name>
 ```
