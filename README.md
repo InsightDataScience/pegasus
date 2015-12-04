@@ -1,6 +1,6 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
 
-# 1. Install the boto package for python
+# 1. Install the boto package for Python on your local machine
 This will allow you to programatically interface with your AWS account
 ```
 $ sudo pip install boto
@@ -13,7 +13,7 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 $ . ~/.profile
 ```
-# 2. Fetching AWS cluster IP information
+# 2. Fetching AWS cluster DNS and hostname information
 Always run `ec2fetch` to get the instance DNSs and hostnames for the next installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```
 $ ./ec2fetch <region> <cluster-name>
