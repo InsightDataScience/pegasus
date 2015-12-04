@@ -13,7 +13,14 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 $ . ~/.profile
 ```
-# 2. Fetching AWS cluster DNS and hostname information
+# 2. Spin up your cluster on AWS
+
+* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
+* To start we recommend deploying a 4 node cluster
+
+# 3. Fetching AWS cluster DNS and hostname information
+Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine
+
 Always run `ec2fetch` to get the instance DNSs and hostnames for the next installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```
 $ ./ec2fetch <region> <cluster-name>
@@ -35,7 +42,7 @@ ip-172-31-42-254 **WORKER2**
 ip-172-31-44-133 **WORKER3**
 ```
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
-# 3. Setting up a newly provisioned AWS cluster
+# 4. Setting up a newly provisioned AWS cluster
 If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations
 
 1. **Environment/Packages on all machines** - installs base packages for python, java, scala on all nodes in the cluster
@@ -46,7 +53,7 @@ $ ./ec2install <pem-key> <cluster-name> environment
 $ ./ec2install <pem-key> <cluster-name> ssh
 $ ./ec2install <pem-key> <cluster-name> aws
 ```
-# 4. Start installing!
+# 5. Start installing!
 ```
 $ ./ec2install <pem-key> <cluster-name> <technology>
 ```
@@ -64,7 +71,7 @@ The `technology` tag can be any of the following:
   *   kibana (requires elasticsearch)
 * cassandra
 
-# 5. Terminate a cluster
+# 6. Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
 ```
 $ ./ec2terminate <pem-key> <cluster-name>
