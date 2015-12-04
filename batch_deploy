@@ -6,17 +6,17 @@ DEPLOY_MODE=spin_and_config
 #CLUSTER_NAMES=(abishek-spark-cluster atul-spark-cluster shelby-spark-cluster shuai-spark-cluster)
 #CLUSTER_NAMES=(reza-spark-cluster nicole-spark-cluster carlos-spark-cluster nahiyan-spark-cluster)
 #CLUSTER_NAMES=(mark-spark-cluster ronak-spark-cluster guang-spark-cluster)
-CLUSTER_NAMES=(austin-spark-cluster)
+CLUSTER_NAMES=(austin-spark-cluster2)
 
 PEM_NAME=insight-cluster
-PURCHASE_TYPE=spot #spot or on_demand
+PURCHASE_TYPE=on_demand #spot or on_demand
 REGION=us-west-2
 AZ=us-west-2a
 NUM_INSTANCES=4
 SECURITY_GROUP=open
-INSTANCE_TYPE=m4.xlarge
+INSTANCE_TYPE=m4.large
 EBS_SIZE=500
-PRICE=0.25
+PRICE=0.13
 AMI=ami-f30b1c92  # Spark 1.4.1 with Hadoop 2.7.1
 #AMI=ami-4a48582b  # Spark 1.5.2 with Hadoop 2.7.1
 #AMI=ami-5189a661  # Clean Ubuntu 14.04 AMI
@@ -24,7 +24,7 @@ AMI=ami-f30b1c92  # Spark 1.4.1 with Hadoop 2.7.1
 if [ "$DEPLOY_MODE" == "spin" ] || [ "$DEPLOY_MODE" == "spin_and_config" ]; then
   for CLUSTER_NAME in ${CLUSTER_NAMES[@]}; do
     echo "spinning up $CLUSTER_NAME..."
-    time util/spin_up -u $PURCHASE_TYPE -r $REGION -z $AZ -c $CLUSTER_NAME -i $PEM_NAME -n $NUM_INSTANCES -s $SECURITY_GROUP -t $INSTANCE_TYPE -e $EBS_SIZE -p $PRICE -a $AMI &
+    time ./spin_up -u $PURCHASE_TYPE -r $REGION -z $AZ -c $CLUSTER_NAME -i $PEM_NAME -n $NUM_INSTANCES -s $SECURITY_GROUP -t $INSTANCE_TYPE -e $EBS_SIZE -p $PRICE -a $AMI &
     echo -e "\n"
   done
   wait
