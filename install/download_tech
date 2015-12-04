@@ -11,7 +11,7 @@ PIG_VER=0.15.0
 SPARK_VER=1.4.1
 SPARK_HADOOP_VER=2.4
 TACHYON_VER=0.8.2
-ZOOKEEPER_VER=3.4.6
+ZOOKEEPER_VER=3.4.7
 
 CASSANDRA_URL=http://downloads.datastax.com/community/dsc.tar.gz
 ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
@@ -24,7 +24,7 @@ OPSCENTER_URL=http://downloads.datastax.com/community/opscenter.tar.gz
 PIG_URL=http://apache.mirrorcatalogs.com/pig/latest/pig-$PIG_VER.tar.gz
 SPARK_URL=http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
 TACHYON_URL=https://github.com/amplab/tachyon/releases/download/v$TACHYON_VER/tachyon-$TACHYON_VER-bin.tar.gz
-ZOOKEEPER_URL=http://mirror.cc.columbia.edu/pub/software/apache/zookeeper/stable/zookeeper-$ZOOKEEPER_VER.tar.gz
+ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/stable/zookeeper-$ZOOKEEPER_VER.tar.gz
 
 if [ "$#" -ne 1 ]; then
   echo "Provide technology to download!"
