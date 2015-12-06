@@ -7,23 +7,15 @@
         "type": "amazon-ebs",
         "access_key": "{{user `aws_access_key`}}",
         "secret_key": "{{user `aws_secret_key`}}",
-        "region": "us-west-2",
-        "source_ami": "ami-5189a661",
+        "region": "us-east-1",
+        "source_ami": "ami-d05e75b8",
         "instance_type": "m4.large",
         "ssh_username": "ubuntu",
         "ami_name": "packer-spark {{timestamp}}"
     }],
     "provisioners": [{
       "type": "shell",
-      "scripts": [
-        "../../install/Environment/install_env.sh",
-        "../../install/Hadoop/install_hadoop.sh",
-        "../../install/Hive/install_hive.sh",
-        "../../install/Pig/install_pig.sh",
-        "../../install/Spark/install_spark.sh",
-        "../../install/Tachyon/install_tachyon.sh",
-        "../../install/Zeppelin/install_zeppelin.sh"
-      ],
+      "script": "download.sh",
       "pause_before": "30s"
     }]
 }
