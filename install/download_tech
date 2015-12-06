@@ -23,7 +23,7 @@ KIBANA_URL=https://download.elastic.co/kibana/kibana/kibana-$KIBANA_VER-linux-x6
 OPSCENTER_URL=http://downloads.datastax.com/community/opscenter.tar.gz
 PIG_URL=http://apache.mirrorcatalogs.com/pig/latest/pig-$PIG_VER.tar.gz
 SPARK_URL=http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
-TACHYON_URL=https://github.com/amplab/tachyon/releases/download/v$TACHYON_VER/tachyon-$TACHYON_VER-bin.tar.gz
+TACHYON_URL=http://tachyon-project.org/downloads/files/$TACHYON_VER/tachyon-$TACHYON_VER-bin.tar.gz
 ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/stable/zookeeper-$ZOOKEEPER_VER.tar.gz
 
 if [ "$#" -ne 1 ]; then

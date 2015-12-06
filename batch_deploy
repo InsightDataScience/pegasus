@@ -2,11 +2,11 @@
 
 DEPLOY_MODE=spin_and_config
 
-#CLUSTER_NAMES=(dhaval-spark-cluster felix-spark-cluster mehmet-spark-cluster reid-spark-cluster)
-#CLUSTER_NAMES=(abishek-spark-cluster atul-spark-cluster shelby-spark-cluster shuai-spark-cluster)
-#CLUSTER_NAMES=(reza-spark-cluster nicole-spark-cluster carlos-spark-cluster nahiyan-spark-cluster)
-#CLUSTER_NAMES=(mark-spark-cluster ronak-spark-cluster guang-spark-cluster)
-CLUSTER_NAMES=(austin-spark-cluster2)
+CLUSTER_NAMES=(nitin-spark-cluster lia-spark-cluster dustin-spark-cluster zeyu-spark-cluster)
+CLUSTER_NAMES=(archana-spark-cluster eric-spark-cluster robert-spark-cluster rani-spark-cluster)
+CLUSTER_NAMES=(sunanda-spark-cluster dylan-spark-cluster chris-spark-cluster william-spark-cluster)
+CLUSTER_NAMES=(jon-spark-cluster vicki-spark-cluster lana-spark-cluster lucia-spark-cluster)
+CLUSTER_NAMES=(roni-spark-cluster yan-spark-cluster luis-spark-cluster dan-spark-cluster)
 
 PEM_NAME=insight-cluster
 PURCHASE_TYPE=on_demand #spot or on_demand
@@ -14,12 +14,12 @@ REGION=us-west-2
 AZ=us-west-2a
 NUM_INSTANCES=4
 SECURITY_GROUP=open
-INSTANCE_TYPE=m4.large
+INSTANCE_TYPE=m4.xlarge
 EBS_SIZE=500
 PRICE=0.13
-AMI=ami-f30b1c92  # Spark 1.4.1 with Hadoop 2.7.1
-#AMI=ami-4a48582b  # Spark 1.5.2 with Hadoop 2.7.1
-#AMI=ami-5189a661  # Clean Ubuntu 14.04 AMI
+AMI=ami-f30b1c92  # Spark 1.4.1 with Hadoop 2.7.1 us-west-2
+#AMI=ami-4a48582b  # Spark 1.5.2 with Hadoop 2.7.1 us-west-2
+#AMI=ami-5189a661  # Clean Ubuntu 14.04 AMI us-west-2
 
 if [ "$DEPLOY_MODE" == "spin" ] || [ "$DEPLOY_MODE" == "spin_and_config" ]; then
   for CLUSTER_NAME in ${CLUSTER_NAMES[@]}; do
