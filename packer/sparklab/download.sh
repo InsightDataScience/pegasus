@@ -10,4 +10,4 @@ pegasus/install/download_tech hive
 pegasus/install/download_tech pig
 pegasus/install/download_tech spark
 pegasus/install/download_tech tachyon
-pegasus/Zeppelin/install_zeppelin.sh
+pegasus/install/Zeppelin/install_zeppelin.sh

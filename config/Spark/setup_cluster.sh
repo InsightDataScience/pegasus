@@ -50,4 +50,4 @@ wait
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/config_workers.sh "${SLAVE_DNS[@]}"
 ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_ipython.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_ipython.sh $GITHUB_USER $GITHUB_PASSWORD

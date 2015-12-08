@@ -80,19 +80,9 @@ case $TECHNOLOGY in
     fi
     ;;
   spark)
-    echo "Checking dependencies ..."
-    DEP=hadoop
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo "Installing Spark on $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
+    echo "Installing Spark on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   tachyon)
     echo "Installing Tachyon on $CLUSTER_NAME"
