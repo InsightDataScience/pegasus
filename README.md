@@ -61,7 +61,7 @@ The `technology` tag can be any of the following:
 * hadoop
   * hive  (requires hadoop)
   * pig   (requires hadoop)
-  * spark (requires hadoop)
+* spark
 * zeppelin
 * tachyon
 * zookeeper
