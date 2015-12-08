@@ -5,13 +5,13 @@ This will allow you to programatically interface with your AWS account
 ```
 $ sudo pip install boto
 ```
-Add your AWS credentials to `~/.profile` and source it
+Add your AWS credentials to `~/.bash_profile` and source it
 ```
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 ```
-$ . ~/.profile
+$ . ~/.bash_profile
 ```
 # 2. Spin up your cluster on AWS
 
