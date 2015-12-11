@@ -4,12 +4,12 @@ import json
 import time
 import os
 import copy
+import shutil
 
 class BotoUtil(object):
 
     def __init__(self, region):
         self.conn = boto.ec2.connect_to_region(region)
-        self.s3_conn = boto.connect_s3()
 
     def create_ec2(self, IC):
 
@@ -22,14 +22,17 @@ class BotoUtil(object):
         bdm['/dev/sda1'] = dev_sda1
 
         if IC.purchase_type == 'spot':
-            spot_requests = self.conn.request_spot_instances(price=IC.price,
-                                                             image_id=IC.image,
-                                                             placement=IC.az,
-                                                             count=IC.num_instances,
-                                                             key_name=IC.key_name,
-                                                             security_groups=IC.security_groups,
-                                                             instance_type=IC.instance_type,
-                                                             block_device_map=bdm)
+            spot_requests = self.conn.request_spot_instances(
+                price=IC.price,
+                image_id=IC.image,
+                placement=IC.az,
+                subnet_id=IC.subnet,
+                count=IC.num_instances,
+                key_name=IC.key_name,
+                security_group_ids=IC.security_group_ids,
+                instance_type=IC.instance_type,
+                block_device_map=bdm
+                )
 
             time.sleep(30)
 
@@ -56,12 +59,13 @@ class BotoUtil(object):
         elif IC.purchase_type == 'on_demand':
             image = self.conn.get_all_images(IC.image)
             reservations = image[0].run(placement=IC.az,
-                                        min_count=IC.num_instances,
-                                        max_count=IC.num_instances,
-                                        key_name=IC.key_name,
-                                        security_groups=IC.security_groups,
-                                        instance_type=IC.instance_type,
-                                        block_device_map=bdm)
+                subnet_id=IC.subnet,
+                min_count=IC.num_instances,
+                max_count=IC.num_instances,
+                key_name=IC.key_name,
+                security_group_ids=IC.security_group_ids,
+                instance_type=IC.instance_type,
+                block_device_map=bdm)
 
             instances = reservations.instances
 
@@ -151,11 +155,14 @@ class BotoUtil(object):
 
 
     def write_dns(self, instance_name, dns_tup):
-        if not os.path.exists("tmp/{}".format(instance_name)):
-            os.makedirs("tmp/{}".format(instance_name))
+        cluster_info_path="tmp/{}".format(instance_name)
+        if os.path.exists(cluster_info_path):
+            shutil.rmtree(cluster_info_path)
 
-        f_priv = open('tmp/{}/private_dns'.format(instance_name), 'w')
-        f_pub = open('tmp/{}/public_dns'.format(instance_name), 'w')
+        os.makedirs(cluster_info_path)
+
+        f_priv = open('{}/private_dns'.format(cluster_info_path), 'w')
+        f_pub = open('{}/public_dns'.format(cluster_info_path), 'w')
 
         for pair in dns_tup:
             f_priv.write(pair[0] + "\n")
@@ -168,25 +175,18 @@ class BotoUtil(object):
 
 class InstanceConfig(object):
 
-    def __init__(self, region='us-west-2',
-                       az='us-west-2a',
-                       purchase_type='on_demand',
-                       image='ami-5189a661',
-                       price=0.04,
-                       num_instances=4,
-                       key_name='insight-cluster',
-                       security_groups=["open"],
-                       instance_type='m4.xlarge',
-                       tag_name='test-cluster',
-                       vol_size=100):
+    def __init__(self, region, az, subnet, purchase_type, image, price,
+        num_instances, key_name, security_group_ids, instance_type, tag_name,
+        vol_size):
         self.region = region
         self.az = az
+        self.subnet = subnet
         self.purchase_type= purchase_type
         self.image = image
         self.price = price
         self.num_instances = num_instances
         self.key_name = key_name
-        self.security_groups = security_groups
+        self.security_group_ids = security_group_ids
         self.instance_type = instance_type
         self.tag_name = tag_name
         self.vol_size = vol_size

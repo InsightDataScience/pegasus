@@ -1,11 +1,9 @@
-Stream/.twitter
-Stream/temp_file
-Devs/public_dns
-Devs/private_dns
 .DS_Store
 DataLabs
 tmp
 archive
+templates/instances/*.json
+!templates/instances/example.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
