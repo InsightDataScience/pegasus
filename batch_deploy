@@ -1,13 +1,13 @@
 #!/bin/bash
 
 DEPLOY_MODE=spin_and_config
-CLUSTER_NAMES=(shelby-spark-cluster matt-spark-cluster kevin-spark-cluster)
+CLUSTER_NAMES=(austin-spark-cluster)
 
 PEM_NAME=sparklab-west-2
 PURCHASE_TYPE=spot #spot or on_demand
 REGION=us-west-2
 AZ=us-west-2a
-NUM_INSTANCES=4
+NUM_INSTANCES=20
 SECURITY_GROUP=open
 INSTANCE_TYPE=m4.xlarge
 EBS_SIZE=500
