@@ -1,0 +1,5 @@
+#!/bin/bash
+
+TEMPLATE_PATH=$1
+
+python util/spin_up.py $TEMPLATE_PATH
