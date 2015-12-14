@@ -2,8 +2,13 @@
 DataLabs
 tmp
 archive
-templates/instances/*.json
+templates/instances/*
 !templates/instances/example.json
+
+templates/pipelines/*
+!templates/pipelines/spark_hadoop.sh
+
+util/sparklab
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
