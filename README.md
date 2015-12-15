@@ -40,6 +40,7 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 * instance_type - type of instances to deploy e.g. "m4.large"
 * tag_name - tag all your instances with this name e.g. "test-cluster"
 * vol_size - size of the EBS volume in GB. Uses magnetic storage e.g. 100
+
 # 3. Fetching AWS cluster DNS and hostname information
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine
 
@@ -75,6 +76,11 @@ $ ./ec2install <cluster-name> environment
 $ ./ec2install <cluster-name> ssh
 $ ./ec2install <cluster-name> aws
 ```
+
+Depending on what you decide to install in the environment step, the process could take anywhere from 10-30 minutes. If you wish to speed this up, we recommend that you bake an AMI using [Packer](https://www.packer.io/) and the environment installation script. This will cut down the time to spin up a new cluster significantly. Some examples are shown in the packer folder.
+
+When you use the `ec2spinup` script, you will need to change the instance JSON template to use the new AMI instead of the base Ubuntu 14.04 Trusty AMI
+
 # 5. Start installing!
 ```
 $ ./ec2install <cluster-name> <technology>
