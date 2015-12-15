@@ -2,40 +2,31 @@
 
 from boto_util import BotoUtil, InstanceConfig
 import argparse
+import json
+from pprint import pprint
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('purchase_type', help='define on demand or spot')
-    parser.add_argument('region', help='region for instances to spin up')
-    parser.add_argument('az', help='avaliability zone for the instance to spin up')
-    parser.add_argument('instance_name', help='instance name to tag each instance')
-    parser.add_argument('pem_key_name', help='region specific pem key name to associate instances with')
-    parser.add_argument('num_instances', help='number of instances to spin up')
-    parser.add_argument('security_groups', help='array of security group names')
-    parser.add_argument('instance_type', help='type of instances to spin up')
-    parser.add_argument('volume_size', help='size in GB of default EBS volume')
-    parser.add_argument('price', help='bid price of spot instance')
-    parser.add_argument('image', help='region specific ami to use')
-
-
+    parser.add_argument('template_path', help='path to instance template')
     args = parser.parse_args()
 
-    BUtil = BotoUtil(args.region)
-    IConf = InstanceConfig(purchase_type=args.purchase_type,
-                           region=args.region,
-                           az=args.az,
-                           image=args.image,
-                           price=args.price,
-                           num_instances=args.num_instances,
-                           key_name=args.pem_key_name,
-                           security_groups=[args.security_groups],
-                           instance_type=args.instance_type,
-                           tag_name=args.instance_name,
-                           vol_size=args.volume_size)
+    with open(args.template_path) as json_file:
+        params = json.load(json_file)
+
+
+    BUtil = BotoUtil(params["region"])
+    IConf = InstanceConfig(purchase_type=params["purchase_type"],
+                           region=params["region"],
+                           az=params["az"],
+                           subnet=params["subnet"],
+                           image=params["image"],
+                           price=params["price"],
+                           num_instances=params["num_instances"],
+                           key_name=params["key_name"],
+                           security_group_ids=params["security_group_ids"],
+                           instance_type=params["instance_type"],
+                           tag_name=params["tag_name"],
+                           vol_size=params["vol_size"])
 
     BUtil.create_ec2(IConf)
-
-    dns_tup, cluster_name = BUtil.get_ec2_instances(args.instance_name)
-    BUtil.write_dns(args.instance_name, dns_tup)
-
 

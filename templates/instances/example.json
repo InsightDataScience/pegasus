@@ -1,0 +1,16 @@
+{
+    "purchase_type": "on_demand",
+    "region": "us-west-1",
+    "az": "us-west-1a",
+    "subnet": "subnet-61c12804",
+    "image": "ami-df6a8b9b",
+    "price": 0.25,
+    "num_instances": 4,
+    "key_name": "insight-cluster3",
+    "security_group_ids": [
+        "sg-e9f17e8c"
+    ],
+    "instance_type": "m4.xlarge",
+    "tag_name": "test-cluster",
+    "vol_size": 100
+}

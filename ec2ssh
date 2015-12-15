@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# check input arguments
+if [ "$#" -ne 2 ]; then
+  echo "Please specify cluster name and node number" && exit 1
+fi
+
+CLUSTER_NAME=$1
+NODE=$2
+
+if [ ! -d tmp/$CLUSTER_NAME ]; then
+  echo "cluster does not exist! please run ec2fetc first." && exit 1
+fi
+
+ssh -i tmp/$CLUSTER_NAME/*.pem ubuntu@$(sed -n ''"$NODE"'p' tmp/$CLUSTER_NAME/public_dns)

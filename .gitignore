@@ -1,11 +1,14 @@
-Stream/.twitter
-Stream/temp_file
-Devs/public_dns
-Devs/private_dns
 .DS_Store
 DataLabs
 tmp
 archive
+templates/instances/*
+!templates/instances/example.json
+
+templates/pipelines/*
+!templates/pipelines/spark_hadoop.sh
+
+util/sparklab
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
