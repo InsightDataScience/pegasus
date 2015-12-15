@@ -137,7 +137,7 @@ class BotoUtil(object):
         print json.dumps(instance_type, indent=2, sort_keys=True)
 
         if len(set(pem_keys)) == 1:
-            return dns, i.tags['Name'], i.pem_keys
+            return dns, i.tags['Name'], i.key_name
         else:
             "Instances in {} cluster do not have the same pem keys!".format(cluster_name)
             return
