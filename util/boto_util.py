@@ -112,29 +112,35 @@ class BotoUtil(object):
 
         print "Instance State: {} running".format(IC.tag_name)
 
-    def get_ec2_instances(self, instance_name):
-        instances = self.conn.get_only_instances(filters={"instance-state-name":"running", "tag:Name":"*{}*".format(instance_name)})
+    def get_ec2_instances(self, cluster_name):
+        instances = self.conn.get_only_instances(filters={"instance-state-name":"running", "tag:Name":"*{}*".format(cluster_name)})
 
         dns = []
         instance_type = {}
+        pem_keys = []
 
         for i in instances:
             priv_name = str(i.private_dns_name).split(".")[0]
             pub_name = str(i.public_dns_name)
             dns.append((priv_name, pub_name))
+            pem_keys.append(i.key_name)
 
             if i.instance_type in instance_type:
                 instance_type[i.instance_type] += 1
             else:
                 instance_type[i.instance_type] = 1
 
-            print i.tags['Name']
+            print i.tags['Name'], i.key_name
 
         dns.sort()
 
         print json.dumps(instance_type, indent=2, sort_keys=True)
 
-        return dns, i.tags['Name']
+        if len(set(pem_keys)) == 1:
+            return dns, i.tags['Name'], i.pem_keys
+        else:
+            "Instances in {} cluster do not have the same pem keys!".format(cluster_name)
+            return
 
     def wait_for_fulfillment(self, request_ids, pending_request_ids):
         """Loop through all pending request ids waiting for them to be fulfilled.
@@ -153,12 +159,13 @@ class BotoUtil(object):
             print "waiting on {} requests".format(len(pending_request_ids))
             self.wait_for_fulfillment(request_ids, pending_request_ids)
 
-
-    def write_dns(self, instance_name, dns_tup):
-        cluster_info_path="tmp/{}".format(instance_name)
+    def remove_cluster_info(self, cluster_name):
+        cluster_info_path="tmp/{}".format(cluster_name)
         if os.path.exists(cluster_info_path):
             shutil.rmtree(cluster_info_path)
 
+    def write_dns(self, cluster_name, dns_tup):
+        cluster_info_path="tmp/{}".format(cluster_name)
         os.makedirs(cluster_info_path)
 
         f_priv = open('{}/private_dns'.format(cluster_info_path), 'w')
@@ -171,7 +178,10 @@ class BotoUtil(object):
         f_priv.close()
         f_pub.close()
 
-
+    def copy_pem(self, cluster_name, pem_name):
+        cluster_info_path="tmp/{}".format(cluster_name)
+        pem_key_loc = "{}/.ssh/{}.pem".format(os.path.expanduser("~"), pem_name)
+        shutil.copy(pem_key_loc, cluster_info_path)
 
 class InstanceConfig(object):
 

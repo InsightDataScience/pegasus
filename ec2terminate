@@ -2,7 +2,7 @@
 
 # check input arguments
 if [ "$#" -ne 2 ]; then
-    echo "Please specify region and cluster name" && exit 1
+  echo "Please specify region and cluster name" && exit 1
 fi
 
 REGION=$1
@@ -12,7 +12,7 @@ BLU='\033[0;34m'
 NC='\033[0m'
 
 if [ ! -d tmp/$CLUSTER_NAME ]; then
-    echo "cluster does not exist! please run fetch_instances.py first." && exit 1
+  echo "cluster does not exist! please run ec2fetch first." && exit 1
 fi
 
 echo -e "Are you sure you want to terminate ${BLU}$CLUSTER_NAME${NC}?"
