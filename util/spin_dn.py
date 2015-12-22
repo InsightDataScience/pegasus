@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 import argparse
-from util.boto_util import BotoUtil, InstanceConfig
+from util.boto_util import BotoUtil
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,6 +14,6 @@ if __name__ == '__main__':
     BUtil = BotoUtil(args.region)
 
     public_dns_list = args.public_dns
-    ips = map(lambda dns: ".".join(dns.split('.')[0].split('-')[1:]), public_dns_list)
+    ips = [".".join(dns.split('.')[0].split('-')[1:]) for dns in  public_dns_list]
 
     BUtil.terminate_cluster(ips)

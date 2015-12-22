@@ -26,7 +26,8 @@ class BotoUtil(object):
         if inst_conf.purchase_type == "on_demand":
             inst_ids = self.request_ondemand(inst_conf)
         elif inst_conf.purchase_type == "spot":
-            inst_ids = self.request_spot(inst_conf)
+            spot_req_ids = self.request_spot(inst_conf)
+            inst_ids = self.wait_for_instance_ids_from_spot(spot_req_ids)
         else:
             return
 
@@ -69,7 +70,7 @@ class BotoUtil(object):
                 'BlockDeviceMappings': [inst_conf.bdm],
                 'SubnetId': inst_conf.subnet,
                 'Monitoring': {
-                    'Enabled': True
+                    'Enabled': False
                 },
                 'SecurityGroupIds': inst_conf.security_group_ids
             }
@@ -81,6 +82,18 @@ class BotoUtil(object):
             Resources=spot_req_ids,
             Tags=[{'Key': 'Name', 'Value': inst_conf.tag_name}]
         )
+
+        return spot_req_ids
+
+    def wait_for_instance_ids_from_spot(self, spot_req_ids):
+        """Wait for spot requests to be fulfilled and grab the instance ids
+
+        Args:
+            spot_req_ids: a list of spot request ids in string format
+
+        Returns:
+            a list of instance ids in string format
+        """
 
         print "Waiting on spot requests: {}".format(spot_req_ids)
         waiter = self.client.get_waiter('spot_instance_request_fulfilled')
@@ -114,7 +127,7 @@ class BotoUtil(object):
             BlockDeviceMappings=[inst_conf.bdm],
             SubnetId=inst_conf.subnet,
             Monitoring={
-                'Enabled': True
+                'Enabled': False
             },
             SecurityGroupIds=inst_conf.security_group_ids
         )
@@ -168,9 +181,16 @@ class BotoUtil(object):
         print json.dumps(instance_type, indent=2, sort_keys=True)
 
         if len(set(pem_keys)) == 1:
+            msg = "{} instances found in {} with the name {}"
+            print msg.format(len(pem_keys), self.client.meta.region_name, cluster_name)
             return dns, cluster_name, pem_keys[0]
+        elif len(set(pem_keys)) > 1:
+            msg = "Instances with the name {} do not have the same pem keys!"
+            print msg.format(cluster_name)
+            return
         else:
-            "Instances in {} cluster do not have the same pem keys!".format(cluster_name)
+            msg = "No instances found in {} with the name {}"
+            print msg.format(self.client.meta.region_name, cluster_name)
             return
 
     def terminate_cluster(self, ips):
@@ -220,14 +240,13 @@ class InstanceConfig(object):
         Uses the InstanceConfig class to create a block device map
 
         Args:
-            IC: InstanceConfig class
-                e.g. InstanceConfig()
+            None
 
         Returns:
             A block device map to be used by an instance
 
         Example:
-            bdm = self.__create_block_device_map(IC)
+            bdm = IC.create_block_device_map()
         """
 
         bdm = {}

@@ -1,13 +1,13 @@
-from util.boto_util import InstanceConfig, BotoUtil
+from util.boto_util import InstanceConfig
 
-class TestInstanceConfig:
+class TestInstanceConfig(object):
 
-    def test_is_valid_single_correct_key(self):
+    def test_is_valid_one_correct_key(self):
         params = {"vol_size": 100}
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == False
+        assert inst_conf.is_valid() is False
 
     def test_is_valid_correct_keys_str(self):
         params = {'region': 'us-west-2',
@@ -22,13 +22,13 @@ class TestInstanceConfig:
                   'tag_name': 'test-cluster',
                   'vol_size': 100,
                   'bdm': {}
-                  }
+                 }
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == False
+        assert inst_conf.is_valid() is False
 
-    def test_is_valid_correct_keys_unicode(self):
+    def test_is_valid_correct_keys_uni(self):
         params = {'region': u'us-west-2',
                   'subnet': u'subnet-3a78835f',
                   'purchase_type': u'on_demand',
@@ -40,11 +40,11 @@ class TestInstanceConfig:
                   'instance_type': u'm4x.large',
                   'tag_name': u'test-cluster',
                   'vol_size': 100
-                  }
+                 }
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == True
+        assert inst_conf.is_valid() is True
 
     def test_is_valid_missing_a_key(self):
         params = {'region': u'us-west-2',
@@ -57,11 +57,11 @@ class TestInstanceConfig:
                   'instance_type': u'm4x.large',
                   'tag_name': u'test-cluster',
                   'vol_size':100
-                  }
+                 }
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == False
+        assert inst_conf.is_valid() is False
 
     def test_is_valid_spot_instance(self):
         params = {'region': u'us-west-2',
@@ -75,11 +75,11 @@ class TestInstanceConfig:
                   'instance_type': u'm4x.large',
                   'tag_name': u'test-cluster',
                   'vol_size':100
-                  }
+                 }
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == True
+        assert inst_conf.is_valid() is True
 
     def test_is_valid_num_instances_str(self):
         params = {'region': u'us-west-2',
@@ -93,10 +93,10 @@ class TestInstanceConfig:
                   'instance_type': u'm4x.large',
                   'tag_name': u'test-cluster',
                   'vol_size':100
-                  }
+                 }
 
         inst_conf = InstanceConfig(params)
 
-        assert inst_conf.is_valid() == False
+        assert inst_conf.is_valid() is False
 
 

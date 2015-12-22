@@ -1,10 +1,15 @@
 ## Project pegasus - Flying in the Cloud with Automated AWS Deployment
 
-# 1. Install the boto package for Python on your local machine
+# 1. Install all Python dependencies on your local machine
 This will allow you to programatically interface with your AWS account
 ```
-$ sudo pip install boto
+$ sudo pip install -e .
 ```
+Installs the following Python packages
+* boto3
+* moto
+* schema
+
 Add your AWS credentials to `~/.bash_profile` and source it
 ```
 export AWS_ACCESS_KEY_ID=XXXX
@@ -12,6 +17,11 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 ```
 $ . ~/.bash_profile
+```
+Install pytest and run tests from top directory
+```
+$ sudo pip install pytest
+$ py.test
 ```
 # 2. Spin up your cluster on AWS
 
@@ -33,7 +43,7 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 * az - AWS availability zone you wish to spin your cluster in e.g. "us-west-2a"
 * subnet - the VPC subnet id e.g. "subnet-61c12804"
 * image - the AMI id you would like to spin the instance up with e.g. "ami-df6a8b9b"
-* price - spot price you would like to set. Ignored if purchase type is "on_demand" e.g. 0.25
+* price - spot price you would like to set. Ignored if purchase type is "on_demand" e.g. "0.25"
 * num_instances - number of instances to deploy e.g. 4
 * key_name - the pem key name to be used for all instances e.g. "insight-cluster"
 * security_group_ids - an array of the security group ids e.g. ["sg-e9f17e8c"]

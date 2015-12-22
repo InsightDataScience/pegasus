@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CLUSTER_NAME=test-cluster
-PEM_KEY_LOC=~/.ssh/insight-cluster3.pem
-REGION=us-west-1
+PEM_KEY_LOC=~/.ssh/insight-cluster.pem
+REGION=us-west-2
 
 ./ec2spinup templates/instances/example.json
 
