@@ -40,7 +40,6 @@ $ ./ec2spinup <instance-template-file>
 The `instance-template-file` is simply a JSON file that ec2spinup uses. Within this file you will must specify the follow as shown in `templates/instances/example.json`.
 * purchase_type - "on_demand" or "spot"
 * region - AWS region you wish to spin your cluster in e.g. "us-west-2"
-* az - AWS availability zone you wish to spin your cluster in e.g. "us-west-2a"
 * subnet - the VPC subnet id e.g. "subnet-61c12804"
 * image - the AMI id you would like to spin the instance up with e.g. "ami-df6a8b9b"
 * price - spot price you would like to set. Ignored if purchase type is "on_demand" e.g. "0.25"
