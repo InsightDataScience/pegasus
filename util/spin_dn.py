@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
-from boto_util import BotoUtil, InstanceConfig
 import argparse
+from util.boto_util import BotoUtil
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,26 +14,6 @@ if __name__ == '__main__':
     BUtil = BotoUtil(args.region)
 
     public_dns_list = args.public_dns
-    ips = map(lambda dns: ".".join(dns.split('.')[0].split('-')[1:]), public_dns_list)
+    ips = [".".join(dns.split('.')[0].split('-')[1:]) for dns in  public_dns_list]
 
-    instance_ids = []
-    request_ids = []
-    for ip in ips:
-        filters = {"ip-address": ip}
-        instances = BUtil.conn.get_only_instances(filters=filters)
-        if len(instances) > 0:
-            if instances[0].id is not None:
-                instance_ids.append(instances[0].id)
-            if instances[0].spot_instance_request_id is not None:
-                request_ids.append(instances[0].spot_instance_request_id)
-
-    if len(instance_ids) > 0:
-        print "{} terminating ...".format(instance_ids)
-        BUtil.conn.terminate_instances(instance_ids=instance_ids)
-    else:
-        print "No instances with ips: {}".format(ips)
-
-    if len(request_ids) > 0:
-        print "{} spot requests cancelling ...".format(request_ids)
-        BUtil.conn.cancel_spot_instance_requests(request_ids=request_ids)
-
+    BUtil.terminate_cluster(ips)

@@ -1,203 +1,355 @@
-import boto.ec2
-import boto
+"""Example style docstrings
+"""
 import json
-import time
 import os
-import copy
 import shutil
+import boto3
+from schema import Schema, And
 
 class BotoUtil(object):
+    """All boto related functions to be used in Pegasus
+    """
+    def __init__(self, region='us-west-2'):
+        self.client = boto3.client('ec2', region)
 
-    def __init__(self, region):
-        self.conn = boto.ec2.connect_to_region(region)
+    def launch_instances(self, inst_conf):
+        """Launch spot or on demand instances
 
-    def create_ec2(self, IC):
+        Args:
+            inst_conf: InstanceConfig class type
 
-        # set default EBS size
-        dev_sda1 = boto.ec2.blockdevicemapping.BlockDeviceType()
-        dev_sda1.size = IC.vol_size
-        dev_sda1.delete_on_termination = True
+        Returns:
+            None
 
-        bdm = boto.ec2.blockdevicemapping.BlockDeviceMapping()
-        bdm['/dev/sda1'] = dev_sda1
+        """
 
-        if IC.purchase_type == 'spot':
-            spot_requests = self.conn.request_spot_instances(
-                price=IC.price,
-                image_id=IC.image,
-                placement=IC.az,
-                subnet_id=IC.subnet,
-                count=IC.num_instances,
-                key_name=IC.key_name,
-                security_group_ids=IC.security_group_ids,
-                instance_type=IC.instance_type,
-                block_device_map=bdm
-                )
-
-            time.sleep(30)
-
-            # monitor spot instances for when they are satisfied
-            request_ids = [sir.id for sir in spot_requests]
-            self.wait_for_fulfillment(request_ids, copy.deepcopy(request_ids))
-
-            time.sleep(10)
-
-            for req_id in request_ids:
-                self.conn.create_tags([req_id], {"Name":IC.tag_name})
-
-            # check to see when all instance IDs have been assigned to spot requests
-            fulfilled_spot_requests = self.conn.get_all_spot_instance_requests(request_ids=request_ids)
-            instance_ids = [sir.instance_id for sir in fulfilled_spot_requests]
-
-            reservations = self.conn.get_all_instances(instance_ids=instance_ids)
-
-            instances = []
-            for r in reservations:
-                instances.extend(r.instances)
-
-
-        elif IC.purchase_type == 'on_demand':
-            image = self.conn.get_all_images(IC.image)
-            reservations = image[0].run(placement=IC.az,
-                subnet_id=IC.subnet,
-                min_count=IC.num_instances,
-                max_count=IC.num_instances,
-                key_name=IC.key_name,
-                security_group_ids=IC.security_group_ids,
-                instance_type=IC.instance_type,
-                block_device_map=bdm)
-
-            instances = reservations.instances
-
+        if inst_conf.purchase_type == "on_demand":
+            inst_ids = self.request_ondemand(inst_conf)
+        elif inst_conf.purchase_type == "spot":
+            spot_req_ids = self.request_spot(inst_conf)
+            inst_ids = self.wait_for_instance_ids_from_spot(spot_req_ids)
         else:
-            print "invalid purchase type: {}".format(IC.purchase_type)
             return
 
+        self.client.create_tags(
+            Resources=inst_ids,
+            Tags=[{'Key': 'Name', 'Value': inst_conf.tag_name}]
+        )
 
-        # monitor when instances are ready to SSH
-        state_running = False
+        print "Waiting for running instances: {}".format(inst_ids)
+        waiter = self.client.get_waiter('instance_running')
+        waiter.wait(InstanceIds=inst_ids)
+        print "Instances running"
 
-        while not state_running:
-            print "Instance State: {} pending".format(IC.tag_name)
-            time.sleep(10)
+        print "Waiting for instance status ok: {}".format(inst_ids)
+        waiter = self.client.get_waiter('instance_status_ok')
+        waiter.wait(InstanceIds=inst_ids)
+        print "Instances with status ok"
 
-            instance_state = []
-            for instance in instances:
-                instance_state.append(instance.state)
-                instance.update()
 
-            instance_state = all([inst.state==u'running' for inst in instances])
+    def request_spot(self, inst_conf):
+        """Create spot requests based on the InstanceConfig class
 
-            statuses = self.conn.get_all_instance_status(instance_ids=[inst.id for inst in instances])
+        Does a linking of the InstanceConfig class variables to the boto3 API
 
-            instance_status = []
-            system_status = []
-            for stat in statuses:
-                instance_status.append(stat.instance_status.status==u'ok')
-                system_status.append(stat.system_status.status==u'ok')
+        Args:
+            inst_conf: InstanceConfig class type
 
-            if len(statuses)>0:
-                instance_ready = all(instance_status)
-                system_ready = all(system_status)
-            else:
-                instance_ready = False
-                system_ready = False
+        Returns:
+            list of instance IDs
+        """
 
-            state_running = instance_ready and system_ready and instance_state
+        spot_req = self.client.request_spot_instances(
+            SpotPrice=inst_conf.price,
+            InstanceCount=inst_conf.num_instances,
+            Type='one-time',
+            LaunchSpecification={
+                'ImageId': inst_conf.image,
+                'KeyName': inst_conf.key_name,
+                'InstanceType': inst_conf.instance_type,
+                'BlockDeviceMappings': [inst_conf.bdm],
+                'SubnetId': inst_conf.subnet,
+                'Monitoring': {
+                    'Enabled': False
+                },
+                'SecurityGroupIds': inst_conf.security_group_ids
+            }
+        )
 
-        # give each instance a name
-        for instance in instances:
-            print instance.id
-            self.conn.create_tags([instance.id], {"Name":IC.tag_name})
+        spot_req_ids = [sr['SpotInstanceRequestId'] for sr in spot_req['SpotInstanceRequests']]
 
-        print "Instance State: {} running".format(IC.tag_name)
+        self.client.create_tags(
+            Resources=spot_req_ids,
+            Tags=[{'Key': 'Name', 'Value': inst_conf.tag_name}]
+        )
 
-    def get_ec2_instances(self, cluster_name):
-        instances = self.conn.get_only_instances(filters={"instance-state-name":"running", "tag:Name":"*{}*".format(cluster_name)})
+        return spot_req_ids
+
+    def wait_for_instance_ids_from_spot(self, spot_req_ids):
+        """Wait for spot requests to be fulfilled and grab the instance ids
+
+        Args:
+            spot_req_ids: a list of spot request ids in string format
+
+        Returns:
+            a list of instance ids in string format
+        """
+
+        print "Waiting on spot requests: {}".format(spot_req_ids)
+        waiter = self.client.get_waiter('spot_instance_request_fulfilled')
+        waiter.wait(SpotInstanceRequestIds=spot_req_ids)
+        print "Spot instances fullfilled"
+
+        spot_req = self.client.describe_spot_instance_requests(SpotInstanceRequestIds=spot_req_ids)
+
+        inst_ids = [sr['InstanceId'] for sr in spot_req['SpotInstanceRequests']]
+
+        return inst_ids
+
+    def request_ondemand(self, inst_conf):
+        """Create on demand reservations based on the InstanceConfig class
+
+        Does a linking of the InstanceConfig class variables to the boto3 API
+
+        Args:
+            inst_conf: InstanceConfig class type
+
+        Returns:
+            dictionary of Reservations
+        """
+
+        reservations = self.client.run_instances(
+            MinCount=inst_conf.num_instances,
+            MaxCount=inst_conf.num_instances,
+            ImageId=inst_conf.image,
+            KeyName=inst_conf.key_name,
+            InstanceType=inst_conf.instance_type,
+            BlockDeviceMappings=[inst_conf.bdm],
+            SubnetId=inst_conf.subnet,
+            Monitoring={
+                'Enabled': False
+            },
+            SecurityGroupIds=inst_conf.security_group_ids
+        )
+
+        inst_ids = [r['InstanceId'] for r in reservations['Instances']]
+
+        return inst_ids
+
+    def fetch_instances(self, cluster_name):
+        """Grab the public dns and hostname of all instances with matching cluster names
+
+        Args:
+            cluster_name: A string that represents the cluster tag name in AWS.
+              This does not have to be exact, since wildcards are used in the
+              filtering
+
+        Returns:
+            a tuple with the DNS, cluster name, and pem key name
+
+        """
+
+        reservations = self.client.describe_instances(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
+                     {'Name': 'tag:Name', 'Values': ['*{}*'.format(cluster_name)]}]
+        )
 
         dns = []
         instance_type = {}
         pem_keys = []
 
-        for i in instances:
-            priv_name = str(i.private_dns_name).split(".")[0]
-            pub_name = str(i.public_dns_name)
-            dns.append((priv_name, pub_name))
-            pem_keys.append(i.key_name)
+        for reservation in reservations['Reservations']:
+            for instance in reservation['Instances']:
+                priv_name = "ip-" + str(instance['PrivateIpAddress']).replace('.', '-')
+                pub_name = instance['PublicDnsName']
+                dns.append((priv_name, pub_name))
+                pem_keys.append(instance['KeyName'])
 
-            if i.instance_type in instance_type:
-                instance_type[i.instance_type] += 1
-            else:
-                instance_type[i.instance_type] = 1
+                if instance['InstanceType'] in instance_type:
+                    instance_type[instance['InstanceType']] += 1
+                else:
+                    instance_type[instance['InstanceType']] = 1
 
-            print i.tags['Name'], i.key_name
+                tags = instance['Tags']
+                for tag in tags:
+                    if tag['Key'] == 'Name':
+                        print "Instance name {} using {} key".format(tag['Value'],\
+                            instance['KeyName'])
 
         dns.sort()
 
         print json.dumps(instance_type, indent=2, sort_keys=True)
 
         if len(set(pem_keys)) == 1:
-            return dns, i.tags['Name'], i.key_name
+            msg = "{} instances found in {} with the name {}"
+            print msg.format(len(pem_keys), self.client.meta.region_name, cluster_name)
+            return dns, cluster_name, pem_keys[0]
+        elif len(set(pem_keys)) > 1:
+            msg = "Instances with the name {} do not have the same pem keys!"
+            print msg.format(cluster_name)
+            return
         else:
-            "Instances in {} cluster do not have the same pem keys!".format(cluster_name)
+            msg = "No instances found in {} with the name {}"
+            print msg.format(self.client.meta.region_name, cluster_name)
             return
 
-    def wait_for_fulfillment(self, request_ids, pending_request_ids):
-        """Loop through all pending request ids waiting for them to be fulfilled.
-        If a request is fulfilled, remove it from pending_request_ids.
-        If there are still pending requests, sleep and check again in 10 seconds.
-        Only return when all spot requests have been fulfilled."""
-        results = self.conn.get_all_spot_instance_requests(request_ids=pending_request_ids)
-        for result in results:
-            if result.status.code == 'fulfilled':
-                pending_request_ids.pop(pending_request_ids.index(result.id))
-                print "spot request `{}` fulfilled!".format(result.id)
-        if len(pending_request_ids) == 0:
-            print "all {} spots fulfilled!".format(len(request_ids))
+    def terminate_cluster(self, ips):
+        """Searches for instances with the ips terminates them on AWS
+
+        Args:
+            ips: a list of public IPs for the instances to be terminated
+
+        Returns:
+            None
+
+        """
+
+        instance_ids = []
+        request_ids = []
+
+        reservations = self.client.describe_instances(
+            Filters=[{'Name': 'ip-address', 'Values': ips}]
+        )
+
+        for reservation in reservations['Reservations']:
+            for instance in reservation['Instances']:
+                instance_ids.append(instance['InstanceId'])
+                if 'SpotInstanceRequestId' in instance:
+                    request_ids.append(instance['SpotInstanceRequestId'])
+
+        if len(instance_ids) > 0:
+            print "{} terminating ...".format(instance_ids)
+            self.client.terminate_instances(InstanceIds=instance_ids)
         else:
-            time.sleep(10)
-            print "waiting on {} requests".format(len(pending_request_ids))
-            self.wait_for_fulfillment(request_ids, pending_request_ids)
+            print "No instances with IPs: {}".format(ips)
 
-    def remove_cluster_info(self, cluster_name):
-        cluster_info_path="tmp/{}".format(cluster_name)
-        if os.path.exists(cluster_info_path):
-            shutil.rmtree(cluster_info_path)
-
-    def write_dns(self, cluster_name, dns_tup):
-        cluster_info_path="tmp/{}".format(cluster_name)
-        os.makedirs(cluster_info_path)
-
-        f_priv = open('{}/private_dns'.format(cluster_info_path), 'w')
-        f_pub = open('{}/public_dns'.format(cluster_info_path), 'w')
-
-        for pair in dns_tup:
-            f_priv.write(pair[0] + "\n")
-            f_pub.write(pair[1] + "\n")
-
-        f_priv.close()
-        f_pub.close()
-
-    def copy_pem(self, cluster_name, pem_name):
-        cluster_info_path="tmp/{}".format(cluster_name)
-        pem_key_loc = "{}/.ssh/{}.pem".format(os.path.expanduser("~"), pem_name)
-        shutil.copy(pem_key_loc, cluster_info_path)
+        if len(request_ids) > 0:
+            print "{} spot requests cancelling ...".format(request_ids)
+            self.client.cancel_spot_instance_requests(SpotInstanceRequestIds=request_ids)
 
 class InstanceConfig(object):
+    """Class defining ec2 instance configurations
+    """
+    def __init__(self, params):
+        self.__dict__.update(params)
+        self.bdm = self.create_block_device_map()
 
-    def __init__(self, region, az, subnet, purchase_type, image, price,
-        num_instances, key_name, security_group_ids, instance_type, tag_name,
-        vol_size):
-        self.region = region
-        self.az = az
-        self.subnet = subnet
-        self.purchase_type= purchase_type
-        self.image = image
-        self.price = price
-        self.num_instances = num_instances
-        self.key_name = key_name
-        self.security_group_ids = security_group_ids
-        self.instance_type = instance_type
-        self.tag_name = tag_name
-        self.vol_size = vol_size
+    def create_block_device_map(self):
+        """Create a block device map for an ec2 instance
+
+        Uses the InstanceConfig class to create a block device map
+
+        Args:
+            None
+
+        Returns:
+            A block device map to be used by an instance
+
+        Example:
+            bdm = IC.create_block_device_map()
+        """
+
+        bdm = {}
+
+        bdm['DeviceName'] = '/dev/sda1'
+
+        bdm['Ebs'] = {}
+        bdm['Ebs']['VolumeSize'] = self.__dict__['vol_size']
+        bdm['Ebs']['DeleteOnTermination'] = True
+        bdm['Ebs']['VolumeType'] = "standard"
+
+        return bdm
+
+    def is_valid(self):
+        """Checks if the input dictionary contains all valid types
+
+        Checks the __dict__ attribute and ensure it follows the correct
+        schema
+
+        Args:
+            None
+
+        Returns:
+            A Boolean if dictionary follows schema
+        """
+
+        schema = Schema({
+            'region': unicode,
+            'subnet': unicode,
+            'purchase_type': And(unicode, lambda x: x in ["on_demand", "spot"]),
+            'image': unicode,
+            'price': unicode,
+            'num_instances': int,
+            'key_name': unicode,
+            'security_group_ids': list,
+            'instance_type': unicode,
+            'tag_name': unicode,
+            'vol_size': int,
+            'bdm': dict})
+
+        try:
+            schema.validate(self.__dict__)
+            return True
+        except Exception as exc:
+            print exc
+            print "Invalid instance template"
+            return False
+
+
+def remove_cluster_info(cluster_name):
+    """Removes the directory path for specified cluster
+
+    Args:
+        cluster_name: string representing the cluster name stored locally
+
+    Returns:
+        None
+
+    """
+
+    cluster_info_path = "tmp/{}".format(cluster_name)
+    if os.path.exists(cluster_info_path):
+        shutil.rmtree(cluster_info_path)
+
+def write_dns(cluster_name, dns_tup):
+    """Writes the public dns and hostname to the cluster folder
+
+    Args:
+        cluster_name: string representing the cluster name
+        dns_tup: array of paired tuples where the first element is the
+          hostname and the second is the public DNS
+
+    Returns:
+        None
+
+    """
+
+    cluster_info_path = "tmp/{}".format(cluster_name)
+    os.makedirs(cluster_info_path)
+
+    f_priv = open('{}/private_dns'.format(cluster_info_path), 'w')
+    f_pub = open('{}/public_dns'.format(cluster_info_path), 'w')
+
+    for pair in dns_tup:
+        f_priv.write(pair[0] + "\n")
+        f_pub.write(pair[1] + "\n")
+
+    f_priv.close()
+    f_pub.close()
+
+def copy_pem(cluster_name, pem_name):
+    """Copies the pem key found locally to the cluster folder
+
+    Args:
+        cluster_name: string representing the cluster
+        pem_name: string representing the pem key to be copied over
+
+    Returns:
+        None
+
+    """
+
+    cluster_info_path = "tmp/{}".format(cluster_name)
+    pem_key_loc = "{}/.ssh/{}.pem".format(os.path.expanduser("~"), pem_name)
+    shutil.copy(pem_key_loc, cluster_info_path)
 

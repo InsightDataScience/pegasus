@@ -1,9 +1,8 @@
 #!/usr/local/bin/python
 
-from boto_util import BotoUtil, InstanceConfig
 import argparse
 import json
-from pprint import pprint
+from util.boto_util import BotoUtil, InstanceConfig
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,19 +13,10 @@ if __name__ == '__main__':
         params = json.load(json_file)
 
 
-    BUtil = BotoUtil(params["region"])
-    IConf = InstanceConfig(purchase_type=params["purchase_type"],
-                           region=params["region"],
-                           az=params["az"],
-                           subnet=params["subnet"],
-                           image=params["image"],
-                           price=params["price"],
-                           num_instances=params["num_instances"],
-                           key_name=params["key_name"],
-                           security_group_ids=params["security_group_ids"],
-                           instance_type=params["instance_type"],
-                           tag_name=params["tag_name"],
-                           vol_size=params["vol_size"])
+    BUtil = BotoUtil(params['region'])
+    IConf = InstanceConfig(params)
 
-    BUtil.create_ec2(IConf)
+    if IConf.is_valid():
+        BUtil.launch_instances(IConf)
+
 
