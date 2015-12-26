@@ -26,6 +26,28 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```
 $ . ~/.bash_profile
 ```
+You can test your boto3 AWS access by querying for the available regions for your AWS account:
+```
+>>> import boto3
+>>> client = boto3.client('ec2')
+>>> client.describe_regions()
+{u'Regions': [{u'Endpoint': 'ec2.eu-west-1.amazonaws.com',
+   u'RegionName': 'eu-west-1'},
+  {u'Endpoint': 'ec2.ap-southeast-1.amazonaws.com',
+   u'RegionName': 'ap-southeast-1'},
+  {u'Endpoint': 'ec2.ap-southeast-2.amazonaws.com',
+   u'RegionName': 'ap-southeast-2'},
+  {u'Endpoint': 'ec2.eu-central-1.amazonaws.com',
+   u'RegionName': 'eu-central-1'},
+  {u'Endpoint': 'ec2.ap-northeast-1.amazonaws.com',
+   u'RegionName': 'ap-northeast-1'},
+  {u'Endpoint': 'ec2.us-east-1.amazonaws.com', u'RegionName': 'us-east-1'},
+  {u'Endpoint': 'ec2.sa-east-1.amazonaws.com', u'RegionName': 'sa-east-1'},
+  {u'Endpoint': 'ec2.us-west-1.amazonaws.com', u'RegionName': 'us-west-1'},
+  {u'Endpoint': 'ec2.us-west-2.amazonaws.com', u'RegionName': 'us-west-2'}],
+ 'ResponseMetadata': {'HTTPStatusCode': 200,
+  'RequestId': '8949dfbe-63ab-4c0f-ba56-f9cd946de2ed'}}
+```
 Install pytest and run tests from top directory
 ```
 $ sudo pip install pytest
