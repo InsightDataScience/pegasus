@@ -4,7 +4,15 @@ This project permits anyone with an Amazon Web Services ([AWS] (http://aws.amazo
 
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
-# 1. Install all Python dependencies on your local machine
+1. [Install Pegasus on your local machine](README.md#1-install-pegasus-on-your-local-machine)
+2. [Spin up your cluster on AWS](README.md#2-spin-up-your-cluster-on-aws)
+3. [Fetching AWS cluster DNS and hostname information](README.md#3-fetching-aws-cluster-dns-and-hostname-information)
+4. [Setting up a newly provisioned AWS cluster](README.md#4-setting-up-a-newly-provisioned-aws-cluster)
+5. [Start installing!](README.md#5-start-installing)
+6. [Terminate a cluster](README.md#6-terminate-a-cluster)
+7. [Deployment Pipelines](README.md#7-deployment-pipelines)
+
+# 1. Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account
 
 Clone the Pegasus project to your local computer and install Python dependencies
@@ -28,6 +36,7 @@ $ . ~/.bash_profile
 ```
 You can test your boto3 AWS access by querying for the available regions for your AWS account:
 ```
+$ python
 >>> import boto3
 >>> client = boto3.client('ec2')
 >>> client.describe_regions()
@@ -48,7 +57,7 @@ You can test your boto3 AWS access by querying for the available regions for you
  'ResponseMetadata': {'HTTPStatusCode': 200,
   'RequestId': '8949dfbe-63ab-4c0f-ba56-f9cd946de2ed'}}
 ```
-Install pytest and run tests from top directory
+Install [pytest] (http://pytest.org/latest/) and run tests from top directory
 ```
 $ sudo pip install pytest
 $ py.test
