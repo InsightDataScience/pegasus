@@ -14,7 +14,6 @@ We want to continue improving this tool by adding more features and other instal
 7. [Deployment Pipelines](README.md#7-deployment-pipelines)
 
 # 1. Install Pegasus on your local machine
-[Table of Contents](README.md#table-of-contents)
 
 This will allow you to programatically interface with your AWS account
 
@@ -67,7 +66,6 @@ $ py.test
 ```
 
 # 2. Spin up your cluster on AWS
-[Table of Contents](README.md#table-of-contents)
 
 Currently all installations have only been tested on the Ubuntu Server 14.04 LTS (HVM) AMI.
 
@@ -115,7 +113,6 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
 
 # 3. Fetching AWS cluster DNS and hostname information
-[Table of Contents](README.md#table-of-contents)
 
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine
 
@@ -142,7 +139,6 @@ ip-172-31-44-133 **WORKER3**
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
 
 # 4. Setting up a newly provisioned AWS cluster
-[Table of Contents](README.md#table-of-contents)
 
 If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations
 
@@ -160,7 +156,6 @@ Depending on what you decide to install in the environment step, the process cou
 When you use the `ec2spinup` script, you will need to change the instance JSON template to use the new AMI instead of the base Ubuntu 14.04 Trusty AMI
 
 # 5. Start installing!
-[Table of Contents](README.md#table-of-contents)
 
 ```
 $ ./ec2install <cluster-name> <technology>
@@ -191,7 +186,6 @@ If you wish to install a different version of these technologies, please go into
 Additional technologies can be included into Pegasus by adding the technology version and url to `install/download_tech` and also writing the appropriate configurations in the `config` folder.
 
 # 6. Terminate a cluster
-[Table of Contents](README.md#table-of-contents)
 
 Tears down an on-demand or spot cluster on AWS
 ```
@@ -199,7 +193,6 @@ $ ./ec2terminate <region> <cluster-name>
 ```
 
 # 7. Deployment Pipelines
-[Table of Contents](README.md#table-of-contents)
 
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the `templates/pipelines/spark_hadoop.sh` file.
 
