@@ -1,8 +1,16 @@
-## Project pegasus - Flying in the Cloud with Automated AWS Deployment
+## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
+
+This project permits anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from you laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them. 
+
+We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
 # 1. Install all Python dependencies on your local machine
 This will allow you to programatically interface with your AWS account
+
+Clone the Pegasus project to your local computer and install Python dependencies
 ```
+$ git clone https://github.com/InsightDataScience/pegasus.git
+$ cd pegasus
 $ sudo pip install -e .
 ```
 Installs the following Python packages
@@ -24,10 +32,11 @@ $ sudo pip install pytest
 $ py.test
 ```
 # 2. Spin up your cluster on AWS
+Currently all installations have only been tested on the Ubuntu Server 14.04 LTS (HVM) AMI.
 
-* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
+* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI 
 * To start we recommend deploying a 4 node cluster
-* Tag each instance with the same name through the AWS EC2 console
+* Tag each instance with the same name through the AWS EC2 console (REQUIRED!!!)
   * e.g. test-cluster 
 
 Or
@@ -37,7 +46,7 @@ Use ec2spinup to deploy a cluster from the command line
 $ ./ec2spinup <instance-template-file>
 ```
 
-The `instance-template-file` is simply a JSON file that ec2spinup uses. Within this file you will must specify the follow as shown:
+The `instance-template-file` is simply a JSON file that ec2spinup uses. Within this file you will must specify the following as shown:
 ```
 {
     "purchase_type": "spot"|"on_demand",
@@ -113,25 +122,29 @@ When you use the `ec2spinup` script, you will need to change the instance JSON t
 $ ./ec2install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
-* hadoop
-* hive
+* hadoop (default v2.7.1)
+* hive (default v1.2.1)
   * requires hadoop
-* pig
+* pig (default v0.15.0)
   * requires hadoop
-* spark
+* spark (default v1.5.2 with hadoop v2.4+)
 * zeppelin
-* tachyon
-* zookeeper
-* hbase
+* tachyon (default v0.8.2)
+* zookeeper (default v3.4.7)
+* hbase (default v1.1.2)
   * requires hadoop, zookeeper
-* kafka
+* kafka (default v0.8.2.2 with scala v2.10)
   * requires zookeeper
-* elasticsearch
-* kibana
+* elasticsearch (default v2.1.0)
+* kibana (default v4.3.0)
   * requires elasticsearch
-* cassandra
+* cassandra (default v2.2.4)
 * opscenter
   * requires cassandra
+
+If you wish to install a different version of these technologies, please go into the `install/download_tech` script and update the technology version and technology binary download URL.
+
+Additional technologies can be included into Pegasus by adding the technology version and url to `install/download_tech` and also writing the appropriate configurations in the `config` folder.
 
 # 6. Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
