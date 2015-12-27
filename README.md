@@ -180,6 +180,7 @@ The `technology` tag can be any of the following:
 * cassandra (default v2.2.4)
 * opscenter
   * requires cassandra
+* redis (default v3.0.6)
 
 If you wish to install a different version of these technologies, please go into the `install/download_tech` script and update the technology version and technology binary download URL.
 
