@@ -74,6 +74,11 @@ case $TECHNOLOGY in
       exit 1
     fi
     ;;
+  redis)
+    echo "Installing Redis on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/Redis/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   spark)
     echo "Installing Spark on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
