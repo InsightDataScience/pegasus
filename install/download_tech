@@ -3,6 +3,8 @@
 # import technology versions and URLs
 CASSANDRA_VER=2.2.4
 ELASTICSEARCH_VER=2.1.0
+FLINK_VER=0.10.0
+FLINK_HADOOP_VER=2
 HADOOP_VER=2.7.1
 HBASE_VER=1.1.2
 HIVE_VER=1.2.1
@@ -19,6 +21,7 @@ ZOOKEEPER_VER=3.4.7
 
 CASSANDRA_URL=http://www.us.apache.org/dist/cassandra/$CASSANDRA_VER/apache-cassandra-$CASSANDRA_VER-bin.tar.gz
 ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
+FLINK_URL=http://mirror.sdunix.com/apache/flink/flink-$FLINK_VER/flink-$FLINK_VER-bin-hadoop$FLINK_HADOOP_VER-scala_2.10.tgz
 HADOOP_URL=https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz
 HBASE_URL=http://mirror.symnds.com/software/Apache/hbase/stable/hbase-$HBASE_VER-bin.tar.gz
 HIVE_URL=http://apache.mirrors.pair.com/hive/stable/apache-hive-$HIVE_VER-bin.tar.gz
