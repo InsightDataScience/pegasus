@@ -18,7 +18,7 @@ We want to continue improving this tool by adding more features and other instal
 This will allow you to programatically interface with your AWS account
 
 Clone the Pegasus project to your local computer and install Python dependencies
-```
+```bash
 $ git clone https://github.com/InsightDataScience/pegasus.git
 $ cd pegasus
 $ sudo pip install -e .
@@ -29,15 +29,15 @@ Installs the following Python packages
 * schema
 
 Add your AWS credentials to `~/.bash_profile` and source it
-```
+```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
 ```
-```
+```bash
 $ . ~/.bash_profile
 ```
 You can test your boto3 AWS access by querying for the available regions for your AWS account:
-```
+```python
 $ python
 >>> import boto3
 >>> client = boto3.client('ec2')
@@ -60,7 +60,7 @@ $ python
   'RequestId': '8949dfbe-63ab-4c0f-ba56-f9cd946de2ed'}}
 ```
 Install [pytest] (http://pytest.org/latest/) and run tests from top directory
-```
+```bash
 $ sudo pip install pytest
 $ py.test
 ```
@@ -77,12 +77,12 @@ Currently all installations have only been tested on the Ubuntu Server 14.04 LTS
 Or
 
 Use ec2spinup to deploy a cluster from the command line
-```
+```bash
 $ ./ec2spinup <instance-template-file>
 ```
 
 The `instance-template-file` is simply a JSON file that ec2spinup uses. Within this file you will must specify the following as shown:
-```
+```python
 {
     "purchase_type": "spot"|"on_demand",
     "region": "us-east-1"|"us-west-1"|"us-west-2"|"eu-central-1"|"eu-west-1"|"ap-southeast-1"|"ap-southeast-2"|"ap-northeast-1"|"sa-east-1",
@@ -117,20 +117,20 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine
 
 Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
-```
+```bash
 $ ./ec2fetch <region> <cluster-name>
 ```
 Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup. 
 
 *tmp/\<cluster-name\>/public_dns*
-```
+```bash
 ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
 ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
 *tmp/\<cluster-name\>/private_dns*
-```
+```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
 ip-172-31-42-254 **WORKER2**
@@ -145,7 +145,7 @@ If this is a newly provisioned AWS cluster, always start with at least the follo
 1. **Environment/Packages on all machines** - installs base packages for python, java, scala on all nodes in the cluster
 2. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS
 3. **AWS Credentials** - places AWS keys onto all machines
-```
+```bash
 $ ./ec2install <cluster-name> environment
 $ ./ec2install <cluster-name> ssh
 $ ./ec2install <cluster-name> aws
@@ -157,7 +157,7 @@ When you use the `ec2spinup` script, you will need to change the instance JSON t
 
 # 5. Start installing!
 
-```
+```bash
 $ ./ec2install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
@@ -190,7 +190,7 @@ Additional technologies can be included into Pegasus by adding the technology ve
 # 6. Terminate a cluster
 
 Tears down an on-demand or spot cluster on AWS
-```
+```bash
 $ ./ec2terminate <region> <cluster-name>
 ```
 
@@ -199,10 +199,10 @@ $ ./ec2terminate <region> <cluster-name>
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the `templates/pipelines/spark_hadoop.sh` file.
 
 Here it shows how we can spin up a 4 node cluster (ec2spinup) using the `example.json` instance template, grab the cluster information (ec2fetch) and install all the technologies (ec2install) in one script. We can deploy this cluster simply by running the following:
-```
+```bash
 $ templates/pipelines/spark_hadoop.sh
 ```
-```
+```bash
 #!/bin/bash
 
 CLUSTER_NAME=test-cluster
