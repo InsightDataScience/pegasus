@@ -74,6 +74,11 @@ case $TECHNOLOGY in
       exit 1
     fi
     ;;
+  presto)
+    echo "Installing Presto on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/Presto/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   redis)
     echo "Installing Redis on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY

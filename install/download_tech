@@ -10,7 +10,7 @@ KAFKA_VER=0.8.2.2
 KAFKA_SCALA_VER=2.10
 KIBANA_VER=4.3.0
 PIG_VER=0.15.0
-PRESTO_VER=0.131
+PRESTO_VER=0.86
 REDIS_VER=3.0.6
 SPARK_VER=1.5.2
 SPARK_HADOOP_VER=2.4
@@ -58,6 +58,7 @@ curl_tech () {
   echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
   echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
   sudo chown -R $USER /usr/local/$TECHNOLOGY
+  eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_VER" >> /usr/local/$TECHNOLOGY/tech_ver.txt
 }
 
 check_folder
