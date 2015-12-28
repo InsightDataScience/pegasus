@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+from time import sleep
 import boto3
 from schema import Schema, And
 
@@ -30,6 +31,8 @@ class BotoUtil(object):
             inst_ids = self.wait_for_instance_ids_from_spot(spot_req_ids)
         else:
             return
+
+        sleep(1)
 
         self.client.create_tags(
             Resources=inst_ids,
@@ -77,6 +80,8 @@ class BotoUtil(object):
         )
 
         spot_req_ids = [sr['SpotInstanceRequestId'] for sr in spot_req['SpotInstanceRequests']]
+
+        sleep(1)
 
         self.client.create_tags(
             Resources=spot_req_ids,
