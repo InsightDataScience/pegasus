@@ -161,26 +161,27 @@ When you use the `ec2spinup` script, you will need to change the instance JSON t
 $ ./ec2install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
+* cassandra (default v2.2.4)
+* elasticsearch (default v2.1.0)
 * hadoop (default v2.7.1)
-* hive (default v1.2.1)
-  * requires hadoop
-* pig (default v0.15.0)
-  * requires hadoop
-* spark (default v1.5.2 with hadoop v2.4+)
-* zeppelin
-* tachyon (default v0.8.2)
-* zookeeper (default v3.4.7)
 * hbase (default v1.1.2)
   * requires hadoop, zookeeper
+* hive (default v1.2.1)
+  * requires hadoop
 * kafka (default v0.8.2.2 with scala v2.10)
   * requires zookeeper
-* elasticsearch (default v2.1.0)
 * kibana (default v4.3.0)
   * requires elasticsearch
-* cassandra (default v2.2.4)
 * opscenter
   * requires cassandra
+* pig (default v0.15.0)
+  * requires hadoop
+* presto (default v0.86)
 * redis (default v3.0.6)
+* spark (default v1.5.2 with hadoop v2.4+)
+* tachyon (default v0.8.2)
+* zeppelin
+* zookeeper (default v3.4.7)
 
 If you wish to install a different version of these technologies, please go into the `install/download_tech` script and update the technology version and technology binary download URL.
 
