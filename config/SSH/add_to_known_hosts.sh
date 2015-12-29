@@ -16,3 +16,7 @@ done
 
 # add Secondary NameNode to known_hosts
 ssh-keyscan -H -t ecdsa 0.0.0.0 >> ~/.ssh/known_hosts
+
+# add localhost and 127.0.0.1 to known_hosts
+ssh-keyscan -H -t ecdsa localhost >> ~/.ssh/known_hosts
+ssh-keyscan -H -t ecdsa 127.0.0.1 >> ~/.ssh/known_hosts

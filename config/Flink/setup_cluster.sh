@@ -14,20 +14,9 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS names
-FIRST_LINE=true
-while read line; do
-    if [ "$FIRST_LINE" = true ]; then
-        MASTER_NAME=$line
-        SLAVE_NAME=()
-        FIRST_LINE=false
-    else
-        SLAVE_NAME+=($line)
-    fi
-done < tmp/$INSTANCE_NAME/private_dns
-
 # import AWS public DNS's
 FIRST_LINE=true
+NUM_WORKERS=0
 while read line; do
     if [ "$FIRST_LINE" = true ]; then
         MASTER_DNS=$line
@@ -35,19 +24,21 @@ while read line; do
         FIRST_LINE=false
     else
         SLAVE_DNS+=($line)
+        NUM_WORKERS=$(echo "$NUM_WORKERS + 1" | bc -l)
     fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Install and configure Spark on all nodes
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_single.sh $MASTER_DNS &
+echo $NUM_WORKERS
+
+# Install and configure Flink on all nodes
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Flink/setup_single.sh $MASTER_DNS $NUM_WORKERS &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Spark/setup_single.sh $dns &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Flink/setup_single.sh $MASTER_DNS $NUM_WORKERS &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/config_workers.sh "${SLAVE_DNS[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
-
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_ipython.sh $GITHUB_USER $GITHUB_PASSWORD
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Flink/config_master.sh $MASTER_DNS "${SLAVE_DNS[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/start-cluster.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/start-webclient.sh'

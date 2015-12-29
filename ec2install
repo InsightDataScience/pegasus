@@ -40,6 +40,11 @@ case $TECHNOLOGY in
     echo "Passing AWS credentials to $CLUSTER_NAME"
     config/pass_aws_cred $PEMLOC $CLUSTER_NAME
     ;;
+  flink)
+    echo "Installing Flink on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/Flink/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   hadoop)
     echo "Installing Hadoop on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
