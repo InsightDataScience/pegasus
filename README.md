@@ -163,6 +163,7 @@ $ ./ec2install <cluster-name> <technology>
 The `technology` tag can be any of the following:
 * cassandra (default v2.2.4)
 * elasticsearch (default v2.1.0)
+* flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
 * hbase (default v1.1.2)
   * requires hadoop, zookeeper
