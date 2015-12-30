@@ -28,8 +28,6 @@ while read line; do
     fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-echo $NUM_WORKERS
-
 # Install and configure Flink on all nodes
 ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Flink/setup_single.sh $MASTER_DNS $NUM_WORKERS &
 for dns in "${SLAVE_DNS[@]}"

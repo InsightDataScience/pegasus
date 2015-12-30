@@ -11,8 +11,6 @@ TASKMANAGER_HEAP=$(printf "%.0f" $(echo "0.90 * ($TOTMEM - 1000)" | bc -l))
 PARALLELISM=$(echo "$(nproc) * $NUM_WORKERS" | bc -l)
 TMP_DIRS=/var/flink/tmp
 
-echo $PARALLELISM
-
 sudo mkdir -p $TMP_DIRS
 sudo chown -R ubuntu $TMP_DIRS
 
