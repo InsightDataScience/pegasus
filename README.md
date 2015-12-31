@@ -166,22 +166,15 @@ The `technology` tag can be any of the following:
 * flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
 * hbase (default v1.1.2)
-  * requires hadoop, zookeeper
 * hive (default v1.2.1)
-  * requires hadoop
 * kafka (default v0.8.2.2 with scala v2.10)
-  * requires zookeeper
 * kibana (default v4.3.0)
-  * requires elasticsearch
 * opscenter
-  * requires cassandra
 * pig (default v0.15.0)
-  * requires hadoop
 * presto (default v0.86)
 * redis (default v3.0.6)
 * spark (default v1.5.2 with hadoop v2.4+)
 * storm (default v0.10.0)
-  * requires zookeeper
 * tachyon (default v0.8.2)
 * zeppelin
 * zookeeper (default v3.4.7)
