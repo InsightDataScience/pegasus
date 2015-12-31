@@ -68,16 +68,11 @@ case $TECHNOLOGY in
     echo "Passing AWS credentials to $CLUSTER_NAME"
     config/pass_aws_cred $PEMLOC $CLUSTER_NAME
     ;;
-  elasticsearch)
-    echo "Installing Elasticsearch on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
-    ;;
   environment)
     echo "Setting up base environment packages on $CLUSTER_NAME"
     install/environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
-  cassandra|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|tachyon|zookeeper)
+  cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|tachyon|zookeeper)
     get_dependencies
     install_tech
     ;;
