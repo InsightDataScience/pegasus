@@ -11,7 +11,7 @@ MAX_MEMORY_PER_NODE=$(printf "%.0f" $(echo "0.90 * ($TOTMEM - 6000) * 0.001" | b
 
 MAX_MEMORY=$(echo "$MAX_MEMORY_PER_NODE * $NUM_WORKERS" | bc -l)
 
-PORT=8181
+PORT=8080
 
 mkdir $PRESTO_HOME/etc
 
