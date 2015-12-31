@@ -25,7 +25,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 IP_CNT=0
 for dns in "${NODE_DNS[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Redis/setup_single.sh &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/redis/setup_single.sh &
 done
 
 wait
@@ -34,6 +34,6 @@ wait
 sleep 5
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Redis/join_redis_cluster.sh "${NODE_DNS[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/redis/join_redis_cluster.sh "${NODE_DNS[@]}"
 
 echo "Redis configuration complete!"

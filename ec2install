@@ -34,7 +34,8 @@ install_tech () {
   else
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then
-      DEP=${DEP[@]:1}
+      DEP=(${DEP[@]:1})
+      echo $DEP
       install_tech
     else
       echo "$DEP is not installed in $DEP_ROOT_FOLDER"
@@ -45,83 +46,44 @@ install_tech () {
   fi
 }
 
+get_dependencies () {
+  while read line; do
+    KEY_RAW=$(echo $line | awk '{print $1}')
+    KEY=${KEY_RAW%?}
+    VALUE=$(echo $line | awk '{print $2}')
+    if [ "$KEY" == "$TECHNOLOGY" ]; then
+      if [ -z $VALUE ]; then
+        DEP=()
+        break
+      else
+        DEP_RAW=${VALUE/,/ }
+        DEP=($DEP_RAW)
+      fi
+    fi
+  done < dependencies.txt
+}
+
 case $TECHNOLOGY in
   aws)
     echo "Passing AWS credentials to $CLUSTER_NAME"
     config/pass_aws_cred $PEMLOC $CLUSTER_NAME
     ;;
-  cassandra)
-    DEP=()
-    install_tech
-    ;;
   elasticsearch)
     echo "Installing Elasticsearch on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
+    config/elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
     ;;
   environment)
     echo "Setting up base environment packages on $CLUSTER_NAME"
     install/environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
-  flink)
-    DEP=()
-    install_tech
-    ;;
-  hadoop)
-    DEP=()
-    install_tech
-    ;;
-  hbase)
-    DEP=(hadoop zookeeper)
-    install_tech
-    ;;
-  hive)
-    DEP=(hadoop)
-    install_tech
-    ;;
-  kafka)
-    DEP=(zookeeper)
-    install_tech
-    ;;
-  kibana)
-    DEP=(elasticsearch)
-    install_tech
-    ;;
-  opscenter)
-    DEP=(cassandra)
-    install_tech
-    ;;
-  pig)
-    DEP=(hadoop)
-    install_tech
-    ;;
-  presto)
-    DEP=()
-    install_tech
-    ;;
-  redis)
-    DEP=()
-    install_tech
-    ;;
-  spark)
-    DEP=()
+  cassandra|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|tachyon|zookeeper)
+    get_dependencies
     install_tech
     ;;
   ssh)
     echo "Setting up passwordless SSH on $CLUSTER_NAME"
     config/SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  storm)
-    DEP=(zookeeper)
-    install_tech
-    ;;
-  tachyon)
-    DEP=()
-    install_tech
-    ;;
-  zookeeper)
-    DEP=()
-    install_tech
     ;;
   zeppelin)
     echo "Installing Zeppelin on Master Node in $CLUSTER_NAME"

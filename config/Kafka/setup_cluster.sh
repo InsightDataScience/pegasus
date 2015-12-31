@@ -25,7 +25,7 @@ BROKER_ID=0
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Kafka/setup_single.sh $BROKER_ID $dns "${DNS[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/kafka/setup_single.sh $BROKER_ID $dns "${DNS[@]}" &
     BROKER_ID=$(echo "$BROKER_ID+1" | bc)
 done
 

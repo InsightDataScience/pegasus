@@ -31,7 +31,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 # Install Tachyon on master and slaves
 for dns in "${NODE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Tachyon/setup_single.sh "${NODE_NAME[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/tachyon/setup_single.sh "${NODE_NAME[@]}" &
 done
 
 wait

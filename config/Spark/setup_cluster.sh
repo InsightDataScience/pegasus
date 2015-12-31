@@ -39,15 +39,15 @@ while read line; do
 done < tmp/$INSTANCE_NAME/public_dns
 
 # Install and configure Spark on all nodes
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_single.sh $MASTER_DNS &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_single.sh $MASTER_DNS &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Spark/setup_single.sh $dns &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/spark/setup_single.sh $dns &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/config_workers.sh "${SLAVE_DNS[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/config_workers.sh "${SLAVE_DNS[@]}"
 ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Spark/setup_ipython.sh $GITHUB_USER $GITHUB_PASSWORD
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_ipython.sh $GITHUB_USER $GITHUB_PASSWORD

@@ -33,15 +33,15 @@ done < tmp/$INSTANCE_NAME/public_dns
 # Configure base Storm nimbus and supervisors
 for dns in "${PUBLIC_DNS[@]}"
 do
-  ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Storm/setup_single.sh $WORKERS_PER_NODE $MASTER_DNS "${SLAVE_DNS[@]}" &
+  ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/storm/setup_single.sh $WORKERS_PER_NODE $MASTER_DNS "${SLAVE_DNS[@]}" &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Storm/start_master.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/storm/start_master.sh
 
 for dns in "${SLAVE_DNS[@]}"; do
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/Storm/start_slave.sh
+  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/storm/start_slave.sh
 done
 
 

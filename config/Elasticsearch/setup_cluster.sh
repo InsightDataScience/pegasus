@@ -26,7 +26,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Elasticsearch/setup_single.sh $REGION $EC2_GROUP $INSTANCE_NAME &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/elasticsearch/setup_single.sh $REGION $EC2_GROUP $INSTANCE_NAME &
 done
 
 wait

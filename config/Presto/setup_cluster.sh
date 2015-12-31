@@ -31,19 +31,19 @@ while read line; do
 done < tmp/$INSTANCE_NAME/public_dns
 
 # Configure base Presto coordinator and workers
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Presto/setup_single.sh $MASTER_DNS $NUM_WORKERS &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/presto/setup_single.sh $MASTER_DNS $NUM_WORKERS &
 for dns in "${SLAVE_DNS[@]}"
 do
-  ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Presto/setup_single.sh $MASTER_DNS $NUM_WORKERS &
+  ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/presto/setup_single.sh $MASTER_DNS $NUM_WORKERS &
 done
 
 wait
 
 # Configure Presto coordinator and workers
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Presto/config_coordinator.sh &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/presto/config_coordinator.sh &
 for dns in "${SLAVE_DNS[@]}"
 do
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/Presto/config_worker.sh &
+  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/presto/config_worker.sh &
 done
 
 wait
@@ -54,7 +54,7 @@ do
 done
 ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $PRESTO_HOME/bin/launcher start'
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Presto/setup_cli.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/presto/setup_cli.sh
 
 echo "Presto configuration complete!"
 echo "NOTE: Presto versions after 0.86 require Java 8"

@@ -31,7 +31,7 @@ MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 # Install HBase on master and slaves
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/HBase/setup_single.sh $MASTER_DNS "${HOSTIP[@]}" &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/hbase/setup_single.sh $MASTER_DNS "${HOSTIP[@]}" &
 done
 
 wait
