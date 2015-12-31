@@ -41,20 +41,20 @@ while read line; do
 done < tmp/$INSTANCE_NAME/public_dns
 
 # Configure base Hadoop master and slaves
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Hadoop/setup_single.sh $MASTER_DNS &
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/setup_single.sh $MASTER_DNS &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Hadoop/setup_single.sh $MASTER_DNS &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/hadoop/setup_single.sh $MASTER_DNS &
 done
 
 wait
 
 # Configure Hadoop master and slaves
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Hadoop/config_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_DNS[@]}" "${SLAVE_NAME[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Hadoop/config_namenode.sh $MASTER_NAME "${SLAVE_NAME[@]}" &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/config_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_DNS[@]}" "${SLAVE_NAME[@]}"
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/config_namenode.sh $MASTER_NAME "${SLAVE_NAME[@]}" &
 for dns in "${SLAVE_DNS[@]}"
 do
-    ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/Hadoop/config_datanode.sh &
+    ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/hadoop/config_datanode.sh &
 done
 
 wait

@@ -1,0 +1,20 @@
+aws:
+cassandra:
+elasticsearch:
+environment:
+flink:
+hadoop:
+hbase: zookeeper,hadoop
+hive: hadoop
+kafka: zookeeper
+kibana: elasticsearch
+opscenter: cassandra
+pig: hadoop
+presto:
+redis:
+spark:
+ssh:
+storm: zookeeper
+tachyon:
+zookeeper:
+zeppelin:

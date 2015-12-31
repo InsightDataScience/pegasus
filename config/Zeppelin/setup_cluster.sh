@@ -14,4 +14,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-ssh -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < config/Zeppelin/setup_zeppelin.sh
+ssh -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < config/zeppelin/setup_zeppelin.sh

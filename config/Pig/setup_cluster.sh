@@ -19,5 +19,5 @@ fi
 
 MASTER_DNS=$(sed -n '1p' tmp/$CLUSTER_NAME/public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/Pig/setup_pig.sh
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/pig/setup_pig.sh
 

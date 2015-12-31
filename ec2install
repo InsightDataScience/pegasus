@@ -14,6 +14,7 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$CLUSTER_NAME/public_dns)
 PEMLOC=tmp/$CLUSTER_NAME/*.pem
+DEP_ROOT_FOLDER=/usr/local/
 
 check_remote_folder () {
   ssh -i $PEMLOC ubuntu@$MASTER_DNS bash -c "'
@@ -25,183 +26,64 @@ check_remote_folder () {
   '"
 }
 
-DEP_ROOT_FOLDER=/usr/local/
+install_tech () {
+  if [ -z "$DEP" ]; then
+    echo "Installing $TECHNOLOGY on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/$TECHNOLOGY/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+  else
+    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
+    if [ "$INSTALLED" = "installed" ]; then
+      DEP=(${DEP[@]:1})
+      echo $DEP
+      install_tech
+    else
+      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
+      echo "Please install $DEP and then proceed with $TECHNOLOGY"
+      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
+      exit 1
+    fi
+  fi
+}
+
+get_dependencies () {
+  while read line; do
+    KEY_RAW=$(echo $line | awk '{print $1}')
+    KEY=${KEY_RAW%?}
+    VALUE=$(echo $line | awk '{print $2}')
+    if [ "$KEY" == "$TECHNOLOGY" ]; then
+      if [ -z $VALUE ]; then
+        DEP=()
+        break
+      else
+        DEP_RAW=${VALUE/,/ }
+        DEP=($DEP_RAW)
+      fi
+    fi
+  done < dependencies.txt
+}
 
 case $TECHNOLOGY in
   aws)
     echo "Passing AWS credentials to $CLUSTER_NAME"
     config/pass_aws_cred $PEMLOC $CLUSTER_NAME
     ;;
-  cassandra)
-    echo "Installing Cassandra on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Cassandra/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  elasticsearch)
-    echo "Installing Elasticsearch on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Elasticsearch/setup_cluster.sh $PEMLOC $CLUSTER_NAME us-west-2 open
-    ;;
   environment)
     echo "Setting up base environment packages on $CLUSTER_NAME"
-    install/Environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
-  flink)
-    echo "Installing Flink on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Flink/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  hadoop)
-    echo "Installing Hadoop on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Hadoop/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  hbase)
-    echo "Checking dependencies ..."
-    DEP=zookeeper
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      DEP=hadoop
-      INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-      if [ "$INSTALLED" = "installed" ]; then
-        echo "Installing HBase on $CLUSTER_NAME"
-        install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-        config/HBase/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-      else
-        echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-        echo "Please install $DEP and then proceed with $TECHNOLOGY"
-        echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-        exit 1
-      fi
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  hive)
-    echo "Checking dependencies ..."
-    DEP=hadoop
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo "Installing Hive on Master Node in $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Hive/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  kafka)
-    echo "Checking dependencies ..."
-    DEP=zookeeper
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo "Installing Kafka on $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Kafka/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  kibana)
-    echo "Checking dependencies ..."
-    DEP=elasticsearch
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo "Installing Kibana on Master Node in $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Kibana/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  opscenter)
-    echo "Checking dependencies ..."
-    DEP=cassandra
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo "Installing Opscenter on Master Node in $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Opscenter/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  pig)
-    echo "Checking dependencies ..."
-    DEP=hadoop
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo " Installing Pig on Master Node in $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  presto)
-    echo "Installing Presto on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Presto/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  redis)
-    echo "Installing Redis on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Redis/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  spark)
-    echo "Installing Spark on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+  cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|tachyon|zookeeper)
+    get_dependencies
+    install_tech
     ;;
   ssh)
     echo "Setting up passwordless SSH on $CLUSTER_NAME"
     config/SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
     ;;
-  storm)
-    echo "Checking dependencies ..."
-    DEP=zookeeper
-    INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
-    if [ "$INSTALLED" = "installed" ]; then
-      echo " Installing Storm on $CLUSTER_NAME"
-      install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-      config/Storm/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    else
-      echo "$DEP is not installed in $DEP_ROOT_FOLDER"
-      echo "Please install $DEP and then proceed with $TECHNOLOGY"
-      echo "./ec2install $PEMLOC $CLUSTER_NAME $DEP"
-      exit 1
-    fi
-    ;;
-  tachyon)
-    echo "Installing Tachyon on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Tachyon/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
-  zookeeper)
-    echo "Installing Zookeeper on $CLUSTER_NAME"
-    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
-    config/Zookeeper/setup_cluster.sh $PEMLOC $CLUSTER_NAME
-    ;;
   zeppelin)
     echo "Installing Zeppelin on Master Node in $CLUSTER_NAME"
-    install/Zeppelin/install_zeppelin_cluster.sh $PEMLOC $CLUSTER_NAME
-    config/Zeppelin/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    install/zeppelin/install_zeppelin_cluster.sh $PEMLOC $CLUSTER_NAME
+    config/zeppelin/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
   *)
     echo "Invalid technology to install."; exit 1 ;;

@@ -34,7 +34,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 IP_CNT=0
 for dns in "${NODE_DNS[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/Cassandra/setup_single.sh $INSTANCE_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/cassandra/setup_single.sh $INSTANCE_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
     IP_CNT=$(echo "$IP_CNT+1" | bc)
 done
 wait
@@ -44,8 +44,5 @@ for dns in "${NODE_DNS[@]}";
 do
     ssh -i $PEMLOC ubuntu@$dns '/usr/local/cassandra/bin/cassandra'
 done
-
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $OPSCENTER_HOME/bin/opscenter'
 
 echo "Cassandra configuration complete!"
