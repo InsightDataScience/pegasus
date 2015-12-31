@@ -163,6 +163,9 @@ $ ./ec2install <cluster-name> <technology>
 The `technology` tag can be any of the following:
 * cassandra (default v2.2.4)
 * elasticsearch (default v2.1.0)
+  * Must have REGION and EC2_GROUP set as environment variables
+  * e.g. REGION=us-west-2
+  * e.g. EC2_GROUP=open
 * flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
 * hbase (default v1.1.2)
