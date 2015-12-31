@@ -180,6 +180,8 @@ The `technology` tag can be any of the following:
 * presto (default v0.86)
 * redis (default v3.0.6)
 * spark (default v1.5.2 with hadoop v2.4+)
+* storm (default v0.10.0)
+  * requires zookeeper
 * tachyon (default v0.8.2)
 * zeppelin
 * zookeeper (default v3.4.7)
