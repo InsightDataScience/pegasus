@@ -94,6 +94,11 @@ case $TECHNOLOGY in
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/Spark/setup_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
+  storm)
+    echo "Installing Storm on $CLUSTER_NAME"
+    install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
+    config/Storm/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    ;;
   tachyon)
     echo "Installing Tachyon on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
