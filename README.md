@@ -36,6 +36,18 @@ export AWS_SECRET_ACCESS_KEY=XXXX
 ```bash
 $ . ~/.bash_profile
 ```
+
+Create a new `.aws` directory and create `config` file with the location of your AWS instance:
+```bash
+mkdir ~/.aws
+nano ~/.aws/conig
+```
+Add the following to `~/.aws/config` based on the region of your AWS cluster:
+```bash
+[default]
+region=<region>
+```
+
 You can test your boto3 AWS access by querying for the available regions for your AWS account:
 ```python
 $ python
@@ -114,7 +126,10 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 
 # 3. Fetching AWS cluster DNS and hostname information
 
-Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine
+Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine.   Make sure your `.pem` key has the proper privelages:
+```bash
+$ chmod 600 ~/.ssh/<your-aws-pem-key> 
+```
 
 Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```bash
