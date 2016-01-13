@@ -17,6 +17,6 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # Install Zeppelin
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/Zeppelin/install_zeppelin.sh
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/zeppelin/install_zeppelin.sh
 
 echo "Zeppelin installed!"
