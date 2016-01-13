@@ -1,6 +1,6 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
 
-This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them. 
+This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
 
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
@@ -81,10 +81,10 @@ $ py.test
 
 Currently all installations have only been tested on the Ubuntu Server 14.04 LTS (HVM) AMI.
 
-* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI 
+* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
 * To start we recommend deploying a 4 node cluster
 * Tag each instance with the same name through the AWS EC2 console (REQUIRED!!!)
-  * e.g. test-cluster 
+  * e.g. test-cluster
 
 Or
 
@@ -128,14 +128,14 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine.   Make sure your `.pem` key has the proper privelages:
 ```bash
-$ chmod 600 ~/.ssh/<your-aws-pem-key> 
+$ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
 
 Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
 ```bash
 $ ./ec2fetch <region> <cluster-name>
 ```
-Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup. 
+Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
 *tmp/\<cluster-name\>/public_dns*
 ```bash
@@ -151,7 +151,7 @@ ip-172-31-39-193 **WORKER1**
 ip-172-31-42-254 **WORKER2**
 ip-172-31-44-133 **WORKER3**
 ```
-Once the cluster IPs have been saved to the tmp folder, we can begin with installations. 
+Once the cluster IPs have been saved to the tmp folder, we can begin with installations.
 
 # 4. Setting up a newly provisioned AWS cluster
 
