@@ -40,12 +40,12 @@ $ . ~/.bash_profile
 Create a new `.aws` directory and create `config` file with the location of your AWS instance:
 ```bash
 mkdir ~/.aws
-nano ~/.aws/conig
+nano ~/.aws/config
 ```
 Add the following to `~/.aws/config` based on the region of your AWS cluster:
 ```bash
 [default]
-region=<region>
+region=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
 ```
 
 You can test your boto3 AWS access by querying for the available regions for your AWS account:
