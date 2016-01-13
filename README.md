@@ -17,7 +17,7 @@ We want to continue improving this tool by adding more features and other instal
 
 This will allow you to programatically interface with your AWS account
 
-Clone the Pegasus project to your local computer and install Python dependencies
+Clone the Pegasus project to your local computer and install Python dependencies (**Python 2.7+ required**)
 ```bash
 $ git clone https://github.com/InsightDataScience/pegasus.git
 $ cd pegasus
@@ -84,7 +84,7 @@ Currently all installations have only been tested on the Ubuntu Server 14.04 LTS
 * Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
 * To start we recommend deploying a 4 node cluster
 * Tag each instance with the same name through the AWS EC2 console (REQUIRED!!!)
-  * e.g. test-cluster
+  * e.g. test-cluster (<cluster-name> in subsequent steps)
 
 Or
 

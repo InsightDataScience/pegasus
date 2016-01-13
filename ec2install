@@ -78,7 +78,7 @@ case $TECHNOLOGY in
     ;;
   ssh)
     echo "Setting up passwordless SSH on $CLUSTER_NAME"
-    config/SSH/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
+    config/ssh/setup_passwordless_ssh.sh $PEMLOC $CLUSTER_NAME
     ;;
   zeppelin)
     echo "Installing Zeppelin on Master Node in $CLUSTER_NAME"
@@ -88,4 +88,3 @@ case $TECHNOLOGY in
   *)
     echo "Invalid technology to install."; exit 1 ;;
 esac
-
