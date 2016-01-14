@@ -131,11 +131,11 @@ Once the nodes are up and running on AWS, we'll need to grab the DNS and hostnam
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
 
-Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `private_dns` respectively
+Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
 ```bash
 $ ./ec2fetch <region> <cluster-name>
 ```
-Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `private_dns` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
+Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
 *tmp/\<cluster-name\>/public_dns*
 ```bash
@@ -144,7 +144,7 @@ ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
-*tmp/\<cluster-name\>/private_dns*
+*tmp/\<cluster-name\>/hostnames*
 ```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**

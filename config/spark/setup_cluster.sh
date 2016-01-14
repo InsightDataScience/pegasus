@@ -24,7 +24,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < tmp/$INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/hostnames
 
 # import AWS public DNS's
 FIRST_LINE=true
