@@ -18,7 +18,7 @@ fi
 HOSTIP=()
 while read line; do
     HOSTIP+=($line)
-done < tmp/$INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/hostnames
 
 # import AWS public DNS's
 DNS=()

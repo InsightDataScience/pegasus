@@ -15,12 +15,12 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS private DNS names
-SEED_IP=$(head -n 1 tmp/$INSTANCE_NAME/private_dns | tr - . | cut -b 4-)
+SEED_IP=$(head -n 1 tmp/$INSTANCE_NAME/hostnames | tr - . | cut -b 4-)
 NODE_IP=()
 while read line; do
     IP=$(echo $line | tr - . | cut -b 4-)
     NODE_IP+=($IP)
-done < tmp/$INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/hostnames
 
 
 # import AWS public DNS's
@@ -34,7 +34,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 IP_CNT=0
 for dns in "${NODE_DNS[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/cassandra/setup_single.sh $INSTANCE_NAME $SEED_IP ${NODE_IP[$IP_CNT]} & 
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/cassandra/setup_single.sh $INSTANCE_NAME $SEED_IP ${NODE_IP[$IP_CNT]} &
     IP_CNT=$(echo "$IP_CNT+1" | bc)
 done
 wait
