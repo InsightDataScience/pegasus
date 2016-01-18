@@ -21,7 +21,7 @@ Clone the Pegasus project to your local computer and install Python dependencies
 ```bash
 $ git clone https://github.com/InsightDataScience/pegasus.git
 $ cd pegasus
-$ sudo pip install -e .
+$ sudo pip install -r requirements.txt
 ```
 Installs the following Python packages
 * boto3
@@ -74,6 +74,8 @@ $ python
 Install [pytest] (http://pytest.org/latest/) and run tests from top directory
 ```bash
 $ sudo pip install pytest
+$ cd /path/to/pegasus
+$ export PYHONPATH=$(pwd)
 $ py.test
 ```
 
