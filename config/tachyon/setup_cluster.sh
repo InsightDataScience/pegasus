@@ -20,7 +20,7 @@ fi
 NODE_NAME=()
 while read line; do
     NODE_NAME+=($line)
-done < tmp/$INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/hostnames
 
 # import AWS public DNS's
 NODE_DNS=()

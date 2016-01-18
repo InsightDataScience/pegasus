@@ -19,7 +19,7 @@ SPARK_VER=1.5.2
 SPARK_HADOOP_VER=2.4
 STORM_VER=0.10.0
 TACHYON_VER=0.8.2
-ZOOKEEPER_VER=3.4.7
+ZOOKEEPER_VER=3.4.6
 
 CASSANDRA_URL=http://www.us.apache.org/dist/cassandra/$CASSANDRA_VER/apache-cassandra-$CASSANDRA_VER-bin.tar.gz
 ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz

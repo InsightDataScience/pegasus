@@ -88,4 +88,3 @@ case $TECHNOLOGY in
   *)
     echo "Invalid technology to install."; exit 1 ;;
 esac
-

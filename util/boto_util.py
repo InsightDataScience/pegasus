@@ -332,7 +332,7 @@ def write_dns(cluster_name, dns_tup):
     cluster_info_path = "tmp/{}".format(cluster_name)
     os.makedirs(cluster_info_path)
 
-    f_priv = open('{}/private_dns'.format(cluster_info_path), 'w')
+    f_priv = open('{}/hostnames'.format(cluster_info_path), 'w')
     f_pub = open('{}/public_dns'.format(cluster_info_path), 'w')
 
     for pair in dns_tup:
@@ -357,4 +357,3 @@ def copy_pem(cluster_name, pem_name):
     cluster_info_path = "tmp/{}".format(cluster_name)
     pem_key_loc = "{}/.ssh/{}.pem".format(os.path.expanduser("~"), pem_name)
     shutil.copy(pem_key_loc, cluster_info_path)
-

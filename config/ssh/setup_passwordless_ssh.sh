@@ -21,7 +21,7 @@ while read line; do
     else
         SLAVE_NAME+=($line)
     fi
-done < tmp/$INSTANCE_NAME/private_dns
+done < tmp/$INSTANCE_NAME/hostnames
 
 # import AWS public DNS's
 FIRST_LINE=true
@@ -47,6 +47,3 @@ ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/ssh/setup_ssh.sh "${SLAVE_D
 
 # Add NameNode, DataNodes, and Secondary NameNode to known hosts
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/ssh/add_to_known_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_NAME[@]}"
-
-
-
