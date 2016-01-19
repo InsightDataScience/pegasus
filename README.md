@@ -24,28 +24,18 @@ $ cd pegasus
 $ sudo pip install -r requirements.txt
 ```
 Installs the following Python packages
-* boto3
-* moto
-* schema
+* boto3==1.2.2
+* moto==0.4.19
+* schema==0.4.0
 
-Add your AWS credentials to `~/.bash_profile` and source it
+Add your AWS credentials to `~/.bash_profile`, choose a default AWS region and source it
 ```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
+export AWS_DEFAULT_REGION=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
 ```
 ```bash
 $ . ~/.bash_profile
-```
-
-Create a new `.aws` directory and create `config` file with the location of your AWS instance:
-```bash
-mkdir ~/.aws
-nano ~/.aws/config
-```
-Add the following to `~/.aws/config` based on the region of your AWS cluster:
-```bash
-[default]
-region=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
 ```
 
 You can test your boto3 AWS access by querying for the available regions for your AWS account:
@@ -74,13 +64,13 @@ Install [pytest] (http://pytest.org/latest/) and run tests from top directory
 ```bash
 $ sudo pip install pytest
 $ cd /path/to/pegasus
-$ export PYHONPATH=$(pwd)
+$ export PYTHONPATH=$(pwd)
 $ py.test
 ```
 
 # 2. Spin up your cluster on AWS
 
-Currently all installations have only been tested on the Ubuntu Server 14.04 LTS (HVM) AMI.
+Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI.
 
 * Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
 * To start we recommend deploying a 4 node cluster
