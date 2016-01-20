@@ -38,7 +38,7 @@ export AWS_DEFAULT_REGION=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|a
 $ . ~/.bash_profile
 ```
 
-You can test your boto3 AWS access by querying for the available regions for your AWS account:
+You can test your boto3 AWS access by querying for the available regions for your AWS account (eg. from python):
 ```python
 >>> import boto3
 >>> client = boto3.client('ec2')
