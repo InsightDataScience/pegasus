@@ -31,6 +31,7 @@ install_tech () {
     echo "Installing $TECHNOLOGY on $CLUSTER_NAME"
     install/cluster_download $PEMLOC $CLUSTER_NAME $TECHNOLOGY
     config/$TECHNOLOGY/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    service/$TECHNOLOGY/start_service.sh $PEMLOC $CLUSTER_NAME
   else
     INSTALLED=$(check_remote_folder $DEP_ROOT_FOLDER$DEP)
     if [ "$INSTALLED" = "installed" ]; then

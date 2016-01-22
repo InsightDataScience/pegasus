@@ -1,5 +1,5 @@
 import argparse
-from util.boto_util import BotoUtil, remove_cluster_info, write_dns, copy_pem
+from boto_util import BotoUtil, remove_cluster_info, write_dns, copy_pem
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

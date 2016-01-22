@@ -12,6 +12,9 @@ class BotoUtil(object):
     """
     def __init__(self, region='us-west-2'):
         self.client = boto3.client('ec2', region)
+        self.images = {"us-west-1": "ami-cb97e3ab",
+                       "us-west-2": "ami-4342a723",
+                       "us-east-1": "ami-a20d2bc8"}
 
     def launch_instances(self, inst_conf):
         """Launch spot or on demand instances
@@ -67,7 +70,7 @@ class BotoUtil(object):
             InstanceCount=inst_conf.num_instances,
             Type='one-time',
             LaunchSpecification={
-                'ImageId': inst_conf.image,
+                'ImageId': self.images[inst_conf.region],
                 'KeyName': inst_conf.key_name,
                 'InstanceType': inst_conf.instance_type,
                 'BlockDeviceMappings': [inst_conf.bdm],
@@ -126,7 +129,7 @@ class BotoUtil(object):
         reservations = self.client.run_instances(
             MinCount=inst_conf.num_instances,
             MaxCount=inst_conf.num_instances,
-            ImageId=inst_conf.image,
+            ImageId=self.images[inst_conf.region],
             KeyName=inst_conf.key_name,
             InstanceType=inst_conf.instance_type,
             BlockDeviceMappings=[inst_conf.bdm],
@@ -276,13 +279,11 @@ class InstanceConfig(object):
 
         Returns:
             A Boolean if dictionary follows schema
-        """
-
+        """ 
         schema = Schema({
-            'region': unicode,
+            'region': And(unicode, lambda x: x in ["us-west-1", "us-west-2", "us-east-1"]),
             'subnet': unicode,
             'purchase_type': And(unicode, lambda x: x in ["on_demand", "spot"]),
-            'image': unicode,
             'price': unicode,
             'num_instances': int,
             'key_name': unicode,
