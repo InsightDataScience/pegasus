@@ -5,6 +5,9 @@ ES_NAME=$1
 
 . ~/.profile
 
+mkdir $ELASTICSEARCH_HOME/logs
+mkdir $ELASTICSEARCH_HOME/plugins
+
 sudo $ELASTICSEARCH_HOME/bin/plugin install cloud-aws
 
 #sudo sed -i '1i discovery.ec2.groups: '"$EC2_GROUP"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
@@ -15,3 +18,4 @@ sudo sed -i '1i cloud.aws.secret_key: '"$AWS_SECRET_ACCESS_KEY"'' $ELASTICSEARCH
 sudo sed -i '1i cloud.aws.access_key: '"$AWS_ACCESS_KEY_ID"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 sudo sed -1 '1i network.host: 0.0.0.0' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 
+sudo chown -R ubuntu $ELASTCSEARCH_HOME
