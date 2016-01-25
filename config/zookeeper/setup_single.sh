@@ -21,5 +21,3 @@ sudo chown -R ubuntu /var/lib/zookeeper
 sudo touch /var/lib/zookeeper/myid
 echo 'echo '"$ID"' >> /var/lib/zookeeper/myid' | sudo -s
 
-zkServer.sh start
-

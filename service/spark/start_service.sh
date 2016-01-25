@@ -26,14 +26,8 @@ while read line; do
     fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Install and configure Spark on all nodes
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_single.sh $MASTER_DNS &
-for dns in "${SLAVE_DNS[@]}"
-do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/spark/setup_single.sh $dns &
-done
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
 
-wait
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < service/spark/setup_ipython.sh
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/config_workers.sh "${SLAVE_DNS[@]}"
-
+echo "Spark Started!"

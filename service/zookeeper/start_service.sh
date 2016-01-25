@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
@@ -14,26 +16,20 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS's
-HOSTIP=()
-while read line; do
-    HOSTIP+=($line)
-done < tmp/$INSTANCE_NAME/hostnames
-
 # import AWS public DNS's
 DNS=()
 while read line; do
     DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-
-# Install HBase on master and slaves
+# Install and configure nodes for zookeeper
+SERVER_NUM=1
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/hbase/setup_single.sh $MASTER_DNS "${HOSTIP[@]}" &
+    echo $dns
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '. ~/.profile; zkServer.sh start' &
 done
 
 wait
 
-echo "HBase configuration complete!"
+echo "Zookeeper Started!" 

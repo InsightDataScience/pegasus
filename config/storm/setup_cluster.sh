@@ -38,12 +38,5 @@ done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/storm/start_master.sh
-
-for dns in "${SLAVE_DNS[@]}"; do
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/storm/start_slave.sh
-done
-
-
 echo "Storm configuration complete!"
 

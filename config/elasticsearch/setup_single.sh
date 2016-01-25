@@ -16,6 +16,6 @@ sudo sed -i '1i cluster.name: '"$ES_NAME"'' $ELASTICSEARCH_HOME/config/elasticse
 sudo sed -i '1i cloud.aws.region: '"$AWS_DEFAULT_REGION"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 sudo sed -i '1i cloud.aws.secret_key: '"$AWS_SECRET_ACCESS_KEY"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 sudo sed -i '1i cloud.aws.access_key: '"$AWS_ACCESS_KEY_ID"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
-sudo sed -1 '1i network.host: 0.0.0.0' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+sudo sed -i '1i network.host: 0.0.0.0' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 
-sudo chown -R ubuntu $ELASTCSEARCH_HOME
+sudo chown -R ubuntu $ELASTICSEARCH_HOME

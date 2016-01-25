@@ -14,9 +14,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-
-# Install Kibana on master
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/kibana/setup_single.sh $MASTER_DNS
-
-echo "Kibana configuration complete!"
+ssh -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) '. ~/.profile; zeppelin-daemon.sh start'

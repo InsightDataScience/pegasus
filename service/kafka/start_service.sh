@@ -14,26 +14,20 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS's
-HOSTIP=()
-while read line; do
-    HOSTIP+=($line)
-done < tmp/$INSTANCE_NAME/hostnames
-
 # import AWS public DNS's
 DNS=()
 while read line; do
     DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-
-# Install HBase on master and slaves
+# Start kafka broker on all nodes
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/hbase/setup_single.sh $MASTER_DNS "${HOSTIP[@]}" &
+    echo $dns
+    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties' &
 done
 
 wait
 
-echo "HBase configuration complete!"
+echo "Kafka Started!"
+

@@ -1,10 +1,5 @@
 #!/bin/bash
 
-GITHUB_USER=$1
-GITHUB_PASSWORD=$2
-
-git clone https://$GITHUB_USER:$GITHUB_PASSWORD@github.com/aouyang1/spark_tutorials.git
-
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
 EXECMEM=$(echo "0.90 * ($TOTMEM - 1000)" | bc -l)

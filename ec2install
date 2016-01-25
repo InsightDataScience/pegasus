@@ -85,6 +85,7 @@ case $TECHNOLOGY in
     echo "Installing Zeppelin on Master Node in $CLUSTER_NAME"
     install/zeppelin/install_zeppelin_cluster.sh $PEMLOC $CLUSTER_NAME
     config/zeppelin/setup_cluster.sh $PEMLOC $CLUSTER_NAME
+    service/zeppelin/start_service.sh $PEMLOC $CLUSTER_NAME
     ;;
   *)
     echo "Invalid technology to install."; exit 1 ;;

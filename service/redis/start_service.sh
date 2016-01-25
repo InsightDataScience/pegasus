@@ -15,19 +15,23 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS public DNS's
-SEED_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 NODE_DNS=()
 while read line; do
     NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
 # Install and configure nodes for cassandra
-IP_CNT=0
 for dns in "${NODE_DNS[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/redis/setup_single.sh &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-server /usr/local/redis/redis.conf' &
 done
 
 wait
 
-echo "Redis configuration complete!"
+# wait for servers to come up in tmux sessions
+sleep 5
+
+MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/redis/join_redis_cluster.sh "${NODE_DNS[@]}" &
+
+echo "Redis Started!"

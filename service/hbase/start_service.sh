@@ -16,7 +16,6 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
-# Install Kibana on master
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/kibana/setup_single.sh $MASTER_DNS
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HBASE_HOME/bin/start-hbase.sh'
 
-echo "Kibana configuration complete!"
+echo "HBase Started!"

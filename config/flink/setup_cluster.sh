@@ -38,5 +38,4 @@ done
 wait
 
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/flink/config_master.sh $MASTER_DNS "${SLAVE_DNS[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/start-cluster.sh'
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/start-webclient.sh'
+

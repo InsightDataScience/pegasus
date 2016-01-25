@@ -16,6 +16,3 @@ EXECMEM=$(echo "0.90 * ($TOTMEM - 1000)" | bc -l)
 
 sed -i 's@<value>8080</value>@<value>7888</value>@g' $ZEPPELIN_HOME/conf/zeppelin-site.xml
 
-tmux new-session -s zeppelin_notebook -n bash -d
-
-tmux send-keys -t zeppelin_notebook '. ~/.profile; zeppelin-daemon.sh start' C-m

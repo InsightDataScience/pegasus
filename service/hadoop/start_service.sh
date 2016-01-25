@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
@@ -16,7 +18,8 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
-# Install Kibana on master
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/kibana/setup_single.sh $MASTER_DNS
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/start-dfs.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/start-yarn.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver'
 
-echo "Kibana configuration complete!"
+echo "Hadoop started!"

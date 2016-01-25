@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
@@ -15,19 +17,23 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS public DNS's
-SEED_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-NODE_DNS=()
+FIRST_LINE=true
 while read line; do
-    NODE_DNS+=($line)
+  if [ "$FIRST_LINE" = true ]; then
+    MASTER_DNS=$line
+    SLAVE_DNS=()
+    FIRST_LINE=false
+  else
+    SLAVE_DNS+=($line)
+  fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Install and configure nodes for cassandra
-IP_CNT=0
-for dns in "${NODE_DNS[@]}";
-do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/redis/setup_single.sh &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < service/storm/start_master.sh
+
+for dns in "${SLAVE_DNS[@]}"; do
+  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < service/storm/start_slave.sh
 done
 
-wait
 
-echo "Redis configuration complete!"
+echo "Storm Started!"
+
