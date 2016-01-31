@@ -90,7 +90,6 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
     "purchase_type": "spot"|"on_demand",
     "region": "us-east-1"|"us-west-1"|"us-west-2"|"eu-central-1"|"eu-west-1"|"ap-southeast-1"|"ap-southeast-2"|"ap-northeast-1"|"sa-east-1",
     "subnet": "string",
-    "image": "string",
     "price": "string",
     "num_instances": 4,
     "key_name": "string",
