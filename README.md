@@ -104,7 +104,6 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 * **purchase_type** (*string*) - choose between on-demand or spot instances
 * **region** (*string*) - AWS region you wish to spin your cluster in
 * **subnet** (*string*) - the VPC subnet id e.g. "subnet-61c12804"
-* **image** (*string*) - the AMI id you would like to spin the instance up with e.g. "ami-df6a8b9b"
 * **price** (*string*) - spot price you would like to set. Ignored if purchase type is "on_demand" e.g. "0.25"
 * **num_instances** (*integer*) - number of instances to deploy
 * **key_name** (*string*) - the pem key name to be used for all instances e.g. "insight-cluster"
