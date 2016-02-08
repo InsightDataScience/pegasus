@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
@@ -20,14 +22,14 @@ while read line; do
     DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Start kafka broker on all nodes
+# Install and configure nodes for zookeeper
+SERVER_NUM=1
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '. ~/.profile; zkServer.sh stop' &
 done
 
 wait
 
-echo "Kafka Started!"
-
+echo "Zookeeper Stopped!" 

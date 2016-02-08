@@ -23,7 +23,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'sudo /usr/local/elasticsearch/bin/elasticsearch -d'
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/elasticsearch/bin/elasticsearch -d'
 done
 
 echo "Elasticsearch started!"

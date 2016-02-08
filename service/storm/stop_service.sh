@@ -28,14 +28,13 @@ while read line; do
   fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-echo $MASTER_DNS
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < service/storm/start_master.sh
-
 for dns in "${SLAVE_DNS[@]}"; do
   echo $dns
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < service/storm/start_slave.sh
+  ssh -i $PEMLOC ubuntu@$dns 'tmux kill-session -t supervisor'
 done
 
+echo $MASTER_DNS
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'tmux kill-session -t stormui; tmux kill-session -t nimbus'
 
-echo "Storm Started!"
+echo "Storm Stopped!"
 

@@ -18,6 +18,7 @@ fi
 
 # import AWS public DNS's
 FIRST_LINE=true
+NUM_WORKERS=0
 while read line; do
   if [ "$FIRST_LINE" = true ]; then
     MASTER_DNS=$line
@@ -25,17 +26,15 @@ while read line; do
     FIRST_LINE=false
   else
     SLAVE_DNS+=($line)
+    NUM_WORKERS=$(echo "$NUM_WORKERS + 1" | bc -l)
   fi
 done < tmp/$INSTANCE_NAME/public_dns
 
-echo $MASTER_DNS
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < service/storm/start_master.sh
-
-for dns in "${SLAVE_DNS[@]}"; do
-  echo $dns
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < service/storm/start_slave.sh
+for dns in "${SLAVE_DNS[@]}"
+do
+  ssh -i $PEMLOC ubuntu@$dns '. ~/.profile; $PRESTO_HOME/bin/launcher stop' &
 done
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $PRESTO_HOME/bin/launcher stop'
 
-
-echo "Storm Started!"
+echo "Presto Stopped!"
 

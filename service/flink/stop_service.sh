@@ -16,6 +16,7 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/stop-webclient.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/flink/bin/stop-cluster.sh'
 
-echo "Kibana Started!"
+echo "Flink Stopped!"

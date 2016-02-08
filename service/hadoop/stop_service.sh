@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
@@ -16,6 +18,8 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh stop historyserver'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/stop-yarn.sh'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HADOOP_HOME/sbin/stop-dfs.sh'
 
-echo "Kibana Started!"
+echo "Hadoop stopped!"

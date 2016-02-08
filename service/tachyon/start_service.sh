@@ -22,6 +22,14 @@ while read line; do
     NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon-start.sh all SudoMount'
+cnt=0
+for dns in ${NODE_DNS[@]}; do
+  if [ $cnt == 0 ]; then
+    ssh -i $PEMLOC ubuntu@${dns} '. ~/.profile; /usr/local/tachyon/bin/tachyon-start.sh master'
+  else
+    ssh -i $PEMLOC ubuntu@${dns} '. ~/.profile; /usr/local/tachyon/bin/tachyon-start.sh worker SudoMount'
+  fi
+  cnt=$(($cnt+1))
+done
 
 echo "Tachyon Started!"

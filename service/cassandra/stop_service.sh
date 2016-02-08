@@ -15,19 +15,15 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS public DNS's
-DNS=()
+NODE_DNS=()
 while read line; do
-    DNS+=($line)
+    NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Start kafka broker on all nodes
-for dns in "${DNS[@]}"
+# Start each cassandra node
+for dns in "${NODE_DNS[@]}";
 do
-    echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
+    ssh -i $PEMLOC ubuntu@$dns '/usr/local/cassandra/bin/nodetool stopdaemon'
 done
 
-wait
-
-echo "Kafka Started!"
-
+echo "Cassandra stopped!"

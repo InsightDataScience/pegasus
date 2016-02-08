@@ -14,8 +14,4 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
-
-echo "Kibana Started!"
+ssh -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) '. ~/.profile; zeppelin-daemon.sh stop'

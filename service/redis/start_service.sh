@@ -20,15 +20,15 @@ while read line; do
     NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Install and configure nodes for cassandra
+# Start redis servers
 for dns in "${NODE_DNS[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-server /usr/local/redis/redis.conf' &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-server /usr/local/redis/redis.conf &' &
 done
 
 wait
 
-# wait for servers to come up in tmux sessions
+# begin discovery of redis servers
 sleep 5
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)

@@ -16,6 +16,6 @@ fi
 
 MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HBASE_HOME/bin/stop-hbase.sh'
 
-echo "Kibana Started!"
+echo "HBase Stopped!"

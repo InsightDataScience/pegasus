@@ -14,8 +14,9 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
+MASTER_DNS=$(head -n 1 tmp/${INSTANCE_NAME}/public_dns)
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'tmux kill-session -t ipython_notebook'
+ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/stop-all.sh'
 
-echo "Kibana Started!"
+echo "Spark Stopped!"

@@ -15,19 +15,17 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS public DNS's
-DNS=()
+NODE_DNS=()
 while read line; do
-    DNS+=($line)
+    NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Start kafka broker on all nodes
-for dns in "${DNS[@]}"
+# Install and configure nodes for cassandra
+for dns in "${NODE_DNS[@]}";
 do
-    echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-cli shutdown' &
 done
 
 wait
 
-echo "Kafka Started!"
-
+echo "Redis Stopped!"

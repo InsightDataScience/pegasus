@@ -2,7 +2,7 @@
 
 # check input arguments
 if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location, cluster name, AWS region!" && exit 1
+    echo "Please specify pem-key location and cluster name!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
@@ -23,7 +23,7 @@ done < tmp/$INSTANCE_NAME/public_dns
 # Install and configure nodes for elasticsearch
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/elasticsearch/setup_single.sh $INSTANCE_NAME &
+  ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/elasticsearch/setup_single.sh $INSTANCE_NAME $AWS_DEFAULT_REGION $AWS_SECRET_ACCESS_KEY $AWS_ACCESS_KEY_ID &
 done
 
 wait

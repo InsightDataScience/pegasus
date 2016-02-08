@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+    echo "Please specify pem-key location!" && exit 1
 fi
 
 # get input arguments [aws region, pem-key location]
@@ -15,19 +17,11 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # import AWS public DNS's
-DNS=()
+NODE_DNS=()
 while read line; do
-    DNS+=($line)
+    NODE_DNS+=($line)
 done < tmp/$INSTANCE_NAME/public_dns
 
-# Start kafka broker on all nodes
-for dns in "${DNS[@]}"
-do
-    echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
-done
+ssh -i $PEMLOC ubuntu@${NODE_DNS[0]} '/usr/local/tachyon/bin/tachyon-stop.sh'
 
-wait
-
-echo "Kafka Started!"
-
+echo "Tachyon Stopped!"

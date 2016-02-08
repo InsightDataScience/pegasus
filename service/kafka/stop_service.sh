@@ -24,10 +24,10 @@ done < tmp/$INSTANCE_NAME/public_dns
 for dns in "${DNS[@]}"
 do
     echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
+    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-stop.sh &'
 done
 
 wait
 
-echo "Kafka Started!"
+echo "Kafka Stopped!"
 
