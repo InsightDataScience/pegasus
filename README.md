@@ -10,8 +10,9 @@ We want to continue improving this tool by adding more features and other instal
 3. [Fetching AWS cluster DNS and hostname information](README.md#3-fetching-aws-cluster-dns-and-hostname-information)
 4. [Setting up a newly provisioned AWS cluster](README.md#4-setting-up-a-newly-provisioned-aws-cluster)
 5. [Start installing!](README.md#5-start-installing)
-6. [Terminate a cluster](README.md#6-terminate-a-cluster)
-7. [Deployment Pipelines](README.md#7-deployment-pipelines)
+6. [Starting and stopping services](README.md#6-starting-and-stopping-services)
+7. [Terminate a cluster](README.md#7-terminate-a-cluster)
+8. [Deployment Pipelines](README.md#8-deployment-pipelines)
 
 # 1. Install Pegasus on your local machine
 
@@ -79,7 +80,7 @@ Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI
 
 Or
 
-Use ec2spinup to deploy a cluster from the command line
+Use ec2spinup to deploy a cluster from the command line (recommended)
 ```bash
 $ ./ec2spinup <instance-template-file>
 ```
@@ -110,12 +111,14 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 * **security_group_ids** (*list*) - a list of the security group ids
   * (*string*) e.g. "sg-e9f17e8c"
 * **instance_type** (*string*) - type of instances to deploy
-* **tag_name** (*string*) - tag all your instances with this name e.g. "test-cluster"
+* **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. "test-cluster"
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
+
+The AMIs used in the ec2spinup script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
 # 3. Fetching AWS cluster DNS and hostname information
 
-Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine.   Make sure your `.pem` key has the proper privelages:
+Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privelages:
 ```bash
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
@@ -144,20 +147,16 @@ Once the cluster IPs have been saved to the tmp folder, we can begin with instal
 
 # 4. Setting up a newly provisioned AWS cluster
 
-If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations
+If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `ec2spinup` script, since the packages have already been installed.
 
-1. **Environment/Packages on all machines** - installs base packages for python, java, scala on all nodes in the cluster
-2. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS
-3. **AWS Credentials** - places AWS keys onto all machines
+1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using ec2spinup)**
+1. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS. This is needed for technologies such as Hadoop and Spark.
+2. **AWS Credentials** - places AWS keys onto all machines under `~/.profile`
 ```bash
-$ ./ec2install <cluster-name> environment
+$ ./ec2install <cluster-name> environment    # not needed if using ec2spinup!!!
 $ ./ec2install <cluster-name> ssh
 $ ./ec2install <cluster-name> aws
 ```
-
-Depending on what you decide to install in the environment step, the process could take anywhere from 10-30 minutes. If you wish to speed this up, we recommend that you bake an AMI using [Packer](https://www.packer.io/) and the environment installation script. This will cut down the time to spin up a new cluster significantly. Some examples are shown in the packer folder.
-
-When you use the `ec2spinup` script, you will need to change the instance JSON template to use the new AMI instead of the base Ubuntu 14.04 Trusty AMI
 
 # 5. Start installing!
 
@@ -167,12 +166,9 @@ $ ./ec2install <cluster-name> <technology>
 The `technology` tag can be any of the following:
 * cassandra (default v2.2.4)
 * elasticsearch (default v2.1.0)
-  * Must have REGION and EC2_GROUP set as environment variables
-  * e.g. REGION=us-west-2
-  * e.g. EC2_GROUP=open
 * flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
-* hbase (default v1.1.2)
+* hbase (default v1.1.3)
 * hive (default v1.2.1)
 * kafka (default v0.8.2.2 with scala v2.10)
 * kibana (default v4.3.0)
@@ -184,24 +180,32 @@ The `technology` tag can be any of the following:
 * storm (default v0.10.0)
 * tachyon (default v0.8.2)
 * zeppelin
-* zookeeper (default v3.4.7)
+* zookeeper (default v3.4.6)
 
-If you wish to install a different version of these technologies, please go into the `install/download_tech` script and update the technology version and technology binary download URL.
+All environment variables are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
-Additional technologies can be included into Pegasus by adding the technology version and url to `install/download_tech` and also writing the appropriate configurations in the `config` folder.
+If you wish to install a different version of these technologies, please go into the [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) script and update the technology version and technology binary download URL.
 
-# 6. Terminate a cluster
+Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) and also writing the appropriate configurations in the `config` folder.
+
+# 6. Starting and stopping services
+Scripts have been provided to start and stop distributed services easily without having to manually SSH into each node
+```bash
+$ ./ec2service <cluster-name> <technology> <start|stop>
+```
+
+# 7. Terminate a cluster
 
 Tears down an on-demand or spot cluster on AWS
 ```bash
 $ ./ec2terminate <region> <cluster-name>
 ```
 
-# 7. Deployment Pipelines
+# 8. Deployment Pipelines
 
-If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the `templates/pipelines/spark_hadoop.sh` file.
+If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`templates/pipelines/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/templates/pipelines/spark_hadoop.sh) file.
 
-Here it shows how we can spin up a 4 node cluster (ec2spinup) using the `example.json` instance template, grab the cluster information (ec2fetch) and install all the technologies (ec2install) in one script. We can deploy this cluster simply by running the following:
+Here it shows how we can spin up a 4 node cluster (ec2spinup) using the [`example.json`](https://github.com/InsightDataScience/pegasus/blob/master/templates/instances/example.json) instance template, grab the cluster information using `ec2fetch` and install all the technologies with `ec2install` in one script. We can deploy this cluster simply by running the following:
 ```bash
 $ templates/pipelines/spark_hadoop.sh
 ```
@@ -215,7 +219,6 @@ REGION=us-west-2
 
 ./ec2fetch $REGION $CLUSTER_NAME
 
-./ec2install $CLUSTER_NAME environment
 ./ec2install $CLUSTER_NAME ssh
 ./ec2install $CLUSTER_NAME aws
 ./ec2install $CLUSTER_NAME hadoop
