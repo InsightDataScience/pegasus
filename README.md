@@ -9,6 +9,7 @@ Supported commands:
 * `ec2fetch` - fetch the hostnames and Public DNS of nodes in the AWS cluster
 * `ec2install` - install a technology on the cluster
 * `ec2service` - start and stop a service on the cluster
+* `ec2ssh` - SSH into a specific node in your AWS cluster
 * `ec2terminate` - terminate a cluster
 
 # Table of Contents
@@ -18,11 +19,11 @@ Supported commands:
 4. [Setting up a newly provisioned AWS cluster](README.md#4-setting-up-a-newly-provisioned-aws-cluster)
 5. [Start installing!](README.md#5-start-installing)
 6. [Starting and stopping services](README.md#6-starting-and-stopping-services)
-7. [Terminate a cluster](README.md#7-terminate-a-cluster)
-8. [Deployment Pipelines](README.md#8-deployment-pipelines)
+7. [SSH into a node](README.md#6-ssh-into-a-node)
+8. [Terminate a cluster](README.md#7-terminate-a-cluster)
+9. [Deployment Pipelines](README.md#8-deployment-pipelines)
 
 # 1. Install Pegasus on your local machine
-
 This will allow you to programatically interface with your AWS account
 
 Clone the Pegasus project to your local computer and install Python dependencies (**Python 2.7+ required**)
@@ -77,7 +78,6 @@ $ py.test
 ```
 
 # 2. Spin up your cluster on AWS
-
 Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI.
 
 * Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
@@ -124,7 +124,6 @@ The `instance-template-file` is simply a JSON file that ec2spinup uses. Within t
 The AMIs used in the ec2spinup script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
 # 3. Fetching AWS cluster DNS and hostname information
-
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privelages:
 ```bash
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
@@ -153,7 +152,6 @@ ip-172-31-44-133 **WORKER3**
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations.
 
 # 4. Setting up a newly provisioned AWS cluster
-
 If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `ec2spinup` script, since the packages have already been installed.
 
 1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using ec2spinup)**
@@ -166,7 +164,6 @@ $ ./ec2install <cluster-name> aws
 ```
 
 # 5. Start installing!
-
 ```bash
 $ ./ec2install <cluster-name> <technology>
 ```
@@ -196,20 +193,25 @@ If you wish to install a different version of these technologies, please go into
 Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) and also writing the appropriate configurations in the `config` folder.
 
 # 6. Starting and stopping services
-Scripts have been provided to start and stop distributed services easily without having to manually SSH into each node
+A script have been provided to start and stop distributed services easily without having to manually SSH into each node
 ```bash
 $ ./ec2service <cluster-name> <technology> <start|stop>
 ```
 
-# 7. Terminate a cluster
+# 7. SSH into a node
+If you need to SSH into a specific node in a cluster, you can use the `ec2ssh` script to easily reference nodes
+```bash
+$ ./ec2ssh <cluster-name> <node-number>
+```
+where `node-number` is the order in which the nodes appear in the `hostnames` and `public_dns` files starting with 1
 
+# 8. Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
 ```bash
 $ ./ec2terminate <region> <cluster-name>
 ```
 
-# 8. Deployment Pipelines
-
+# 9. Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`templates/pipelines/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/templates/pipelines/spark_hadoop.sh) file.
 
 Here it shows how we can spin up a 4 node cluster (ec2spinup) using the [`example.json`](https://github.com/InsightDataScience/pegasus/blob/master/templates/instances/example.json) instance template, grab the cluster information using `ec2fetch` and install all the technologies with `ec2install` in one script. We can deploy this cluster simply by running the following:
