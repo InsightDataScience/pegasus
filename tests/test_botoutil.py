@@ -19,7 +19,6 @@ class TestBotoUtil(object):
     @mock_ec2
     def test_request_on_demand(self):
         region = 'us-west-2'
-        ami_dummy = 'ami-1234abcd' # default mock ami
 
         client = boto3.client('ec2', region)
 
@@ -46,7 +45,6 @@ class TestBotoUtil(object):
         params = {'region': unicode(region),
                   'subnet': unicode(subnet_id),
                   'purchase_type': u'on_demand',
-                  'image': unicode(ami_dummy),
                   'price': u'0.25',
                   'num_instances': 4,
                   'key_name': unicode(kp_name),
@@ -82,7 +80,7 @@ class TestBotoUtil(object):
 
         assert num_instances == 4
         assert len(set(ami_ids)) == 1
-        assert ami_ids[0] == ami_dummy
+        assert ami_ids[0] == "ami-4342a723"
         assert len(set(key_names)) == 1
         assert key_names[0] == kp_name
         assert len(set(security_group_ids)) == 1
@@ -93,7 +91,6 @@ class TestBotoUtil(object):
     @mock_ec2
     def test_request_spot(self):
         region = 'us-west-2'
-        ami_dummy = 'ami-1234abcd' # default mock ami
 
         client = boto3.client('ec2', region)
 
@@ -120,7 +117,6 @@ class TestBotoUtil(object):
         params = {'region': unicode(region),
                   'subnet': unicode(subnet_id),
                   'purchase_type': u'spot',
-                  'image': unicode(ami_dummy),
                   'price': u'0.25',
                   'num_instances': 4,
                   'key_name': unicode(kp_name),
@@ -162,7 +158,7 @@ class TestBotoUtil(object):
 
         assert num_requests == 4
         assert len(set(ami_ids)) == 1
-        assert ami_ids[0] == ami_dummy
+        assert ami_ids[0] == "ami-4342a723"
         assert len(set(key_names)) == 1
         assert key_names[0] == kp_name
         assert len(set(security_group_ids)) == 1

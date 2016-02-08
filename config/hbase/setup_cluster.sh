@@ -36,6 +36,4 @@ done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $HBASE_HOME/bin/start-hbase.sh'
-
 echo "HBase configuration complete!"

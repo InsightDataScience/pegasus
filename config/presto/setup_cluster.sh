@@ -48,12 +48,6 @@ done
 
 wait
 
-for dns in "${SLAVE_DNS[@]}"
-do
-  ssh -i $PEMLOC ubuntu@$dns '. ~/.profile; $PRESTO_HOME/bin/launcher start' &
-done
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; $PRESTO_HOME/bin/launcher start'
-
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/presto/setup_cli.sh
 
 echo "Presto configuration complete!"

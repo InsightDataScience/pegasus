@@ -23,4 +23,4 @@ done
 
 echo $REDIS_NODES
 
-echo "yes" | $REDIS_HOME/src/redis-trib.rb create --replicas 0 $REDIS_NODES
+echo "yes" | $REDIS_HOME/src/redis-trib.rb create --replicas 0 $REDIS_NODES &

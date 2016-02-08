@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# check input arguments
+if [ "$#" -ne 3 ]; then
+    echo "Please specify cluster name, technology and whether to start or stop service" && exit 1
+fi
+
+CLUSTER_NAME=$1
+TECHNOLOGY=$2
+ACTION=$3
+
+if [ ! -d tmp/$CLUSTER_NAME ]; then
+    echo "cluster does not exist! please run ec2fetch first." && exit 1
+fi
+
+MASTER_DNS=$(head -n 1 tmp/$CLUSTER_NAME/public_dns)
+PEMLOC=tmp/$CLUSTER_NAME/*.pem
+ROOT_FOLDER=/usr/local/
+
+check_remote_folder () {
+  ssh -i $PEMLOC ubuntu@$MASTER_DNS bash -c "'
+    if [ -d $1 ]; then
+      echo "installed"
+    else
+      echo "missing"
+    fi
+  '"
+}
+
+service_action () {
+  INSTALLED=$(check_remote_folder ${ROOT_FOLDER}${TECHNOLOGY})
+  if [ "$INSTALLED" = "installed" ]; then
+    case ${ACTION} in
+      start)
+        service/$TECHNOLOGY/start_service.sh $PEMLOC $CLUSTER_NAME
+        ;;
+      stop)
+        service/$TECHNOLOGY/stop_service.sh $PEMLOC $CLUSTER_NAME
+        ;;
+      *)
+        echo -e "Invalid action for ${TECHNOLOGY}"
+        exit 1
+        ;;
+    esac
+  else
+    echo "${TECHNOLOGY} is not installed in $ROOT_FOLDER"
+    exit 1
+  fi
+}
+
+case $TECHNOLOGY in
+  cassandra|elasticsearch|flink|hadoop|hbase|kafka|kibana|opscenter|presto|redis|spark|storm|tachyon|zeppelin|zookeeper)
+    service_action
+    ;;
+  *)
+    echo -e "Invalid service to ${ACTION}."; exit 1 ;;
+esac

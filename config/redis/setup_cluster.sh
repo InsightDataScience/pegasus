@@ -30,10 +30,4 @@ done
 
 wait
 
-# wait for servers to come up in tmux sessions
-sleep 5
-
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/redis/join_redis_cluster.sh "${NODE_DNS[@]}"
-
 echo "Redis configuration complete!"

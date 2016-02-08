@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 import argparse
-from util.boto_util import BotoUtil
+from boto_util import BotoUtil
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

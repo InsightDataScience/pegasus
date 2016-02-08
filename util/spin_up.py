@@ -2,7 +2,7 @@
 
 import argparse
 import json
-from util.boto_util import BotoUtil, InstanceConfig
+from boto_util import BotoUtil, InstanceConfig
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

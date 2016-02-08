@@ -14,18 +14,6 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS names
-FIRST_LINE=true
-while read line; do
-    if [ "$FIRST_LINE" = true ]; then
-        MASTER_NAME=$line
-        SLAVE_NAME=()
-        FIRST_LINE=false
-    else
-        SLAVE_NAME+=($line)
-    fi
-done < tmp/$INSTANCE_NAME/hostnames
-
 # import AWS public DNS's
 FIRST_LINE=true
 while read line; do
@@ -48,6 +36,4 @@ done
 wait
 
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/config_workers.sh "${SLAVE_DNS[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '/usr/local/spark/sbin/start-all.sh'
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_ipython.sh $GITHUB_USER $GITHUB_PASSWORD

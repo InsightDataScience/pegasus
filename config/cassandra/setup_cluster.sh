@@ -39,10 +39,4 @@ do
 done
 wait
 
-# Start each cassandra node
-for dns in "${NODE_DNS[@]}";
-do
-    ssh -i $PEMLOC ubuntu@$dns '/usr/local/cassandra/bin/cassandra'
-done
-
 echo "Cassandra configuration complete!"

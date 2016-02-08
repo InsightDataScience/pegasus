@@ -1,5 +1,5 @@
 import argparse
-from util.boto_util import BotoUtil, remove_cluster_info, write_dns, copy_pem
+from boto_util import BotoUtil, remove_cluster_info, write_dns, copy_pem
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -18,8 +18,11 @@ if __name__ == '__main__':
         cluster_name = cluster_info[1]
         key_name = cluster_info[2]
 
-        for dns in dns_tup:
-            print dns
+        for idx, dns in enumerate(dns_tup):
+            if idx == 0:
+                print "{} NODE: Hostname:{}, Public DNS:{}".format("MASTER", dns[0], dns[1])
+            else:
+                print "{} NODE: Hostname:{}, Public DNS:{}".format("WORKER", dns[0], dns[1])
 
         print "Cluster name: {}".format(cluster_name)
 

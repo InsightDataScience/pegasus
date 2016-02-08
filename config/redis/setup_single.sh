@@ -11,6 +11,3 @@ cd $REDIS_HOME
 make
 cd ~
 
-tmux new-session -s redis_server -n bash -d
-
-tmux send-keys -t redis_server '$REDIS_HOME/src/redis-server $REDIS_HOME/redis.conf' C-m
