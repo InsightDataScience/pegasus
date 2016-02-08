@@ -4,6 +4,13 @@ This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazo
 
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
+Supported commands:
+* `ec2spinup` - launch an AWS cluster
+* `ec2fetch` - fetch the hostnames and Public DNS of nodes in the AWS cluster
+* `ec2install` - install a technology on the cluster
+* `ec2service` - start and stop a service on the cluster
+* `ec2terminate` - terminate a cluster
+
 # Table of Contents
 1. [Install Pegasus on your local machine](README.md#1-install-pegasus-on-your-local-machine)
 2. [Spin up your cluster on AWS](README.md#2-spin-up-your-cluster-on-aws)
