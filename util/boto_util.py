@@ -201,6 +201,47 @@ class BotoUtil(object):
             print msg.format(self.client.meta.region_name, cluster_name)
             return
 
+    def retag_cluster(self, cluster_name, tag_name):
+        """Retag Names of all instances given the list of IPs
+
+        Args:
+            cluster_name: string representing the tag_name of the current cluster
+            tag_name: string representing the new tag name for the cluster
+
+        Returns:
+            None
+
+        """
+
+        instance_ids = []
+        request_ids = []
+
+        reservations = self.client.describe_instances(
+            Filters=[{'Name': 'instance-state-name', 'Values': ['running']},
+                     {'Name': 'tag:Name', 'Values': ['*{}*'.format(cluster_name)]}]
+        )
+
+        for reservation in reservations['Reservations']:
+            for instance in reservation['Instances']:
+                instance_ids.append(instance['InstanceId'])
+                if 'SpotInstanceRequestId' in instance:
+                    request_ids.append(instance['SpotInstanceRequestId'])
+
+        if len(request_ids) > 0:
+            sleep(1)
+            self.client.create_tags(
+                Resources=request_ids,
+                Tags=[{'Key': 'Name', 'Value': tag_name}]
+            )
+
+        if len(instance_ids) > 0:
+            sleep(1)
+            self.client.create_tags(
+                Resources=instance_ids,
+                Tags=[{'Key': 'Name', 'Value': tag_name}]
+            )
+
+
     def terminate_cluster(self, ips):
         """Searches for instances with the ips terminates them on AWS
 
