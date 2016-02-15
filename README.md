@@ -12,6 +12,7 @@ Supported commands:
 * `ec2uninstall` - uninstall a specific technology from the cluster
 * `ec2ssh` - SSH into a specific node in your AWS cluster
 * `ec2terminate` - terminate a cluster
+* `ec2retag` - retag an existing cluster with a different name
 
 # Table of Contents
 1. [Install Pegasus on your local machine](README.md#1-install-pegasus-on-your-local-machine)
@@ -23,7 +24,8 @@ Supported commands:
 7. [Uninstalling a technology](README.md#6-uninstalling-a-technology)
 8. [SSH into a node](README.md#6-ssh-into-a-node)
 9. [Terminate a cluster](README.md#7-terminate-a-cluster)
-10. [Deployment Pipelines](README.md#8-deployment-pipelines)
+10. [Retag a cluster](README.md#7-retag-a-cluster)
+11. [Deployment Pipelines](README.md#8-deployment-pipelines)
 
 # 1. Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account
@@ -219,7 +221,13 @@ Tears down an on-demand or spot cluster on AWS
 $ ./ec2terminate <region> <cluster-name>
 ```
 
-# 10. Deployment Pipelines
+# 10. Retag a cluster
+Retag an existing cluster on AWS
+```bash
+$ ./ec2retag <region> <cluster-name> <new-cluster-name>
+```
+
+# 11. Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`templates/pipelines/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/templates/pipelines/spark_hadoop.sh) file.
 
 Here it shows how we can spin up a 4 node cluster (ec2spinup) using the [`example.json`](https://github.com/InsightDataScience/pegasus/blob/master/templates/instances/example.json) instance template, grab the cluster information using `ec2fetch` and install all the technologies with `ec2install` in one script. We can deploy this cluster simply by running the following:
