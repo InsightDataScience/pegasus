@@ -11,4 +11,6 @@ if [ ! -f $TEMPLATE_PATH ]; then
   echo "Template file $TEMPLATE_PATH does not exist" && exit 1
 fi
 
+cd $(dirname "${BASH_SOURCE}")
+
 python util/spin_up.py $TEMPLATE_PATH
