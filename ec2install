@@ -75,7 +75,7 @@ case $TECHNOLOGY in
     echo "Setting up base environment packages on $CLUSTER_NAME"
     install/environment/install_env_cluster.sh $PEMLOC $CLUSTER_NAME
     ;;
-  cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|tachyon|zookeeper)
+  alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
     get_dependencies
     install_tech
     ;;

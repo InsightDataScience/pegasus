@@ -37,3 +37,4 @@ wait
 
 ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/config_workers.sh "${SLAVE_DNS[@]}"
 
+ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_ipython.sh

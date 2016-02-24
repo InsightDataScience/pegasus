@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# import technology versions and URLs
+ALLUXIO_VER=1.0.0
 CASSANDRA_VER=2.2.4
 ELASTICSEARCH_VER=2.1.0
 FLINK_VER=0.10.1
@@ -18,9 +18,9 @@ REDIS_VER=3.0.6
 SPARK_VER=1.5.2
 SPARK_HADOOP_VER=2.4
 STORM_VER=0.10.0
-TACHYON_VER=0.8.2
 ZOOKEEPER_VER=3.4.6
 
+ALLUXIO_URL=http://alluxio.org/downloads/files/${ALLUXIO_VER}/alluxio-${ALLUXIO_VER}-bin.tar.gz
 CASSANDRA_URL=http://www.us.apache.org/dist/cassandra/$CASSANDRA_VER/apache-cassandra-$CASSANDRA_VER-bin.tar.gz
 ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
 FLINK_URL=http://www.us.apache.org/dist/flink/flink-$FLINK_VER/flink-$FLINK_VER-bin-hadoop$FLINK_HADOOP_VER-scala_$FLINK_SCALA_VER.tgz
@@ -35,9 +35,9 @@ PRESTO_URL=https://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRE
 REDIS_URL=http://download.redis.io/releases/redis-$REDIS_VER.tar.gz
 SPARK_URL=http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
 STORM_URL=http://www.us.apache.org/dist/storm/apache-storm-$STORM_VER/apache-storm-$STORM_VER.tar.gz
-TACHYON_URL=http://tachyon-project.org/downloads/files/$TACHYON_VER/tachyon-$TACHYON_VER-bin.tar.gz
 ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/stable/zookeeper-$ZOOKEEPER_VER.tar.gz
 
+cd $(dirname "${BASH_SOURCE}")
 
 if [ "$#" -ne 1 ]; then
   echo "Provide technology to download!"
