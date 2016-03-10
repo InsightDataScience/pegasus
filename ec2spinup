@@ -11,6 +11,20 @@ if [ ! -f $TEMPLATE_PATH ]; then
   echo "Template file $TEMPLATE_PATH does not exist" && exit 1
 fi
 
-cd $(dirname "${BASH_SOURCE}")
+PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
-python util/spin_up.py $TEMPLATE_PATH
+source ${PEG_ROOT}/util.sh
+
+set_launch_config ${TEMPLATE_PATH}
+
+echo "launching instances..."
+instance_ids=$(run_on_demand_instances)
+
+tag_instances ${tag_name} ${instance_ids}
+
+echo "waiting for instances ${instance_ids} in status ok state..."
+wait_for_instances_status_ok ${instance_ids}
+
+echo "${instance_ids} ready..."
+
+

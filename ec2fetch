@@ -10,7 +10,7 @@ CLUSTER_NAME=$2
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
-source ${PEG_ROOT}/ec2util.sh
+source ${PEG_ROOT}/util.sh
 
 mkdir -p ${PEG_ROOT}/tmp/${CLUSTER_NAME}
 
