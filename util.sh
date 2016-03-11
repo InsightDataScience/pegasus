@@ -275,7 +275,6 @@ function get_instance_ids_of_spot_request_ids {
 }
 
 function run_instances {
-
   local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
 
   local monitoring="{\"Enabled\":false}"
