@@ -30,55 +30,36 @@ Supported commands:
 # 1. Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account
 
-Clone the Pegasus project to your local computer and install Python dependencies (**Python 2.7+ required**)
+Clone the Pegasus project to your local computer and install awscli
 ```bash
 $ git clone https://github.com/InsightDataScience/pegasus.git
-$ cd pegasus
-$ sudo pip install -r requirements.txt
+$ sudo pip install awscli
 ```
-Installs the following Python packages
-* boto3==1.2.2
-* moto==0.4.19
-* schema==0.4.0
 
 Add your AWS credentials to `~/.bash_profile`, choose a default AWS region and source it
 ```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
-export AWS_DEFAULT_REGION=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
 ```
 ```bash
 $ . ~/.bash_profile
 ```
 
-You can test your boto3 AWS access by querying for the available regions for your AWS account (eg. from python):
-```python
->>> import boto3
->>> client = boto3.client('ec2')
->>> client.describe_regions()
-{u'Regions': [{u'Endpoint': 'ec2.eu-west-1.amazonaws.com',
-   u'RegionName': 'eu-west-1'},
-  {u'Endpoint': 'ec2.ap-southeast-1.amazonaws.com',
-   u'RegionName': 'ap-southeast-1'},
-  {u'Endpoint': 'ec2.ap-southeast-2.amazonaws.com',
-   u'RegionName': 'ap-southeast-2'},
-  {u'Endpoint': 'ec2.eu-central-1.amazonaws.com',
-   u'RegionName': 'eu-central-1'},
-  {u'Endpoint': 'ec2.ap-northeast-1.amazonaws.com',
-   u'RegionName': 'ap-northeast-1'},
-  {u'Endpoint': 'ec2.us-east-1.amazonaws.com', u'RegionName': 'us-east-1'},
-  {u'Endpoint': 'ec2.sa-east-1.amazonaws.com', u'RegionName': 'sa-east-1'},
-  {u'Endpoint': 'ec2.us-west-1.amazonaws.com', u'RegionName': 'us-west-1'},
-  {u'Endpoint': 'ec2.us-west-2.amazonaws.com', u'RegionName': 'us-west-2'}],
- 'ResponseMetadata': {'HTTPStatusCode': 200,
-  'RequestId': '8949dfbe-63ab-4c0f-ba56-f9cd946de2ed'}}
-```
-Install [pytest] (http://pytest.org/latest/) and run tests from top directory
+You can test your AWS-CLI access by querying for the available regions for your AWS account:
 ```bash
-$ sudo pip install pytest
-$ cd /path/to/pegasus
-$ export PYTHONPATH=$(pwd)
-$ py.test
+$ aws ec2 --output json describe-regions --query Regions[].RegionName
+[
+    "eu-west-1",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "eu-central-1",
+    "ap-northeast-2",
+    "ap-northeast-1",
+    "us-east-1",
+    "sa-east-1",
+    "us-west-1",
+    "us-west-2"
+]
 ```
 
 # 2. Spin up your cluster on AWS
@@ -93,36 +74,30 @@ Or
 
 Use ec2spinup to deploy a cluster from the command line (recommended)
 ```bash
-$ ./ec2spinup <instance-template-file>
+$ ./ec2spinup <region> <instance-template-file>
 ```
 
-The `instance-template-file` is simply a JSON file that ec2spinup uses. Within this file you will must specify the following as shown:
-```python
-{
-    "purchase_type": "spot"|"on_demand",
-    "region": "us-east-1"|"us-west-1"|"us-west-2"|"eu-central-1"|"eu-west-1"|"ap-southeast-1"|"ap-southeast-2"|"ap-northeast-1"|"sa-east-1",
-    "subnet": "string",
-    "price": "string",
-    "num_instances": 4,
-    "key_name": "string",
-    "security_group_ids": [
-        "string"
-    ],
-    "instance_type": "t1.micro"|"m1.small"|"m1.medium"|"m1.large"|"m1.xlarge"|"m3.medium"|"m3.large"|"m3.xlarge"|"m3.2xlarge"|"m4.large"|"m4.xlarge"|"m4.2xlarge"|"m4.4xlarge"|"m4.10xlarge"|"t2.micro"|"t2.small"|"t2.medium"|"t2.large"|"m2.xlarge"|"m2.2xlarge"|"m2.4xlarge"|"cr1.8xlarge"|"i2.xlarge'|"i2.2xlarge'|"i2.4xlarge"|"i2.8xlarge"|"hi1.4xlarge"|"hs1.8xlarge"|"c1.medium"|"c1.xlarge"|"c3.large"|"c3.xlarge"|"c3.2xlarge"|"c3.4xlarge"|"c3.8xlarge"|"c4.large"|"c4.xlarge"|"c4.2xlarge"|"c4.4xlarge"|"c4.8xlarge"|"cc1.4xlarge"|"cc2.8xlarge"|"g2.2xlarge"|"cg1.4xlarge"|"r3.large"|"r3.xlarge"|"r3.2xlarge"|"r3.4xlarge"|"r3.8xlarge"|"d2.xlarge"|"d2.2xlarge"|"d2.4xlarge"|"d2.8xlarge",
-    "tag_name": "string"
-    "vol_size": 100
-}
+The `instance-template-file` is simply a yaml file that ec2spinup uses. Within this file you will must specify the following as shown:
+```bash
+purchase_type: spot|on_demand,
+subnet: string
+price: string
+num_instances": 4
+key_name": "string
+security_group_ids: string
+instance_type: t1.micro|m1.small|m1.medium|m1.large|m1.xlarge|m3.medium|m3.large|m3.xlarge|m3.2xlarge|m4.large|m4.xlarge|m4.2xlarge|m4.4xlarge|m4.10xlarge|t2.micro|t2.small|t2.medium|t2.large|m2.xlarge|m2.2xlarge|m2.4xlarge|cr1.8xlarge|i2.xlarge|i2.2xlarge|i2.4xlarge|i2.8xlarge|hi1.4xlarge|hs1.8xlarge|c1.medium|c1.xlarge|c3.large|c3.xlarge|c3.2xlarge|c3.4xlarge|c3.8xlarge|c4.large|c4.xlarge|c4.2xlarge|c4.4xlarge|c4.8xlarge|cc1.4xlarge|cc2.8xlarge|g2.2xlarge|cg1.4xlarge|r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|r3.8xlarge|d2.xlarge|d2.2xlarge|d2.4xlarge|d2.8xlarge
+tag_name: string
+vol_size: 100
 ```
-* **purchase_type** (*string*) - choose between on-demand or spot instances
-* **region** (*string*) - AWS region you wish to spin your cluster in
-* **subnet** (*string*) - the VPC subnet id e.g. "subnet-61c12804"
-* **price** (*string*) - spot price you would like to set. Ignored if purchase type is "on_demand" e.g. "0.25"
+* **purchase_type** (*string*) - choose between on_demand or spot instances
+* **subnet** (*string*) - the VPC subnet id e.g. subnet-61c12804
+* **price** (*string*) - spot price you would like to set. Ignored if purchase type is on_demand e.g. 0.25
 * **num_instances** (*integer*) - number of instances to deploy
-* **key_name** (*string*) - the pem key name to be used for all instances e.g. "insight-cluster"
+* **key_name** (*string*) - the pem key name to be used for all instances e.g. insight-cluster
 * **security_group_ids** (*list*) - a list of the security group ids
-  * (*string*) e.g. "sg-e9f17e8c"
+  * (*string*) e.g. sg-e9f17e8c
 * **instance_type** (*string*) - type of instances to deploy
-* **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. "test-cluster"
+* **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. test-cluster
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
 
 The AMIs used in the ec2spinup script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
@@ -172,7 +147,7 @@ $ ./ec2install <cluster-name> aws
 $ ./ec2install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
-* cassandra (default v2.2.4)
+* cassandra (default v2.2.5)
 * elasticsearch (default v2.1.0)
 * flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
@@ -188,7 +163,7 @@ The `technology` tag can be any of the following:
 * storm (default v0.10.0)
 * tachyon (default v0.8.2)
 * zeppelin
-* zookeeper (default v3.4.6)
+* zookeeper (default v3.4.8)
 
 All environment variables are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
@@ -240,7 +215,7 @@ $ templates/pipelines/spark_hadoop.sh
 CLUSTER_NAME=test-cluster
 REGION=us-west-2
 
-./ec2spinup templates/instances/example.json
+./ec2spinup $REGION templates/instances/example.json
 
 ./ec2fetch $REGION $CLUSTER_NAME
 
