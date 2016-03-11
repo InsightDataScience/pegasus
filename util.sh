@@ -4,11 +4,6 @@ PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
 AWS_CMD="aws ec2 --region ${REGION:=us-west-2} --output text"
 
-ROOT_DISK_TYPE=${ROOT_DISK_TYPE:-standard}
-ROOT_DISK_SIZE=${ROOT_DISK_SIZE:-400}
-
-BLOCK_DEVICE_MAPPINGS="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${ROOT_DISK_SIZE},\"VolumeType\":\"${ROOT_DISK_TYPE}\"}}]"
-
 function parse_yaml {
   local prefix=$2
   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -210,15 +205,15 @@ function set_launch_config {
 function select_ami {
   case "${REGION}" in
     us-west-2)
-      aws_image=ami-4342a723
+      AWS_IMAGE=ami-4342a723
       ;;
 
     us-west-1)
-      aws_image=ami-cb97e3ab
+      AWS_IMAGE=ami-cb97e3ab
       ;;
 
     us-east-1)
-      aws_image=ami-a20d2bc8
+      AWS_IMAGE=ami-a20d2bc8
       ;;
 
     *)
@@ -228,33 +223,35 @@ function select_ami {
 }
 
 function run_spot_instances {
-  # TODO
-  echo "asdf"
+  local launch_specification="{\"ImageId\":\"${AWS_IMAGE}\",\"KeyName\":\"${key_name}\",\"InstanceType\":\"${instance_type}\",\"BlockDeviceMappings\":${block_device_mappings},\"SubnetId\":\"${subnet_id}\",\"Monitoring\":${monitoring},\"SecurityGroupIds\":[\"${security_group_ids}\"]}"
+
+  ${AWS_CMD} request-spot-instances \
+    --spot-price "${price:?"specify spot price"}" \
+    --instance-count ${num_instances:?"specify number of instances"} \
+    --type "one-time" \
+    --launch-specification ${launch_specification} \
+    --query SpotInstanceRequests[].SpotInstanceRequestId
+
 }
 
 function run_on_demand_instances {
-  local monitoring="{\"Enabled\":false}"
-
-  select_ami
-
   ${AWS_CMD} run-instances \
     --count ${num_instances:?"specify number of instances"} \
-    --image-id ${aws_image} \
+    --image-id ${AWS_IMAGE} \
     --key-name ${key_name:?"specify pem key to use"} \
     --security-group-ids ${security_group_ids:?"specify security group ids"} \
     --instance-type ${instance_type:?"specify instance type"} \
     --subnet-id ${subnet_id:?"specify subnet id to launch"} \
-    --block-device-mappings ${BLOCK_DEVICE_MAPPINGS} \
+    --block-device-mappings ${block_device_mappings} \
     --monitoring ${monitoring} \
     --query Instances[].InstanceId
-
 }
 
-function tag_instances {
+function tag_name_of_resources {
   local tag_name=$1; shift
-  local instance_ids="$@"
+  local resource_ids="$@"
   ${AWS_CMD} create-tags \
-    --resources ${instance_ids} \
+    --resources ${resource_ids} \
     --tags Key=Name,Value=${tag_name}
 }
 
@@ -263,3 +260,56 @@ function wait_for_instances_status_ok {
   ${AWS_CMD} wait instance-status-ok \
     --instance-ids ${instance_ids}
 }
+
+function wait_for_spot_requests {
+  local spot_request_ids="$@"
+  ${AWS_CMD} wait spot-instance-request-fulfilled \
+    --spot-instance-request-ids ${spot_request_ids}
+}
+
+function get_instance_ids_of_spot_request_ids {
+  local spot_request_ids="$@"
+  ${AWS_CMD} describe-spot-instance-requests \
+    --spot-instance-request-ids ${spot_request_ids} \
+    --query SpotInstanceRequests[].InstanceId
+}
+
+function run_instances {
+
+  local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
+
+  local monitoring="{\"Enabled\":false}"
+
+  select_ami
+
+  case "${purchase_type}" in
+    spot)
+      echo "requesting spot instances..."
+      local spot_request_ids=$(run_spot_instances)
+
+      tag_name_of_resources ${tag_name} ${spot_request_ids}
+
+      echo "waiting for spot requests ${spot_request_ids} to be fulfilled..."
+      wait_for_spot_requests ${spot_request_ids}
+
+      local instance_ids=$(get_instance_ids_of_spot_request_ids ${spot_request_ids})
+      ;;
+
+    on_demand)
+      local instance_ids=$(run_on_demand_instances)
+      ;;
+
+    *)
+      echo "Invalid purchase type. Please select spot or on_demand."
+      exit 1
+      ;;
+  esac
+
+  tag_name_of_resources ${tag_name} ${instance_ids}
+
+  echo "waiting for instances ${instance_ids} in status ok state..."
+  wait_for_instances_status_ok ${instance_ids}
+
+  echo "${instance_ids} ready..."
+}
+
