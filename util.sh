@@ -280,7 +280,7 @@ function get_instance_ids_of_spot_request_ids {
     --query SpotInstanceRequests[].InstanceId
 }
 
-function get_instanceids_with_name {
+function get_instance_ids_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
@@ -296,7 +296,7 @@ function get_spot_request_ids_of_instance_ids {
 
 function terminate_instances_with_name {
   local cluster_name=$1
-  local instance_ids=$(get_instanceids_with_name ${cluster_name})
+  local instance_ids=$(get_instance_ids_with_name ${cluster_name})
   local spot_request_ids=$(get_spot_request_ids_of_instance_ids ${instance_ids})
   local num_instances=$(echo ${instance_ids} | wc -w)
   local num_spot_requests=$(echo ${spot_request_ids} | wc -w)
@@ -312,6 +312,16 @@ function terminate_instances_with_name {
         --spot-instance-request-ids ${spot_request_ids}
     fi
   fi
+}
+
+function retag_instance_with_name {
+  local cluster_name=$1
+  local new_cluster_name=$2
+  local instance_ids=$(get_instance_ids_with_name ${cluster_name})
+
+  ${AWS_CMD} create-tags \
+    --resources ${instance_ids} \
+    --tags Key=Name,Value=${new_cluster_name}
 }
 
 function run_instances {
@@ -370,7 +380,6 @@ function install_tech {
     echo "Installing ${TECHNOLOGY} on ${CLUSTER_NAME}"
     ${PEG_ROOT}/install/cluster_download ${PEMLOC} ${CLUSTER_NAME} ${TECHNOLOGY}
     ${PEG_ROOT}config/${TECHNOLOGY}/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
-    ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} start
   else
     INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
     if [ "${INSTALLED}" = "installed" ]; then
@@ -404,20 +413,13 @@ function get_dependencies {
 }
 
 function uninstall_tech {
-  INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
-  if [ "$INSTALLED" = "installed" ]; then
-    ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} stop
-    for dns in ${PUBLIC_DNS[@]}; do
-      echo ${dns}
-      ssh -i ${PEMLOC} ubuntu@${dns} bash -c "'
-        sudo rm -rf /usr/local/${TECHNOLOGY}
-        sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
-      '"
-    done
-  else
-    echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
-    exit 1
-  fi
+  for dns in ${PUBLIC_DNS[@]}; do
+    echo ${dns}
+    ssh -i ${PEMLOC} ubuntu@${dns} bash -c "'
+      sudo rm -rf /usr/local/${TECHNOLOGY}
+      sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
+    '"
+  done
 }
 
 function service_action {

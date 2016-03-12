@@ -118,6 +118,7 @@ case ${command} in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
           get_dependencies
           install_tech
+          peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
 
         ssh)
@@ -129,7 +130,7 @@ case ${command} in
           echo "Installing Zeppelin on Master Node in ${CLUSTER_NAME}"
           ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
           ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
-          ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} start
+          peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
 
         *)
@@ -167,7 +168,14 @@ case ${command} in
 
       case ${TECHNOLOGY} in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
-          uninstall_tech
+          INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+          if [ "$INSTALLED" = "installed" ]; then
+            peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
+            uninstall_tech
+          else
+            echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
+            exit 1
+          fi
           ;;
 
         *)
@@ -242,6 +250,40 @@ case ${command} in
     else
       echo "invalid number of arguments"
       echo "usage: peg terminate <cluster-name>"
+    fi
+    ;;
+
+  ssh)
+    if [[ "${nfargs}" -eq "2" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      NODE_NUM=${PARAMETER_ARR[1]}
+
+      if [ -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
+        ssh -o "StrictHostKeyChecking no" -i ${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem ubuntu@$(sed -n ''"$NODE"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
+      else
+        echo "cluster does not exist"
+        echo "run peg fetch <cluster-name> first"
+        exit 1
+      fi
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg ssh <cluster-name> <node-number>"
+    fi
+    ;;
+
+  retag)
+    if [[ "${nfargs}" -eq "2" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      NEW_CLUSTER_NAME=${PARAMETER_ARR[1]}
+
+      retag_instance_with_name ${CLUSTER_NAME} ${NEW_CLUSTER_NAME}
+
+      peg fetch ${NEW_CLUSTER_NAME}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg retag <cluster-name> <new-cluster-name>"
     fi
     ;;
 
