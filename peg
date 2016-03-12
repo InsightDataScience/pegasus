@@ -1,0 +1,254 @@
+#!/bin/bash
+
+BLU='\033[0;34m'
+NC='\033[0m'
+
+PEG_ROOT=$(dirname "${BASH_SOURCE}")
+REGION=${AWS_DEFAULT_REGION:=us-west-2}
+
+source ${PEG_ROOT}/util.sh
+
+nargs="$#"
+
+if [ ${nargs} == 0 ]; then
+  echo "usage: peg [options] <command> [parameters]"
+  echo "peg: error: too few arguments"
+  echo "use the -h option for available commands"
+  exit 1
+fi
+
+while getopts ":h" opt; do
+  case ${opt} in
+    h)
+      echo "peg"
+      echo "    - region"
+      echo "    - fetch"
+      echo "    - up"
+      echo "    - down"
+      echo "    - install"
+      echo "    - uninstall"
+      echo "    - service"
+      exit 1
+      ;;
+
+    *)
+      echo "invalid option flag: -${OPTARG}"
+      exit 1
+      ;;
+  esac
+done
+
+args=("$@")
+command=${args[0]}
+parameters=${args[@]:1}
+nfargs=$(echo ${parameters} | wc -w)
+
+case ${command} in
+  region)
+    if [[ "${nfargs}" -eq "0" ]]; then
+      echo "region set to ${REGION}"
+    else
+      echo "invalid number of arguments"
+      exit 1
+    fi
+    ;;
+
+  fetch)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      CLUSTER_NAME=${parameters}
+
+      CLUSTER_INFO_PATH=${PEG_ROOT}/tmp/${CLUSTER_NAME}
+      if [ -d ${CLUSTER_INFO_PATH} ]; then
+        rm -rf ${CLUSTER_INFO_PATH}
+      fi
+
+      mkdir -p ${CLUSTER_INFO_PATH}
+
+      store_public_dns ${CLUSTER_NAME}
+      store_hostnames ${CLUSTER_NAME}
+      store_pemkey ${CLUSTER_NAME}
+      describe_cluster ${CLUSTER_NAME}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg fetch <region>"
+      exit 1
+    fi
+    ;;
+
+  up)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      TEMPLATE_PATH=${parameters}
+
+      set_launch_config ${TEMPLATE_PATH}
+      run_instances
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg up <template-path>"
+      exit 1
+    fi
+    ;;
+
+  install)
+    if [[ "${nfargs}" -eq "2" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      TECHNOLOGY=${PARAMETER_ARR[1]}
+
+      if [ ! -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
+        echo "cluster does not exist"
+        echo "run peg fetch <cluster-name> first"
+        exit 1
+      fi
+
+      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
+      PEMLOC=${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem
+      DEP_ROOT_FOLDER=/usr/local/
+
+      case ${TECHNOLOGY} in
+        aws)
+          echo "Passing AWS credentials to ${CLUSTER_NAME}"
+          ${PEG_ROOT}/config/pass_aws_cred ${PEMLOC} ${CLUSTER_NAME}
+          ;;
+
+        environment)
+          echo "Setting up base environment packages on ${CLUSTER_NAME}"
+          ${PEG_ROOT}/install/environment/install_env_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+          ;;
+
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
+          get_dependencies
+          install_tech
+          ;;
+
+        ssh)
+          echo "Setting up passwordless SSH on ${CLUSTER_NAME}"
+          ${PEG_ROOT}/config/ssh/setup_passwordless_ssh.sh ${PEMLOC} ${CLUSTER_NAME}
+          ;;
+
+        zeppelin)
+          echo "Installing Zeppelin on Master Node in ${CLUSTER_NAME}"
+          ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} start
+          ;;
+
+        *)
+          echo "Invalid technology to install."
+          exit 1
+          ;;
+
+      esac
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg install <cluster-name> <technology>"
+    fi
+    ;;
+
+  uninstall)
+    if [[ "${nfargs}" -eq "2" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      TECHNOLOGY=${PARAMETER_ARR[1]}
+
+      if [ ! -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
+        echo "cluster does not exist"
+        echo "run peg fetch <cluster-name> first"
+        exit 1
+      fi
+
+      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns)
+      PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
+      ROOT_FOLDER=/usr/local/
+
+      PUBLIC_DNS=()
+      while read line; do
+        PUBLIC_DNS+=(${line})
+      done < ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns
+
+      case ${TECHNOLOGY} in
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
+          uninstall_tech
+          ;;
+
+        *)
+          echo "Invalid technology to uninstall."
+          exit 1
+          ;;
+
+      esac
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg uninstall <cluster-name> <technology>"
+    fi
+    ;;
+
+  service)
+    if [[ "${nfargs}" -eq "3" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      TECHNOLOGY=${PARAMETER_ARR[1]}
+      ACTION=${PARAMETER_ARR[2]}
+
+      if [ ! -d ${PEG_ROOT}/tmp/$CLUSTER_NAME ]; then
+          echo "cluster does not exist"
+          echo "run peg fetch <cluster-name> first"
+          exit 1
+      fi
+
+      MASTER_DNS=$(head -n 1 tmp/$CLUSTER_NAME/public_dns)
+      PEMLOC=tmp/$CLUSTER_NAME/*.pem
+      ROOT_FOLDER=/usr/local/
+
+      case $TECHNOLOGY in
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kibana|opscenter|presto|redis|spark|storm|zeppelin|zookeeper)
+          service_action
+          ;;
+
+        *)
+          echo "Invalid service to ${ACTION}."
+          exit 1
+          ;;
+
+      esac
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg service <cluster-name> <technology> <start|stop>"
+    fi
+    ;;
+
+  down)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      CLUSTER_NAME=${parameters}
+      PUBLIC_DNS=($(get_public_dns_with_name ${CLUSTER_NAME}))
+      echo -e "Are you sure you want to terminate ${BLU}$CLUSTER_NAME${NC}?"
+      for dns in ${PUBLIC_DNS[@]}; do
+        echo ${dns}
+      done
+      echo -n "[y/n]: "
+      read RESPONSE
+
+      case $RESPONSE in
+        n)
+          exit 1
+          ;;
+        y)
+          terminate_instances_with_name ${CLUSTER_NAME}
+          ;;
+        *)
+          echo "respond with y or n."
+          exit 1
+          ;;
+      esac
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg terminate <cluster-name>"
+    fi
+    ;;
+
+  *)
+    echo "invalid command. use -h to see available commands"
+    exit 1
+    ;;
+esac
+
+

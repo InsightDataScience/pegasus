@@ -50,7 +50,10 @@ function store_public_dns {
   local public_dns=($(get_public_dns_with_name ${cluster_name}))
   local public_dns_path=${PEG_ROOT}/tmp/${cluster_name}/public_dns
 
-  rm ${public_dns_path}
+  if [ -f ${public_dns_path} ]; then
+    rm ${public_dns_path}
+  fi
+
   for dns in ${public_dns[@]}; do
     echo ${dns} >> ${public_dns_path}
   done
@@ -61,7 +64,10 @@ function store_hostnames {
   local hostnames=($(get_hostnames_with_name ${cluster_name}))
   local hostnames_path=${PEG_ROOT}/tmp/${cluster_name}/hostnames
 
-  rm ${hostnames_path}
+  if [ -f ${hostnames_path} ]; then
+    rm ${hostnames_path}
+  fi
+
   for hostname in ${hostnames[@]}; do
     echo ${hostname} >> ${hostnames_path}
   done
@@ -274,6 +280,40 @@ function get_instance_ids_of_spot_request_ids {
     --query SpotInstanceRequests[].InstanceId
 }
 
+function get_instanceids_with_name {
+  local cluster_name=$1
+  ${AWS_CMD} describe-instances \
+    --filters Name=tag:Name,Values=${cluster_name} \
+    --query Reservations[].Instances[].InstanceId
+}
+
+function get_spot_request_ids_of_instance_ids {
+  local instance_ids="$@"
+  ${AWS_CMD} describe-instances \
+    --instance-ids ${instance_ids} \
+    --query Reservations[].Instances[].SpotInstanceRequestId
+}
+
+function terminate_instances_with_name {
+  local cluster_name=$1
+  local instance_ids=$(get_instanceids_with_name ${cluster_name})
+  local spot_request_ids=$(get_spot_request_ids_of_instance_ids ${instance_ids})
+  local num_instances=$(echo ${instance_ids} | wc -w)
+  local num_spot_requests=$(echo ${spot_request_ids} | wc -w)
+
+  if [[ "${num_instances}" -gt "0" ]]; then
+    echo "terminating instances: ${instance_ids}"
+    ${AWS_CMD} terminate-instances \
+      --instance-ids ${instance_ids}
+
+    if [[ "${num_spot_requests}" -gt "0" ]]; then
+      echo "cancelling spot requests: ${spot_request_ids}"
+      ${AWS_CMD} cancel-spot-instance-requests \
+        --spot-instance-request-ids ${spot_request_ids}
+    fi
+  fi
+}
+
 function run_instances {
   local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
 
@@ -283,12 +323,12 @@ function run_instances {
 
   case "${purchase_type}" in
     spot)
-      echo "requesting spot instances..."
+      echo "[${tag_name}] requesting spot instances..."
       local spot_request_ids=$(run_spot_instances)
 
       tag_name_of_resources ${tag_name} ${spot_request_ids}
 
-      echo "waiting for spot requests ${spot_request_ids} to be fulfilled..."
+      echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
 
       local instance_ids=$(get_instance_ids_of_spot_request_ids ${spot_request_ids})
@@ -299,16 +339,106 @@ function run_instances {
       ;;
 
     *)
-      echo "Invalid purchase type. Please select spot or on_demand."
+      echo "[${tag_name}] Invalid purchase type. Please select spot or on_demand."
       exit 1
       ;;
   esac
 
   tag_name_of_resources ${tag_name} ${instance_ids}
 
-  echo "waiting for instances ${instance_ids} in status ok state..."
+  echo "[${tag_name}] waiting for instances ${instance_ids} in status ok state..."
   wait_for_instances_status_ok ${instance_ids}
 
   echo "${instance_ids} ready..."
 }
+
+function check_remote_folder {
+  local pemloc=$1
+  local remote_dns=$2
+  local dependency_path=$3
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${remote_dns} bash -c "'
+    if [ -d ${dependency_path} ]; then
+      echo "installed"
+    else
+      echo "missing"
+    fi
+    '"
+}
+
+function install_tech {
+  if [ -z "${DEP}" ]; then
+    echo "Installing ${TECHNOLOGY} on ${CLUSTER_NAME}"
+    ${PEG_ROOT}/install/cluster_download ${PEMLOC} ${CLUSTER_NAME} ${TECHNOLOGY}
+    ${PEG_ROOT}config/${TECHNOLOGY}/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+    ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} start
+  else
+    INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
+    if [ "${INSTALLED}" = "installed" ]; then
+      DEP=(${DEP[@]:1})
+      echo ${DEP}
+      install_tech
+    else
+      echo "${DEP} is not installed in ${DEP_ROOT_FOLDER}"
+      echo "Please install ${DEP} and then proceed with ${TECHNOLOGY}"
+      echo "peg install ${CLUSTER_NAME} ${TECHNOLOGY}"
+      exit 1
+    fi
+  fi
+}
+
+function get_dependencies {
+  while read line; do
+    KEY_RAW=$(echo $line | awk '{print $1}')
+    KEY=${KEY_RAW%?}
+    VALUE=$(echo $line | awk '{print $2}')
+    if [ "$KEY" == "$TECHNOLOGY" ]; then
+      if [ -z $VALUE ]; then
+        DEP=()
+        break
+      else
+        DEP_RAW=${VALUE/,/ }
+        DEP=($DEP_RAW)
+      fi
+    fi
+  done < ${PEG_ROOT}/dependencies.txt
+}
+
+function uninstall_tech {
+  INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+  if [ "$INSTALLED" = "installed" ]; then
+    ${PEG_ROOT}/ec2service ${CLUSTER_NAME} ${TECHNOLOGY} stop
+    for dns in ${PUBLIC_DNS[@]}; do
+      echo ${dns}
+      ssh -i ${PEMLOC} ubuntu@${dns} bash -c "'
+        sudo rm -rf /usr/local/${TECHNOLOGY}
+        sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
+      '"
+    done
+  else
+    echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
+    exit 1
+  fi
+}
+
+function service_action {
+  INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+  if [ "${INSTALLED}" = "installed" ]; then
+    case ${ACTION} in
+      start)
+        ${PEG_ROOT}/service/${TECHNOLOGY}/start_service.sh ${PEMLOC} ${CLUSTER_NAME}
+        ;;
+      stop)
+        ${PEG_ROOT}/service/${TECHNOLOGY}/stop_service.sh ${PEMLOC} ${CLUSTER_NAME}
+        ;;
+      *)
+        echo -e "Invalid action for ${TECHNOLOGY}"
+        exit 1
+        ;;
+    esac
+  else
+    echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
+    exit 1
+  fi
+}
+
 
