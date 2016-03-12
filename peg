@@ -72,7 +72,7 @@ case ${command} in
       describe_cluster ${CLUSTER_NAME}
     else
       echo "invalid number of arguments"
-      echo "usage: peg fetch <region>"
+      echo "usage: peg fetch <cluster-name>"
       exit 1
     fi
     ;;
