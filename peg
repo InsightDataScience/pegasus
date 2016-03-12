@@ -28,6 +28,8 @@ while getopts ":h" opt; do
       echo "    - install"
       echo "    - uninstall"
       echo "    - service"
+      echo "    - ssh"
+      echo "    - retag"
       exit 1
       ;;
 
