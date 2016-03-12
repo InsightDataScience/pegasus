@@ -5,14 +5,15 @@ This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazo
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
 Supported commands:
-* `ec2spinup` - launch an AWS cluster
-* `ec2fetch` - fetch the hostnames and Public DNS of nodes in the AWS cluster
-* `ec2install` - install a technology on the cluster
-* `ec2service` - start and stop a service on the cluster
-* `ec2uninstall` - uninstall a specific technology from the cluster
-* `ec2ssh` - SSH into a specific node in your AWS cluster
-* `ec2terminate` - terminate a cluster
-* `ec2retag` - retag an existing cluster with a different name
+* `peg region` - show current region for aws-cli
+* `peg up <template-path>` - launch an AWS cluster
+* `peg fetch <cluster-name>` - fetch the hostnames and Public DNS of nodes in the AWS cluster
+* `peg install <cluster-name> <technology>` - install a technology on the cluster
+* `peg service <cluster-name> <technology> <start|stop>` - start and stop a service on the cluster
+* `peg uninstall <cluster-name> <technology>` - uninstall a specific technology from the cluster
+* `peg ssh <cluster-name> <node-number>` - SSH into a specific node in your AWS cluster
+* `peg down <cluster-name>` - terminate a cluster
+* `peg retag <cluster-name> <new-cluster-name>` - retag an existing cluster with a different name
 
 # Table of Contents
 1. [Install Pegasus on your local machine](README.md#1-install-pegasus-on-your-local-machine)
@@ -40,6 +41,8 @@ Add your AWS credentials to `~/.bash_profile`, choose a default AWS region and s
 ```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
+export AWS_DEFAULT_REGION=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
+export PATH=<path-to-pegasus>:$PATH
 ```
 ```bash
 $ . ~/.bash_profile
@@ -72,18 +75,18 @@ Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI
 
 Or
 
-Use ec2spinup to deploy a cluster from the command line (recommended)
+Use `peg up` to deploy a cluster from the command line (recommended)
 ```bash
-$ ./ec2spinup <region> <instance-template-file>
+$ peg up <instance-template-file>
 ```
 
-The `instance-template-file` is simply a yaml file that ec2spinup uses. Within this file you will must specify the following as shown:
+The `instance-template-file` is simply a yaml file that `peg up` uses. Within this file you will must specify the following as shown:
 ```bash
-purchase_type: spot|on_demand,
+purchase_type: spot|on_demand
 subnet: string
 price: string
 num_instances": 4
-key_name": "string
+key_name: string
 security_group_ids: string
 instance_type: t1.micro|m1.small|m1.medium|m1.large|m1.xlarge|m3.medium|m3.large|m3.xlarge|m3.2xlarge|m4.large|m4.xlarge|m4.2xlarge|m4.4xlarge|m4.10xlarge|t2.micro|t2.small|t2.medium|t2.large|m2.xlarge|m2.2xlarge|m2.4xlarge|cr1.8xlarge|i2.xlarge|i2.2xlarge|i2.4xlarge|i2.8xlarge|hi1.4xlarge|hs1.8xlarge|c1.medium|c1.xlarge|c3.large|c3.xlarge|c3.2xlarge|c3.4xlarge|c3.8xlarge|c4.large|c4.xlarge|c4.2xlarge|c4.4xlarge|c4.8xlarge|cc1.4xlarge|cc2.8xlarge|g2.2xlarge|cg1.4xlarge|r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|r3.8xlarge|d2.xlarge|d2.2xlarge|d2.4xlarge|d2.8xlarge
 tag_name: string
@@ -94,13 +97,12 @@ vol_size: 100
 * **price** (*string*) - spot price you would like to set. Ignored if purchase type is on_demand e.g. 0.25
 * **num_instances** (*integer*) - number of instances to deploy
 * **key_name** (*string*) - the pem key name to be used for all instances e.g. insight-cluster
-* **security_group_ids** (*list*) - a list of the security group ids
-  * (*string*) e.g. sg-e9f17e8c
+* **security_group_ids** (*string*) - security group id e.g. sg-e9f17e8c
 * **instance_type** (*string*) - type of instances to deploy
 * **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. test-cluster
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
 
-The AMIs used in the ec2spinup script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
+The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
 # 3. Fetching AWS cluster DNS and hostname information
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privelages:
@@ -108,11 +110,11 @@ Once the nodes are up and running on AWS, we'll need to grab the DNS and hostnam
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
 
-Always run `ec2fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
+Always run `peg fetch` to get the instance DNSs and hostnames before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
 ```bash
-$ ./ec2fetch <region> <cluster-name>
+$ peg fetch <cluster-name>
 ```
-Under the tmp/`<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
+Under the `tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
 *tmp/\<cluster-name\>/public_dns*
 ```bash
@@ -131,20 +133,20 @@ ip-172-31-44-133 **WORKER3**
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations.
 
 # 4. Setting up a newly provisioned AWS cluster
-If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `ec2spinup` script, since the packages have already been installed.
+If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` script, since the packages have already been installed.
 
-1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using ec2spinup)**
+1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using peg up)**
 1. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS. This is needed for technologies such as Hadoop and Spark.
 2. **AWS Credentials** - places AWS keys onto all machines under `~/.profile`
 ```bash
-$ ./ec2install <cluster-name> environment    # not needed if using ec2spinup!!!
-$ ./ec2install <cluster-name> ssh
-$ ./ec2install <cluster-name> aws
+$ peg install <cluster-name> environment    # not needed if using peg up!!!
+$ peg install <cluster-name> ssh
+$ peg install <cluster-name> aws
 ```
 
 # 5. Start installing!
 ```bash
-$ ./ec2install <cluster-name> <technology>
+$ peg install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
 * cassandra (default v2.2.5)
@@ -174,38 +176,38 @@ Additional technologies can be included into Pegasus by adding the technology ve
 # 6. Starting and stopping services
 A script have been provided to start and stop distributed services easily without having to manually SSH into each node
 ```bash
-$ ./ec2service <cluster-name> <technology> <start|stop>
+$ peg service <cluster-name> <technology> <start|stop>
 ```
 
 # 7. Uninstalling a technology
 A script have been provided to uninstall a specific technology from all nodes in the declared cluster
 ```bash
-$ ./ec2uninstall <cluster-name> <technology>
+$ peg uninstall <cluster-name> <technology>
 ```
 
 # 8. SSH into a node
 If you need to SSH into a specific node in a cluster, you can use the `ec2ssh` script to easily reference nodes
 ```bash
-$ ./ec2ssh <cluster-name> <node-number>
+$ peg ssh <cluster-name> <node-number>
 ```
 where `node-number` is the order in which the nodes appear in the `hostnames` and `public_dns` files starting with 1
 
 # 9. Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
 ```bash
-$ ./ec2terminate <region> <cluster-name>
+$ peg down <cluster-name>
 ```
 
 # 10. Retag a cluster
 Retag an existing cluster on AWS
 ```bash
-$ ./ec2retag <region> <cluster-name> <new-cluster-name>
+$ peg retag <cluster-name> <new-cluster-name>
 ```
 
 # 11. Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`templates/pipelines/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/templates/pipelines/spark_hadoop.sh) file.
 
-Here it shows how we can spin up a 4 node cluster (ec2spinup) using the [`example.json`](https://github.com/InsightDataScience/pegasus/blob/master/templates/instances/example.json) instance template, grab the cluster information using `ec2fetch` and install all the technologies with `ec2install` in one script. We can deploy this cluster simply by running the following:
+Here it shows how we can spin up a 4 node cluster (peg up) using the [`example.yml`](https://github.com/InsightDataScience/pegasus/blob/master/templates/instances/example.yml) instance template, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
 ```bash
 $ templates/pipelines/spark_hadoop.sh
 ```
@@ -213,16 +215,15 @@ $ templates/pipelines/spark_hadoop.sh
 #!/bin/bash
 
 CLUSTER_NAME=test-cluster
-REGION=us-west-2
 
-./ec2spinup $REGION templates/instances/example.json
+peg up templates/instances/example.yml
 
-./ec2fetch $REGION $CLUSTER_NAME
+peg fetch $CLUSTER_NAME
 
-./ec2install $CLUSTER_NAME ssh
-./ec2install $CLUSTER_NAME aws
-./ec2install $CLUSTER_NAME hadoop
-./ec2install $CLUSTER_NAME hive
-./ec2install $CLUSTER_NAME pig
-./ec2install $CLUSTER_NAME spark
+peg install $CLUSTER_NAME ssh
+peg install $CLUSTER_NAME aws
+peg install $CLUSTER_NAME hadoop
+peg install $CLUSTER_NAME hive
+peg install $CLUSTER_NAME pig
+peg install $CLUSTER_NAME spark
 ```
