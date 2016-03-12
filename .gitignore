@@ -3,7 +3,7 @@ DataLabs
 tmp
 archive
 templates/instances/*
-!templates/instances/example.json
+!templates/instances/example.yml
 
 templates/pipelines/*
 !templates/pipelines/spark_hadoop.sh

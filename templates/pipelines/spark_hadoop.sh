@@ -1,16 +1,15 @@
 #!/bin/bash
 
 CLUSTER_NAME=test-cluster
-REGION=us-west-2
 
-./ec2spinup templates/instances/example.json
+peg up templates/instances/example.yml
 
-./ec2fetch $REGION $CLUSTER_NAME
+peg fetch $CLUSTER_NAME
 
-./ec2install $CLUSTER_NAME ssh
-./ec2install $CLUSTER_NAME aws
-./ec2install $CLUSTER_NAME hadoop
-./ec2install $CLUSTER_NAME hive
-./ec2install $CLUSTER_NAME pig
-./ec2install $CLUSTER_NAME spark
+peg install $CLUSTER_NAME ssh
+peg install $CLUSTER_NAME aws
+peg install $CLUSTER_NAME hadoop
+peg install $CLUSTER_NAME hive
+peg install $CLUSTER_NAME pig
+peg install $CLUSTER_NAME spark
 
