@@ -379,7 +379,7 @@ function install_tech {
   if [ -z "${DEP}" ]; then
     echo "Installing ${TECHNOLOGY} on ${CLUSTER_NAME}"
     ${PEG_ROOT}/install/cluster_download ${PEMLOC} ${CLUSTER_NAME} ${TECHNOLOGY}
-    ${PEG_ROOT}config/${TECHNOLOGY}/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+    ${PEG_ROOT}/config/${TECHNOLOGY}/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
   else
     INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
     if [ "${INSTALLED}" = "installed" ]; then
@@ -443,4 +443,25 @@ function service_action {
   fi
 }
 
+function get_cluster_hostname_arr {
+  local cluster_name=$1
+  HOSTNAME_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames))
+}
 
+function get_cluster_privateip_arr {
+  local cluster_name=$1
+  PRIVATE_IP_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-))
+}
+
+function get_cluster_publicdns_arr {
+  local cluster_name=$1
+  PUBLIC_DNS_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns))
+}
+
+function run_script_on_node {
+  local pemloc=$1; shift
+  local public_dns=$1; shift
+  local script="$1"; shift
+  local argin="$@"
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${public_dns} 'bash -s' < "${script}" "${argin}"
+}

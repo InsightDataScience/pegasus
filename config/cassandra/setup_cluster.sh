@@ -2,41 +2,39 @@
 
 # check input arguments
 if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+  echo "Please specify pem-key location and cluster name!" && exit 1
 fi
+
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+REGION=${AWS_DEFAULT_REGION:=us-west-2}
+
+source ${PEG_ROOT}/util.sh
 
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$2
 
 # check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
+if [ ! -f ${PEMLOC} ]; then
+  echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS names
-SEED_IP=$(head -n 1 tmp/$INSTANCE_NAME/hostnames | tr - . | cut -b 4-)
-NODE_IP=()
-while read line; do
-    IP=$(echo $line | tr - . | cut -b 4-)
-    NODE_IP+=($IP)
-done < tmp/$INSTANCE_NAME/hostnames
+get_cluster_privateip_arr ${CLUSTER_NAME}
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
+SEED_IP=${PRIVATE_IP_ARR[0]}
+SEED_DNS=${PUBLIC_DNS_ARR[0]}
 
-# import AWS public DNS's
-SEED_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-NODE_DNS=()
-while read line; do
-    NODE_DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
+single_script="${PEG_ROOT}/config/cassandra/setup_single.sh"
 
-# Install and configure nodes for cassandra
-IP_CNT=0
-for dns in "${NODE_DNS[@]}";
+IDX=0
+for dns in "${PUBLIC_DNS_ARR[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/cassandra/setup_single.sh $INSTANCE_NAME $SEED_IP ${NODE_IP[$IP_CNT]} &
-    IP_CNT=$(echo "$IP_CNT+1" | bc)
+  args="${CLUSTER_NAME} ${SEED_IP} ${PRIVATE_IP_ARR[$IDX]}"
+  run_script_on_node ${PEMLOC} ${dns} ${single_script} ${args} &
+  IDX=$(($IDX+1))
 done
+
 wait
 
 echo "Cassandra configuration complete!"

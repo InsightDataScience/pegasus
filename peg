@@ -262,7 +262,7 @@ case ${command} in
       NODE_NUM=${PARAMETER_ARR[1]}
 
       if [ -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
-        ssh -o "StrictHostKeyChecking no" -i ${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem ubuntu@$(sed -n ''"$NODE"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
+        ssh -o "StrictHostKeyChecking no" -i ${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem ubuntu@$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
       else
         echo "cluster does not exist"
         echo "run peg fetch <cluster-name> first"

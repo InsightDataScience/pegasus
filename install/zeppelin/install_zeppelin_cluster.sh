@@ -7,6 +7,8 @@ if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
 fi
 
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
 INSTANCE_NAME=$2
@@ -17,6 +19,6 @@ if [ ! -f $PEMLOC ]; then
 fi
 
 # Install Zeppelin
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) 'bash -s' < install/zeppelin/install_zeppelin.sh
+ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$(head -n 1 ${PEG_ROOT}/tmp/${INSTANCE_NAME}/public_dns) 'bash -s' < ${PEG_ROOT}/install/zeppelin/install_zeppelin.sh
 
 echo "Zeppelin installed!"

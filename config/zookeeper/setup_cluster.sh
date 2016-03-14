@@ -7,28 +7,29 @@ if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+REGION=${AWS_DEFAULT_REGION:=us-west-2}
+
+source ${PEG_ROOT}/util.sh
+
 PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$2
 
 # check if pem-key location is valid
 if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
+  echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS public DNS's
-DNS=()
-while read line; do
-    DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
+get_cluster_publicdns_arr ${CLUSTER_NAME}
+
+single_script="${PEG_ROOT}/config/zookeeper/setup_single.sh"
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
-for dns in "${DNS[@]}"
-do
-    echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/zookeeper/setup_single.sh $SERVER_NUM "${DNS[@]}" &
-    SERVER_NUM=$(echo "$SERVER_NUM+1" | bc)
+for dns in "${PUBLIC_DNS_ARR[@]}"; do
+  args="$SERVER_NUM "${PUBLIC_DNS_ARR[@]}""
+  run_script_on_node ${PEMLOC} ${dns} ${single_script} ${args}
+  SERVER_NUM=$(($SERVER_NUM+1))
 done
 
 wait

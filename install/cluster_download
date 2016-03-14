@@ -7,6 +7,8 @@ if [ "$#" -ne 3 ]; then
     echo "Please specify pem-key location, cluster name, and technology!" && exit 1
 fi
 
+PEG_ROOT=$(dirname ${BASH_SOURCE})/..
+
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
 INSTANCE_NAME=$2
@@ -21,14 +23,14 @@ fi
 DNS=()
 while read line; do
     DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
+done < ${PEG_ROOT}/tmp/${INSTANCE_NAME}/public_dns
 
 # Install Hadoop master and slaves
 for dns in "${DNS[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < install/download_tech $TECHNOLOGY &
+    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < ${PEG_ROOT}/install/download_tech ${TECHNOLOGY} &
 done
 
 wait
 
-echo "$TECHNOLOGY installed!"
+echo "${TECHNOLOGY} installed!"

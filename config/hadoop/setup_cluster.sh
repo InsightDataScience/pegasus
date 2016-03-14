@@ -7,58 +7,55 @@ if [ "$#" -ne 2 ]; then
     echo "Please specify pem-key location and cluster name!" && exit 1
 fi
 
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+REGION=${AWS_DEFAULT_REGION:=us-west-2}
+
+source ${PEG_ROOT}/util.sh
+
 # get input arguments [aws region, pem-key location]
 PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$2
 
 # check if pem-key location is valid
 if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-# import AWS private DNS names
-FIRST_LINE=true
-while read line; do
-    if [ "$FIRST_LINE" = true ]; then
-        MASTER_NAME=$line
-        SLAVE_NAME=()
-        FIRST_LINE=false
-    else
-        SLAVE_NAME+=($line)
-    fi
-done < tmp/$INSTANCE_NAME/hostnames
+get_cluster_hostname_arr ${CLUSTER_NAME}
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
-# import AWS public DNS's
-FIRST_LINE=true
-while read line; do
-    if [ "$FIRST_LINE" = true ]; then
-        MASTER_DNS=$line
-        SLAVE_DNS=()
-        FIRST_LINE=false
-    else
-        SLAVE_DNS+=($line)
-    fi
-done < tmp/$INSTANCE_NAME/public_dns
+MASTER_HOSTNAME=${HOSTNAME_ARR[0]}
+MASTER_DNS=${PUBLIC_DNS_ARR[0]}
 
 # Configure base Hadoop master and slaves
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/setup_single.sh $MASTER_DNS &
-for dns in "${SLAVE_DNS[@]}"
+single_script="${PEG_ROOT}/config/hadoop/setup_single.sh"
+args="$MASTER_DNS"
+for dns in "${PUBLIC_DNS_ARR[@]}"
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/hadoop/setup_single.sh $MASTER_DNS &
+  run_script_on_node ${PEMLOC} ${dns} ${single_script} ${args} &
 done
 
 wait
 
 # Configure Hadoop master and slaves
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/config_hosts.sh $MASTER_DNS $MASTER_NAME "${SLAVE_DNS[@]}" "${SLAVE_NAME[@]}"
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/hadoop/config_namenode.sh $MASTER_NAME "${SLAVE_NAME[@]}" &
-for dns in "${SLAVE_DNS[@]}"
+hosts_script="${PEG_ROOT}/config/hadoop/config_hosts.sh"
+args="$MASTER_DNS $MASTER_HOSTNAME "${PUBLIC_DNS_ARR[@]:1}" "${HOSTNAME_ARR[@]:1}""
+
+run_script_on_node ${PEMLOC} ${MASTER_DNS} ${hosts_script} ${args}
+
+namenode_script="${PEG_ROOT}/config/hadoop/config_namenode.sh"
+args="$MASTER_HOSTNAME "${HOSTNAME_ARR[@]:1}""
+run_script_on_node ${PEMLOC} ${MASTER_DNS} ${namenode_script} ${args} &
+
+datanode_script="${PEG_ROOT}/config/hadoop/config_datanode.sh"
+for dns in "${PUBLIC_DNS_ARR[@]:1}"
 do
-    ssh -i $PEMLOC ubuntu@$dns 'bash -s' < config/hadoop/config_datanode.sh &
+  run_script_on_node ${PEMLOC} ${dns} ${datanode_script} &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS '. ~/.profile; hdfs namenode -format'
+format_script="${PEG_ROOT}/config/hadoop/format_hdfs.sh"
+run_script_on_node ${PEMLOC} ${MASTER_DNS} ${format_script}
 
 echo "Hadoop configuration complete!"
