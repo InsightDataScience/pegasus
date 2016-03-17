@@ -20,23 +20,30 @@ function parse_yaml {
   }'
 }
 
-function get_public_dns_with_name {
+function get_public_dns_with_name_and_role {
   local cluster_name=$1
+  local cluster_role=$2
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
+              Name=tag:Role,Values=${cluster_role} \
+              Name=instance-state-name,Values=running \
     --query Reservations[].Instances[].NetworkInterfaces[].Association.PublicDnsName
 }
 
-function get_private_dns_with_name {
+function get_private_dns_with_name_and_role {
   local cluster_name=$1
+  local cluster_role=$2
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
+              Name=tag:Role,Values=${cluster_role} \
+              Name=instance-state-name,Values=running \
     --query Reservations[].Instances[].NetworkInterfaces[].PrivateDnsName
 }
 
-function get_hostnames_with_name {
+function get_hostnames_with_name_and_role {
   local cluster_name=$1
-  local private_dns=($(get_private_dns_with_name ${cluster_name}))
+  local cluster_role=$2
+  local private_dns=($(get_private_dns_with_name_and_role ${cluster_name} ${cluster_role}))
   local hostnames=
 
   for dns in ${private_dns[@]}; do
@@ -47,28 +54,41 @@ function get_hostnames_with_name {
 
 function store_public_dns {
   local cluster_name=$1
-  local public_dns=($(get_public_dns_with_name ${cluster_name}))
+  local master_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} master))
+  local worker_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} worker))
   local public_dns_path=${PEG_ROOT}/tmp/${cluster_name}/public_dns
 
   if [ -f ${public_dns_path} ]; then
     rm ${public_dns_path}
   fi
 
-  for dns in ${public_dns[@]}; do
+  # add master node if labeled first to public_dns_path
+  if [ "${#master_public_dns[@]}" -eq "1" ]; then
+    echo ${master_public_dns[0]} >> ${public_dns_path}
+  fi
+
+  # add workers
+  for dns in ${worker_public_dns[@]}; do
     echo ${dns} >> ${public_dns_path}
   done
 }
 
 function store_hostnames {
   local cluster_name=$1
-  local hostnames=($(get_hostnames_with_name ${cluster_name}))
+  local master_hostname=($(get_hostnames_with_name_and_role ${cluster_name} master))
+  local worker_hostnames=($(get_hostnames_with_name_and_role ${cluster_name} worker))
   local hostnames_path=${PEG_ROOT}/tmp/${cluster_name}/hostnames
 
   if [ -f ${hostnames_path} ]; then
     rm ${hostnames_path}
   fi
 
-  for hostname in ${hostnames[@]}; do
+  # add master node if labeled first to hostnames_path
+  if [ "${#master_hostname[@]}" -eq "1" ]; then
+    echo ${master_hostname[0]} >> ${hostnames_path}
+  fi
+
+  for hostname in ${worker_hostnames[@]}; do
     echo ${hostname} >> ${hostnames_path}
   done
 }
@@ -77,6 +97,7 @@ function get_pemkey_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
+              Name=instance-state-name,Values=running \
     --query Reservations[].Instances[].KeyName
 }
 
@@ -100,7 +121,7 @@ function store_pemkey {
 
   # check if pem keys are unique in cluster
   if [ ${num_unique_pemkeys} -ne 1 ]; then
-    echo "pem keys in $1 are not unique!"
+    echo "pem keys in $1 are not identical!"
     echo "found ${unique_pemkeys}"
     exit 1
   fi
@@ -110,17 +131,11 @@ function store_pemkey {
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
 }
 
-function get_instance_names_with_name {
-  local cluster_name=$1
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-    --query Reservations[].Instances[].Tags[?key=='Name'].Value
-}
-
 function get_instance_types_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
+              Name=instance-state-name,Values=running \
     --query Reservations[].Instances[].InstanceType
 }
 
@@ -129,34 +144,45 @@ function get_instance_type_histo_with_name {
   get_instance_types_with_name ${cluster_name} | tr "\t" "\n" | sort | uniq -c
 }
 
+function get_instance_ids_with_name_and_role {
+  local cluster_name=$1
+  local cluster_role=$2
+
+  if [ -z ${cluster_role} ]; then
+    ${AWS_CMD} describe-instances \
+      --filters Name=tag:Name,Values=${cluster_name} \
+                Name=instance-state-name,Values=running \
+      --query Reservations[].Instances[].InstanceId
+  else
+    ${AWS_CMD} describe-instances \
+      --filters Name=tag:Name,Values=${cluster_name} \
+                Name=tag:Role,Values=${cluster_role} \
+                Name=instance-state-name,Values=running \
+      --query Reservations[].Instances[].InstanceId
+  fi
+}
+
 function describe_cluster {
   local cluster_name=$1
-  local public_dns=($(get_public_dns_with_name ${cluster_name}))
-  local hostnames=($(get_hostnames_with_name ${cluster_name}))
-  local instance_names=($(get_instance_names_with_name ${cluster_name}))
-  local pemkeys=($(get_pemkey_with_name ${cluster_name}))
-  local num_instances=${#hostnames[@]}
-
-  for index in ${!pemkeys[@]}; do
-    echo "Instance name ${instance_names[$index]} using ${pemkeys[$index]} key"
-  done
+  local master_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} master))
+  local worker_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} worker))
+  local master_hostnames=($(get_hostnames_with_name_and_role ${cluster_name} master))
+  local worker_hostnames=($(get_hostnames_with_name_and_role ${cluster_name} worker))
+  local master_instance_ids=($(get_instance_ids_with_name_and_role ${cluster_name} master))
+  local worker_instance_ids=($(get_instance_ids_with_name_and_role ${cluster_name} worker))
 
   get_instance_type_histo_with_name ${cluster_name}
 
-  echo "${num_instances} instances found in ${REGION:=us-west-2} with the name ${cluster_name}"
+  for index in ${!master_public_dns[@]}; do
+    echo "MASTER NODE: ${master_instance_ids[$index]}"
+    echo "    Hostname:   ${master_hostnames[$index]}"
+    echo "    Public DNS: ${master_public_dns[$index]}"
+  done
 
-  local first_one=1
-  for index in ${!hostnames[@]}; do
-    if [ ${first_one} -eq 1 ]; then
-      echo "MASTER NODE:"
-      echo "    Hostname:   ${hostnames[$index]}"
-      echo "    Public_DNS: ${public_dns[$index]}"
-      first_one=0
-    else
-      echo "WORKER NODE:"
-      echo "    Hostname:   ${hostnames[$index]}"
-      echo "    Public_DNS: ${public_dns[$index]}"
-    fi
+  for index in ${!worker_public_dns[@]}; do
+    echo "WORKER NODE: ${worker_instance_ids[$index]}"
+    echo "    Hostname:   ${worker_hostnames[$index]}"
+    echo "    Public DNS: ${worker_public_dns[$index]}"
   done
 }
 
@@ -179,9 +205,10 @@ function show_all_subnets_in_vpc {
 
   ${AWS_CMD} describe-subnets \
     --output json \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"} \
+    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"}
 
 }
+
 function show_all_security_groups_in_vpc {
   local vpc_name=$1
   local vpc_id=$(get_vpcids_with_name ${vpc_name})
@@ -253,12 +280,13 @@ function run_on_demand_instances {
     --query Instances[].InstanceId
 }
 
-function tag_name_of_resources {
-  local tag_name=$1; shift
+function tag_resources {
+  local key=$1; shift
+  local val=$1; shift
   local resource_ids="$@"
   ${AWS_CMD} create-tags \
     --resources ${resource_ids} \
-    --tags Key=Name,Value=${tag_name}
+    --tags Key=${key},Value=${val}
 }
 
 function wait_for_instances_status_ok {
@@ -280,12 +308,6 @@ function get_instance_ids_of_spot_request_ids {
     --query SpotInstanceRequests[].InstanceId
 }
 
-function get_instance_ids_with_name {
-  local cluster_name=$1
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-    --query Reservations[].Instances[].InstanceId
-}
 
 function get_spot_request_ids_of_instance_ids {
   local instance_ids="$@"
@@ -296,7 +318,7 @@ function get_spot_request_ids_of_instance_ids {
 
 function terminate_instances_with_name {
   local cluster_name=$1
-  local instance_ids=$(get_instance_ids_with_name ${cluster_name})
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
   local spot_request_ids=$(get_spot_request_ids_of_instance_ids ${instance_ids})
   local num_instances=$(echo ${instance_ids} | wc -w)
   local num_spot_requests=$(echo ${spot_request_ids} | wc -w)
@@ -317,7 +339,7 @@ function terminate_instances_with_name {
 function retag_instance_with_name {
   local cluster_name=$1
   local new_cluster_name=$2
-  local instance_ids=$(get_instance_ids_with_name ${cluster_name})
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
 
   ${AWS_CMD} create-tags \
     --resources ${instance_ids} \
@@ -336,7 +358,7 @@ function run_instances {
       echo "[${tag_name}] requesting spot instances..."
       local spot_request_ids=$(run_spot_instances)
 
-      tag_name_of_resources ${tag_name} ${spot_request_ids}
+      tag_resources Name ${tag_name} ${spot_request_ids}
 
       echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
@@ -354,7 +376,11 @@ function run_instances {
       ;;
   esac
 
-  tag_name_of_resources ${tag_name} ${instance_ids}
+  tag_resources Name ${tag_name} ${instance_ids}
+
+  if [ ! -z ${role} ]; then
+    tag_resources Role ${role} ${instance_ids}
+  fi
 
   echo "[${tag_name}] waiting for instances ${instance_ids} in status ok state..."
   wait_for_instances_status_ok ${instance_ids}
@@ -465,3 +491,4 @@ function run_script_on_node {
   local argin="$@"
   ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${public_dns} 'bash -s' < "${script}" "${argin}"
 }
+
