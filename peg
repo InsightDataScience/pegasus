@@ -30,6 +30,7 @@ while getopts ":h" opt; do
       echo "    - service"
       echo "    - ssh"
       echo "    - retag"
+      echo "    - scale"
       exit 1
       ;;
 
@@ -205,8 +206,8 @@ case ${command} in
           exit 1
       fi
 
-      MASTER_DNS=$(head -n 1 tmp/$CLUSTER_NAME/public_dns)
-      PEMLOC=tmp/$CLUSTER_NAME/*.pem
+      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns)
+      PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
       ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
@@ -289,6 +290,50 @@ case ${command} in
     fi
     ;;
 
+  scale)
+    if [[ "${nfargs}" -eq "4" ]]; then
+      PARAMETER_ARR=(${parameters})
+      DIRECTION=${PARAMETER_ARR[0]}
+      CLUSTER_NAME=${PARAMETER_ARR[1]}
+      TECHNOLOGY=${PARAMETER_ARR[2]}
+      NUMBER=${PARAMETER_ARR[3]}
+
+      if [ ! -d ${PEG_ROOT}/tmp/$CLUSTER_NAME ]; then
+          echo "cluster does not exist"
+          echo "run peg fetch <cluster-name> first"
+          exit 1
+      fi
+
+      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns)
+      PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
+
+      case $TECHNOLOGY in
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|presto|redis|spark|storm|zookeeper)
+
+          peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
+
+          if [[ "${DIRECTION}" == "up" ]];then
+            ${PEG_ROOT}/scale/${TECHNOLOGY}/up.sh ${PEMLOC} ${CLUSTER_NAME} ${NUMBER}
+          else
+            echo "need to finish scale down"
+          fi
+
+          peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
+          ;;
+
+        *)
+          echo "Invalid technology to scale."
+          exit 1
+          ;;
+
+      esac
+
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg scale <up|down> <cluster-name> <technology> <num-instances>"
+    fi
+
+    ;;
   *)
     echo "invalid command. use -h to see available commands"
     exit 1

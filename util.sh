@@ -2,7 +2,7 @@
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
-AWS_CMD="aws ec2 --region ${REGION:=us-west-2} --output text"
+source ${PEG_ROOT}/aws_queries.sh
 
 function parse_yaml {
   local prefix=$2
@@ -20,25 +20,6 @@ function parse_yaml {
   }'
 }
 
-function get_public_dns_with_name_and_role {
-  local cluster_name=$1
-  local cluster_role=$2
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-              Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
-    --query Reservations[].Instances[].NetworkInterfaces[].Association.PublicDnsName
-}
-
-function get_private_dns_with_name_and_role {
-  local cluster_name=$1
-  local cluster_role=$2
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-              Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
-    --query Reservations[].Instances[].NetworkInterfaces[].PrivateDnsName
-}
 
 function get_hostnames_with_name_and_role {
   local cluster_name=$1
@@ -93,13 +74,6 @@ function store_hostnames {
   done
 }
 
-function get_pemkey_with_name {
-  local cluster_name=$1
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
-    --query Reservations[].Instances[].KeyName
-}
 
 function get_unique_pemkey {
   local cluster_name=$1
@@ -131,35 +105,9 @@ function store_pemkey {
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
 }
 
-function get_instance_types_with_name {
-  local cluster_name=$1
-  ${AWS_CMD} describe-instances \
-    --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
-    --query Reservations[].Instances[].InstanceType
-}
-
 function get_instance_type_histo_with_name {
   local cluster_name=$1
   get_instance_types_with_name ${cluster_name} | tr "\t" "\n" | sort | uniq -c
-}
-
-function get_instance_ids_with_name_and_role {
-  local cluster_name=$1
-  local cluster_role=$2
-
-  if [ -z ${cluster_role} ]; then
-    ${AWS_CMD} describe-instances \
-      --filters Name=tag:Name,Values=${cluster_name} \
-                Name=instance-state-name,Values=running \
-      --query Reservations[].Instances[].InstanceId
-  else
-    ${AWS_CMD} describe-instances \
-      --filters Name=tag:Name,Values=${cluster_name} \
-                Name=tag:Role,Values=${cluster_role} \
-                Name=instance-state-name,Values=running \
-      --query Reservations[].Instances[].InstanceId
-  fi
 }
 
 function describe_cluster {
@@ -184,50 +132,6 @@ function describe_cluster {
     echo "    Hostname:   ${worker_hostnames[$index]}"
     echo "    Public DNS: ${worker_public_dns[$index]}"
   done
-}
-
-function show_all_vpcs {
-  ${AWS_CMD} describe-vpcs \
-    --output json \
-    --query Vpcs[]
-}
-
-function get_vpcids_with_name {
-  local vpc_name=$1
-  ${AWS_CMD} describe-vpcs \
-    --filters Name=tag:Name,Values=${vpc_name} \
-    --query Vpcs[].VpcId
-}
-
-function show_all_subnets_in_vpc {
-  local vpc_name=$1
-  local vpc_id=$(get_vpcids_with_name ${vpc_name})
-
-  ${AWS_CMD} describe-subnets \
-    --output json \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"}
-
-}
-
-function show_all_security_groups_in_vpc {
-  local vpc_name=$1
-  local vpc_id=$(get_vpcids_with_name ${vpc_name})
-
-  ${AWS_CMD} describe-security-groups \
-    --output json \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"} \
-    --query SecurityGroups[]
-}
-
-function get_security_groupids_in_vpc_with_name {
-  local vpc_name=$1
-  local vpc_id=$(get_vpcids_with_name ${vpc_name})
-  local security_group_name=$2
-
-  ${AWS_CMD} describe-security-groups \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"} \
-              Name=group-name,Values=${security_group_name} \
-    --query SecurityGroups[].GroupId
 }
 
 function set_launch_config {
@@ -255,67 +159,6 @@ function select_ami {
   esac
 }
 
-function run_spot_instances {
-  local launch_specification="{\"ImageId\":\"${AWS_IMAGE}\",\"KeyName\":\"${key_name}\",\"InstanceType\":\"${instance_type}\",\"BlockDeviceMappings\":${block_device_mappings},\"SubnetId\":\"${subnet_id}\",\"Monitoring\":${monitoring},\"SecurityGroupIds\":[\"${security_group_ids}\"]}"
-
-  ${AWS_CMD} request-spot-instances \
-    --spot-price "${price:?"specify spot price"}" \
-    --instance-count ${num_instances:?"specify number of instances"} \
-    --type "one-time" \
-    --launch-specification ${launch_specification} \
-    --query SpotInstanceRequests[].SpotInstanceRequestId
-
-}
-
-function run_on_demand_instances {
-  ${AWS_CMD} run-instances \
-    --count ${num_instances:?"specify number of instances"} \
-    --image-id ${AWS_IMAGE} \
-    --key-name ${key_name:?"specify pem key to use"} \
-    --security-group-ids ${security_group_ids:?"specify security group ids"} \
-    --instance-type ${instance_type:?"specify instance type"} \
-    --subnet-id ${subnet_id:?"specify subnet id to launch"} \
-    --block-device-mappings ${block_device_mappings} \
-    --monitoring ${monitoring} \
-    --query Instances[].InstanceId
-}
-
-function tag_resources {
-  local key=$1; shift
-  local val=$1; shift
-  local resource_ids="$@"
-  ${AWS_CMD} create-tags \
-    --resources ${resource_ids} \
-    --tags Key=${key},Value=${val}
-}
-
-function wait_for_instances_status_ok {
-  local instance_ids="$@"
-  ${AWS_CMD} wait instance-status-ok \
-    --instance-ids ${instance_ids}
-}
-
-function wait_for_spot_requests {
-  local spot_request_ids="$@"
-  ${AWS_CMD} wait spot-instance-request-fulfilled \
-    --spot-instance-request-ids ${spot_request_ids}
-}
-
-function get_instance_ids_of_spot_request_ids {
-  local spot_request_ids="$@"
-  ${AWS_CMD} describe-spot-instance-requests \
-    --spot-instance-request-ids ${spot_request_ids} \
-    --query SpotInstanceRequests[].InstanceId
-}
-
-
-function get_spot_request_ids_of_instance_ids {
-  local instance_ids="$@"
-  ${AWS_CMD} describe-instances \
-    --instance-ids ${instance_ids} \
-    --query Reservations[].Instances[].SpotInstanceRequestId
-}
-
 function terminate_instances_with_name {
   local cluster_name=$1
   local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
@@ -336,15 +179,7 @@ function terminate_instances_with_name {
   fi
 }
 
-function retag_instance_with_name {
-  local cluster_name=$1
-  local new_cluster_name=$2
-  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
 
-  ${AWS_CMD} create-tags \
-    --resources ${instance_ids} \
-    --tags Key=Name,Value=${new_cluster_name}
-}
 
 function run_instances {
   local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
@@ -363,11 +198,11 @@ function run_instances {
       echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
 
-      local instance_ids=$(get_instance_ids_of_spot_request_ids ${spot_request_ids})
+      INSTANCE_IDS=$(get_instance_ids_of_spot_request_ids ${spot_request_ids})
       ;;
 
     on_demand)
-      local instance_ids=$(run_on_demand_instances)
+      INSTANCE_IDS=$(run_on_demand_instances)
       ;;
 
     *)
@@ -376,16 +211,16 @@ function run_instances {
       ;;
   esac
 
-  tag_resources Name ${tag_name} ${instance_ids}
+  tag_resources Name ${tag_name} ${INSTANCE_IDS}
 
   if [ ! -z ${role} ]; then
-    tag_resources Role ${role} ${instance_ids}
+    tag_resources Role ${role} ${INSTANCE_IDS}
   fi
 
-  echo "[${tag_name}] waiting for instances ${instance_ids} in status ok state..."
-  wait_for_instances_status_ok ${instance_ids}
+  echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} in status ok state..."
+  wait_for_instances_status_ok ${INSTANCE_IDS}
 
-  echo "${instance_ids} ready..."
+  echo "${INSTANCE_IDS} ready..."
 }
 
 function check_remote_folder {
@@ -492,3 +327,30 @@ function run_script_on_node {
   ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${public_dns} 'bash -s' < "${script}" "${argin}"
 }
 
+function launch_more_workers_in {
+  local cluster_name=$1
+  local num=$2
+
+  local worker_instance_ids=($(get_instance_ids_with_name_and_role ${cluster_name} worker))
+  local template_id=${worker_instance_ids[0]}
+
+  AWS_IMAGE=$(get_image_id_from_instances ${template_id})
+  key_name=$(get_pem_key_from_instances ${template_id})
+  security_group_ids=$(get_security_group_ids_from_instances ${template_id})
+  instance_type=$(get_instance_type_from_instances ${template_id})
+  subnet_id=$(get_subnet_id_from_instances ${template_id})
+  vol_size=$(get_volume_size_from_instances ${template_id})
+  tag_name=${cluster_name}
+  num_instances=${num}
+  role=worker
+
+  local spot_request_id=$(get_spot_request_ids_of_instance_ids ${template_id})
+  if [ -z ${spot_request_id} ]; then
+    purchase_type=on_demand
+  else
+    purchase_type=spot
+    price=$(get_price_of_spot_request_ids ${spot_request_id})
+  fi
+
+  run_instances
+}
