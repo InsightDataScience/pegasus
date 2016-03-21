@@ -2,7 +2,7 @@
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
-source ${PEG_ROOT}/aws_queries.sh
+source ${PEG_ROOT}/util-aws.sh
 
 REM_USER=${REM_USER:=ubuntu}
 
