@@ -4,29 +4,21 @@ PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
 source ${PEG_ROOT}/util.sh
 
 # check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location!" && exit 1
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-CLUSTER_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
+MASTER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_DNS} master)
+WORKER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_DNS} worker)
 
-get_cluster_publicdns_arr ${CLUSTER_DNS}
+cmd='/usr/local/alluxio/bin/alluxio-start.sh master'
+run_cmd_on_node ${MASTER_PUBLIC_DNS} ${cmd}
 
-cnt=0
-for dns in ${NODE_DNS[@]}; do
-  if [ $cnt == 0 ]; then
-    ssh -i $PEMLOC ${REM_USER}@${dns} '. ~/.profile; /usr/local/alluxio/bin/alluxio-start.sh master'
-  else
-    ssh -i $PEMLOC ${REM_USER}@${dns} '. ~/.profile; /usr/local/alluxio/bin/alluxio-start.sh worker SudoMount'
-  fi
-  cnt=$(($cnt+1))
+cmd='/usr/local/alluxio/bin/alluxio-start.sh worker SudoMount'
+for dns in ${WORKER_PUBLIC_DNS}; do
+  run_cmd_on_node ${dns} ${cmd}
 done
 
 echo "Alluxio Started!"
