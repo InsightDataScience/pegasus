@@ -20,7 +20,7 @@ fi
 
 while read PUBLIC_DNS; do
   echo $PUBLIC_DNS
-  ssh -o "StrictHostKeyChecking no" -n -i $PEMLOC ubuntu@$PUBLIC_DNS 'echo -e "export AWS_ACCESS_KEY_ID='$AWS_ACCESS_KEY_ID'\nexport AWS_SECRET_ACCESS_KEY='$AWS_SECRET_ACCESS_KEY'\nexport AWS_DEFAULT_REGION='$AWS_DEFAULT_REGION'" >> ~/.profile' &
+  ssh -o "StrictHostKeyChecking no" -n -i $PEMLOC ${REM_USER}@$PUBLIC_DNS 'echo -e "export AWS_ACCESS_KEY_ID='$AWS_ACCESS_KEY_ID'\nexport AWS_SECRET_ACCESS_KEY='$AWS_SECRET_ACCESS_KEY'\nexport AWS_DEFAULT_REGION='$AWS_DEFAULT_REGION'" >> ~/.profile' &
 done < ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns
 
 wait

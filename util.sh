@@ -4,6 +4,8 @@ PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
 source ${PEG_ROOT}/aws_queries.sh
 
+REM_USER=${REM_USER:=ubuntu}
+
 function parse_yaml {
   local prefix=$2
   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -227,7 +229,7 @@ function check_remote_folder {
   local pemloc=$1
   local remote_dns=$2
   local dependency_path=$3
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${remote_dns} bash -c "'
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${remote_dns} bash -c "'
     if [ -d ${dependency_path} ]; then
       echo "installed"
     else
@@ -276,7 +278,7 @@ function get_dependencies {
 function uninstall_tech {
   for dns in ${PUBLIC_DNS[@]}; do
     echo ${dns}
-    ssh -i ${PEMLOC} ubuntu@${dns} bash -c "'
+    ssh -i ${PEMLOC} ${REM_USER}@${dns} bash -c "'
       sudo rm -rf /usr/local/${TECHNOLOGY}
       sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
     '"
@@ -324,7 +326,14 @@ function run_script_on_node {
   local public_dns=$1; shift
   local script="$1"; shift
   local argin="$@"
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ubuntu@${public_dns} 'bash -s' < "${script}" "${argin}"
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} 'bash -s' < "${script}" "${argin}"
+}
+
+function run_cmd_on_node {
+  local pemloc=$1; shift
+  local public_dns=$1; shift
+  local cmd="$1"
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} "${cmd}"
 }
 
 function launch_more_workers_in {
