@@ -108,7 +108,7 @@ vol_size: integer
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
 # 3. Fetching AWS cluster DNS and hostname information
-Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privelages:
+Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privileges:
 ```bash
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
