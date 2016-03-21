@@ -21,7 +21,7 @@ if [ ! -f $PEMLOC ]; then
     echo "pem-key does not exist!" && exit 1
 fi
 
-get_cluster_public_dns_arr ${CLUSTER_NAME}
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
 script="${PEG_ROOT}/install/download_tech"
 args="${TECHNOLOGY}"

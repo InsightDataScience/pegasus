@@ -333,7 +333,10 @@ function run_cmd_on_node {
   local pemloc=$1; shift
   local public_dns=$1; shift
   local cmd="$1"
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} "${cmd}"
+  echo ${pemloc}
+  echo ${public_dns}
+  echo ${cmd}
+  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} '${cmd}'
 }
 
 function launch_more_workers_in {

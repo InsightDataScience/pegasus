@@ -1,8 +1,13 @@
 #!/bin/bash
 
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+
 CLUSTER_NAME=test-cluster
 
-peg up templates/instances/example.yml
+peg up ${PEG_ROOT}/templates/instances/spark_master.yml &
+peg up ${PEG_ROOT}/templates/instances/spark_workers.yml &
+
+wait
 
 peg fetch $CLUSTER_NAME
 
