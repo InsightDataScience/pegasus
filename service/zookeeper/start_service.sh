@@ -1,35 +1,25 @@
 #!/bin/bash
 
-# must be called from the top level
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
-
-# import AWS public DNS's
-DNS=()
-while read line; do
-    DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
-for dns in "${DNS[@]}"
+for dns in "${PUBLIC_DNS_ARR[@]}"
 do
-    echo $dns
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '. ~/.profile; zkServer.sh start' &
+  echo $dns
+  cmd=". ~/.profile; zkServer.sh start"
+  run_cmd_on_node ${dns} ${cmd} &
 done
 
 wait
 
-echo "Zookeeper Started!" 
+echo "Zookeeper Started!"

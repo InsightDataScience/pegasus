@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# must be called from the top level
+
 # check input arguments
 if [ "$#" -ne 1 ]; then
     echo "Please specify cluster name!" && exit 1
@@ -15,9 +17,9 @@ get_cluster_publicdns_arr ${CLUSTER_NAME}
 
 MASTER_DNS=${PUBLIC_DNS_ARR[0]}
 
-# Install HBase on master and slaves
-single_script="${PEG_ROOT}/config/hbase/setup_single.sh"
-args="$MASTER_DNS "${HOSTNAME_ARR[@]}""
+single_script="${PEG_ROOT}/config/alluxio/setup_single.sh"
+args="${HOSTNAME_ARR[@]}"
+# Install Alluxio on master and slaves
 for dns in "${PUBLIC_DNS_ARR[@]}"
 do
   run_script_on_node ${dns} ${single_script} ${args} &
@@ -25,4 +27,7 @@ done
 
 wait
 
-echo "HBase configuration complete!"
+format_script="${PEG_ROOT}/config/alluxio/format_fs.sh"
+run_script_on_node ${MASTER_DNS} ${format_script}
+
+echo "Alluxio configuration complete!"

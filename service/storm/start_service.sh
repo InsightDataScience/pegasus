@@ -1,39 +1,26 @@
 #!/bin/bash
 
-# must be called from the top level
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
+MASTER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+WORKER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} worker)
 
-# import AWS public DNS's
-FIRST_LINE=true
-while read line; do
-  if [ "$FIRST_LINE" = true ]; then
-    MASTER_DNS=$line
-    SLAVE_DNS=()
-    FIRST_LINE=false
-  else
-    SLAVE_DNS+=($line)
-  fi
-done < tmp/$INSTANCE_NAME/public_dns
 
-echo $MASTER_DNS
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < service/storm/start_master.sh
+echo $MASTER_PUBLIC_DNS
+script=${PEG_ROOT}/service/storm/start_master.sh
+run_script_on_node ${MASTER_PUBLIC_DNS} ${script}
 
-for dns in "${SLAVE_DNS[@]}"; do
+script=${PEG_ROOT}/service/storm/start_slave.sh
+for dns in ${WORKER_PUBLIC_DNS}; do
   echo $dns
-  ssh -i $PEMLOC ubuntu@$dns 'bash -s' < service/storm/start_slave.sh
+  run_script_on_node ${dns} ${script}
 done
 
 

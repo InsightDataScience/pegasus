@@ -1,40 +1,28 @@
 #!/bin/bash
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 1 ]; then
+  echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
+CLUSTER_NAME=$1
 
-# import AWS public DNS's
-FIRST_LINE=true
-while read line; do
-    if [ "$FIRST_LINE" = true ]; then
-        MASTER_DNS=$line
-        SLAVE_DNS=()
-        FIRST_LINE=false
-    else
-        SLAVE_DNS+=($line)
-    fi
-done < tmp/$INSTANCE_NAME/public_dns
+get_cluster_publicdns_arr ${CLUSTER_NAME}
+
+MASTER_DNS=${PUBLIC_DNS_ARR[0]}
+WORKER_DNS=${PUBLIC_DNS_ARR[@]:1}
 
 # Install and configure Spark on all nodes
-ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_single.sh $MASTER_DNS &
-for dns in "${SLAVE_DNS[@]}"
-do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns 'bash -s' < config/spark/setup_single.sh $dns &
+for dns in "${PUBLIC_DNS_ARR[@]}"; do
+  single_script="${PEG_ROOT}/config/spark/setup_single.sh"
+  args="${dns}"
+  run_script_on_node ${dns} ${single_script} ${args} &
 done
 
 wait
 
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/config_workers.sh "${SLAVE_DNS[@]}"
-
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/spark/setup_ipython.sh
+worker_script="${PEG_ROOT}/config/spark/config_workers.sh"
+args="${WORKER_DNS}"
+run_script_on_node ${MASTER_DNS} ${worker_script} ${args}

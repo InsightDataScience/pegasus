@@ -11,6 +11,7 @@ fi
 CLUSTER_NAME=$1
 
 MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
-run_cmd_on_node ${MASTER_DNS} '. ~/.profile; $OPSCENTER_HOME/bin/opscenter'
 
-echo "Opscenter Started complete!"
+run_cmd_on_node ${MASTER_DNS} '/usr/local/tachyon/bin/tachyon-stop.sh'
+
+echo "Tachyon Stopped!"

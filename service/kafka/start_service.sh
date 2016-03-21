@@ -1,30 +1,22 @@
 #!/bin/bash
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
-# import AWS public DNS's
-DNS=()
-while read line; do
-    DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
-
+cmd='sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &'
 # Start kafka broker on all nodes
-for dns in "${DNS[@]}"
+for dns in "${PUBLIC_DNS_ARR[@]}"
 do
-    echo $dns
-    ssh -i $PEMLOC ubuntu@$dns 'sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &' &
+  echo $dns
+  run_cmd_on_node ${dns} ${cmd} &
 done
 
 wait

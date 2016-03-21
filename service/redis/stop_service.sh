@@ -1,29 +1,20 @@
 #!/bin/bash
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
+if [ "$#" -ne 1 ]; then
+  echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
+get_cluster_publicdns_arr ${CLUSTER_NAME}
 
-# import AWS public DNS's
-NODE_DNS=()
-while read line; do
-    NODE_DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
-
-# Install and configure nodes for cassandra
-for dns in "${NODE_DNS[@]}";
-do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-cli shutdown' &
+# Install and configure nodes for redis
+cmd='/usr/local/redis/src/redis-cli shutdown'
+for dns in "${PUBLIC_DNS_ARR[@]}"; do
+  run_cmd_on_node ${dns} ${cmd} &
 done
 
 wait
