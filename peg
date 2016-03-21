@@ -315,6 +315,8 @@ case ${command} in
           if [[ "${DIRECTION}" == "up" ]];then
             ${PEG_ROOT}/scale/${TECHNOLOGY}/up.sh ${PEMLOC} ${CLUSTER_NAME} ${NUMBER}
           else
+            # TODO
+            # need to finish scale down
             echo "need to finish scale down"
           fi
 
