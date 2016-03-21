@@ -11,8 +11,8 @@ sudo cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 # add additional for multiple slaves
 for dns in ${SLAVE_DNS[@]}
 do
-    echo "Adding $DNS to authorized keys..."
-    cat ~/.ssh/id_rsa.pub | ssh -o "StrictHostKeyChecking no" -i ~/.ssh/*.pem ubuntu@$dns 'cat >> ~/.ssh/authorized_keys' &
+  echo "Adding $DNS to authorized keys..."
+  cat ~/.ssh/id_rsa.pub | ssh -o "StrictHostKeyChecking no" ${USER}@$dns 'cat >> ~/.ssh/authorized_keys' &
 done
 
 wait

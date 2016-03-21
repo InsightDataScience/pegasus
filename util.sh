@@ -104,7 +104,11 @@ function store_pemkey {
 
   pemkey_exists_locally ${unique_pemkeys}
 
+  chmod 600 ~/.ssh/${unique_pemkeys}.pem
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
+
+  ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
+  echo "${unique_pemkeys}.pem has been added to your ssh-agent"
 }
 
 function get_instance_type_histo_with_name {
@@ -226,10 +230,9 @@ function run_instances {
 }
 
 function check_remote_folder {
-  local pemloc=$1
-  local remote_dns=$2
-  local dependency_path=$3
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${remote_dns} bash -c "'
+  local remote_dns=$1
+  local dependency_path=$2
+  ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@${remote_dns} bash -c "'
     if [ -d ${dependency_path} ]; then
       echo "installed"
     else
@@ -241,10 +244,10 @@ function check_remote_folder {
 function install_tech {
   if [ -z "${DEP}" ]; then
     echo "Installing ${TECHNOLOGY} on ${CLUSTER_NAME}"
-    ${PEG_ROOT}/install/cluster_download ${PEMLOC} ${CLUSTER_NAME} ${TECHNOLOGY}
-    ${PEG_ROOT}/config/${TECHNOLOGY}/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+    ${PEG_ROOT}/install/cluster_download ${CLUSTER_NAME} ${TECHNOLOGY}
+    ${PEG_ROOT}/config/${TECHNOLOGY}/setup_cluster.sh ${CLUSTER_NAME}
   else
-    INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
+    INSTALLED=$(check_remote_folder ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
     if [ "${INSTALLED}" = "installed" ]; then
       DEP=(${DEP[@]:1})
       echo ${DEP}
@@ -278,7 +281,7 @@ function get_dependencies {
 function uninstall_tech {
   for dns in ${PUBLIC_DNS[@]}; do
     echo ${dns}
-    ssh -i ${PEMLOC} ${REM_USER}@${dns} bash -c "'
+    ssh -A ${REM_USER}@${dns} bash -c "'
       sudo rm -rf /usr/local/${TECHNOLOGY}
       sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
     '"
@@ -286,14 +289,14 @@ function uninstall_tech {
 }
 
 function service_action {
-  INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+  INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
   if [ "${INSTALLED}" = "installed" ]; then
     case ${ACTION} in
       start)
-        ${PEG_ROOT}/service/${TECHNOLOGY}/start_service.sh ${PEMLOC} ${CLUSTER_NAME}
+        ${PEG_ROOT}/service/${TECHNOLOGY}/start_service.sh ${CLUSTER_NAME}
         ;;
       stop)
-        ${PEG_ROOT}/service/${TECHNOLOGY}/stop_service.sh ${PEMLOC} ${CLUSTER_NAME}
+        ${PEG_ROOT}/service/${TECHNOLOGY}/stop_service.sh ${CLUSTER_NAME}
         ;;
       *)
         echo -e "Invalid action for ${TECHNOLOGY}"
@@ -322,21 +325,16 @@ function get_cluster_publicdns_arr {
 }
 
 function run_script_on_node {
-  local pemloc=$1; shift
   local public_dns=$1; shift
   local script="$1"; shift
   local argin="$@"
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} 'bash -s' < "${script}" "${argin}"
+  ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@${public_dns} 'bash -s' < "${script}" "${argin}"
 }
 
 function run_cmd_on_node {
-  local pemloc=$1; shift
   local public_dns=$1; shift
-  local cmd="$1"
-  echo ${pemloc}
-  echo ${public_dns}
-  echo ${cmd}
-  ssh -o "StrictHostKeyChecking no" -i ${pemloc} ${REM_USER}@${public_dns} '${cmd}'
+  local cmd="$@"
+  ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@${public_dns} ${cmd}
 }
 
 function launch_more_workers_in {

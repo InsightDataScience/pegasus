@@ -6,6 +6,6 @@ SLAVE_DNS=( "$@" )
 touch $SPARK_HOME/conf/slaves;
 for dns in ${SLAVE_DNS[@]}
 do
-    echo $dns | cat >> $SPARK_HOME/conf/slaves;
+  echo $dns | cat >> $SPARK_HOME/conf/slaves;
 done
 

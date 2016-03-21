@@ -1,12 +1,10 @@
 #!/bin/bash
 
 # check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments
-PEMLOC=$1
-CLUSTER_NAME=$2
+CLUSTER_NAME=$1
 
 echo "Opscenter has no configurations!"

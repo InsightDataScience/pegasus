@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
+if [ "$#" -ne 1 ]; then
+  echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments
-PEMLOC=$1
-CLUSTER_NAME=$2
+CLUSTER_NAME=$1
 
-MASTER_DNS=$(head -n 1 tmp/$CLUSTER_NAME/public_dns)
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'sudo pkill -f opscenter'
+MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+run_cmd_on_node ${MASTER_DNS} 'sudo pkill -f opscenter'
 
 echo "Opscenter Stopped!"

@@ -1,29 +1,22 @@
 #!/bin/bash
 
-# check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
-
-# import AWS public DNS's
-NODE_DNS=()
-while read line; do
-    NODE_DNS+=($line)
-done < tmp/$INSTANCE_NAME/public_dns
+get_cluster_publicdns_arr ${CLUSTER_NAME}
+MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
 
 # Start redis servers
-for dns in "${NODE_DNS[@]}";
+for dns in "${PUBLIC_DNS_ARR[@]}";
 do
-    ssh -o "StrictHostKeyChecking no" -i $PEMLOC ubuntu@$dns '/usr/local/redis/src/redis-server /usr/local/redis/redis.conf &' &
+  cmd='/usr/local/redis/src/redis-server /usr/local/redis/redis.conf &'
+  run_cmd_on_node ${dns} ${cmd} &
 done
 
 wait
@@ -31,7 +24,8 @@ wait
 # begin discovery of redis servers
 sleep 5
 
-MASTER_DNS=$(head -n 1 tmp/$INSTANCE_NAME/public_dns)
-ssh -i $PEMLOC ubuntu@$MASTER_DNS 'bash -s' < config/redis/join_redis_cluster.sh "${NODE_DNS[@]}" &
+script=${PEG_ROOT}/config/redis/join_redis_cluster.sh
+args="${NODE_DNS[@]}"
+run_script_on_node ${MASTER_DNS} ${script} ${args} &
 
 echo "Redis Started!"

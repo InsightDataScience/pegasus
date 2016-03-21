@@ -23,6 +23,7 @@ while getopts ":h" opt; do
       echo "peg"
       echo "    - region"
       echo "    - fetch"
+      echo "    - describe"
       echo "    - up"
       echo "    - down"
       echo "    - install"
@@ -70,10 +71,22 @@ case ${command} in
       store_public_dns ${CLUSTER_NAME}
       store_hostnames ${CLUSTER_NAME}
       store_pemkey ${CLUSTER_NAME}
-      describe_cluster ${CLUSTER_NAME}
+      peg describe ${CLUSTER_NAME}
     else
       echo "invalid number of arguments"
       echo "usage: peg fetch <cluster-name>"
+      exit 1
+    fi
+    ;;
+
+  describe)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      CLUSTER_NAME=${parameters}
+
+      describe_cluster ${CLUSTER_NAME}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg describe <cluster-name>"
       exit 1
     fi
     ;;
@@ -103,19 +116,18 @@ case ${command} in
         exit 1
       fi
 
-      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
-      PEMLOC=${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem
+      MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
       DEP_ROOT_FOLDER=/usr/local/
 
       case ${TECHNOLOGY} in
         aws)
           echo "Passing AWS credentials to ${CLUSTER_NAME}"
-          ${PEG_ROOT}/config/pass_aws_cred ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/pass_aws_cred ${CLUSTER_NAME}
           ;;
 
         environment)
           echo "Setting up base environment packages on ${CLUSTER_NAME}"
-          ${PEG_ROOT}/install/environment/install_env_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/install/environment/install_env_cluster.sh ${CLUSTER_NAME}
           ;;
 
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
@@ -126,13 +138,13 @@ case ${command} in
 
         ssh)
           echo "Setting up passwordless SSH on ${CLUSTER_NAME}"
-          ${PEG_ROOT}/config/ssh/setup_passwordless_ssh.sh ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/ssh/setup_passwordless_ssh.sh ${CLUSTER_NAME}
           ;;
 
         zeppelin)
           echo "Installing Zeppelin on Master Node in ${CLUSTER_NAME}"
-          ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
-          ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${PEMLOC} ${CLUSTER_NAME}
+          ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${CLUSTER_NAME}
           peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
 
@@ -171,7 +183,7 @@ case ${command} in
 
       case ${TECHNOLOGY} in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
-          INSTALLED=$(check_remote_folder ${PEMLOC} ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+          INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
             uninstall_tech
@@ -206,8 +218,7 @@ case ${command} in
           exit 1
       fi
 
-      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns)
-      PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
+      MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
       ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
@@ -313,7 +324,7 @@ case ${command} in
           peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
 
           if [[ "${DIRECTION}" == "up" ]];then
-            ${PEG_ROOT}/scale/${TECHNOLOGY}/up.sh ${PEMLOC} ${CLUSTER_NAME} ${NUMBER}
+            ${PEG_ROOT}/scale/${TECHNOLOGY}/up.sh ${CLUSTER_NAME} ${NUMBER}
           else
             # TODO
             # need to finish scale down

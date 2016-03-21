@@ -2,11 +2,11 @@
 DataLabs
 tmp
 archive
-templates/instances/*
-!templates/instances/example.yml
 
-templates/pipelines/*
-!templates/pipelines/spark_hadoop.sh
+examples/*
+!examples/spark_hadoop.sh
+!examples/spark_master.yml
+!examples/spark_workers.yml
 
 util/sparklab
 
