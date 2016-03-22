@@ -218,7 +218,7 @@ If you'd like to automate this deployment process completely, you can write your
 
 Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
 ```bash
-$ templates/pipelines/spark_hadoop.sh
+$ examples/spark_hadoop.sh
 ```
 ```bash
 #!/bin/bash
