@@ -9,11 +9,11 @@ fi
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
-for dns in "${PUBLIC_DNS_ARR[@]}"
+for dns in ${PUBLIC_DNS}; do
 do
     echo $dns
     cmd=". ~/.profile; zkServer.sh stop"

@@ -9,15 +9,16 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
-MASTER_DNS=${PUBLIC_DNS_ARR[0]}
-NUM_WORKERS=${#PUBLIC_DNS_ARR[@]}
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
+NUM_WORKERS=$(echo ${WORKER_DNS} | wc -w)
 
 # Configure base Presto coordinator and workers
 single_script="${PEG_ROOT}/config/presto/setup_single.sh"
 args="$MASTER_DNS $NUM_WORKERS"
-for dns in "${PUBLIC_DNS_ARR[@]}"; do
+for dns in ${PUBLIC_DNS}; do
   run_script_on_node ${dns} ${single_script} ${args} &
 done
 
@@ -28,8 +29,7 @@ coordinator_script="${PEG_ROOT}/config/presto/config_coordinator.sh"
 run_script_on_node ${MASTER_DNS} ${coordinator_script}
 
 worker_script="${PEG_ROOT}/config/presto/config_worker.sh"
-for dns in "${PUBLIC_DNS_ARR[@]:1}"
-do
+for dns in ${WORKER_DNS}; do
   run_script_on_node ${dns} ${worker_script} &
 done
 

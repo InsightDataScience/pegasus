@@ -10,14 +10,14 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 single_script="${PEG_ROOT}/config/kafka/setup_single.sh"
 
 # Install and configure nodes for kafka
 BROKER_ID=0
-for dns in "${PUBLIC_DNS_ARR[@]}"; do
-  args="$BROKER_ID $dns "${PUBLIC_DNS_ARR[@]}""
+for dns in ${PUBLIC_DNS}; do
+  args="$BROKER_ID $dns ${PUBLIC_DNS}"
   run_script_on_node ${dns} ${single_script} ${args} &
   BROKER_ID=$(($BROKER_ID+1))
 done

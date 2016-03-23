@@ -10,11 +10,11 @@ fi
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 cmd='/usr/local/cassandra/bin/cassandra'
 # Start each cassandra node
-for dns in "${PUBLIC_DNS_ARR[@]}"; do
+for dns in ${PUBLIC_DNS}; do
   run_cmd_on_node ${dns} ${cmd}
 done
 

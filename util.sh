@@ -22,7 +22,6 @@ function parse_yaml {
   }'
 }
 
-
 function get_hostnames_with_name_and_role {
   local cluster_name=$1
   local cluster_role=$2
@@ -32,7 +31,7 @@ function get_hostnames_with_name_and_role {
   for dns in ${private_dns[@]}; do
     hostnames+=${dns%%.*}\ 
   done
-  echo $hostnames
+  echo ${hostnames}
 }
 
 function store_public_dns {
@@ -185,8 +184,6 @@ function terminate_instances_with_name {
   fi
 }
 
-
-
 function run_instances {
   local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
 
@@ -309,21 +306,6 @@ function service_action {
   fi
 }
 
-function get_cluster_hostname_arr {
-  local cluster_name=$1
-  HOSTNAME_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames))
-}
-
-function get_cluster_privateip_arr {
-  local cluster_name=$1
-  PRIVATE_IP_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-))
-}
-
-function get_cluster_publicdns_arr {
-  local cluster_name=$1
-  PUBLIC_DNS_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns))
-}
-
 function run_script_on_node {
   local public_dns=$1; shift
   local script="$1"; shift
@@ -363,4 +345,83 @@ function launch_more_workers_in {
   fi
 
   run_instances
+}
+
+function fetch_public_dns_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_hostname_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_private_ip_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_master_public_dns {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_cluster_worker_public_dns {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_cluster_master_private_ip {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_worker_private_ips {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_master_hostname {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_worker_hostnames {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_hostnames {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_private_ips {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_public_dns {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function port_forward {
+  local cluster_name=$1; shift
+  local cluster_num=$1; shift
+  local port_cmd="$@"
+
+  local pid=$(lsof -i 4:7777 | awk '{print $2}' | sed 1d)
+
+  if [ ! -z ${pid} ]; then
+    kill ${pid}
+  fi
+
+  local dns=$(fetch_public_dns_of_node_in_cluster ${cluster_name} ${cluster_num})
+
+  ssh -N -f -L ${port_cmd} ${REM_USER}@${dns}
 }

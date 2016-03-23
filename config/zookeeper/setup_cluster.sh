@@ -12,14 +12,14 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 single_script="${PEG_ROOT}/config/zookeeper/setup_single.sh"
 
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
-for dns in "${PUBLIC_DNS_ARR[@]}"; do
-  args="$SERVER_NUM "${PUBLIC_DNS_ARR[@]}""
+for dns in ${PUBLIC_DNS}; do
+  args="$SERVER_NUM ${PUBLIC_DNS}"
   run_script_on_node ${dns} ${single_script} ${args}
   SERVER_NUM=$(($SERVER_NUM+1))
 done

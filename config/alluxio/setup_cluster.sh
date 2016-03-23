@@ -12,15 +12,14 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-get_cluster_hostname_arr ${CLUSTER_NAME}
-get_cluster_publicdns_arr ${CLUSTER_NAME}
-
-MASTER_DNS=${PUBLIC_DNS_ARR[0]}
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
+HOSTNAMES=$(fetch_cluster_hostnames ${CLUSTER_NAME})
 
 single_script="${PEG_ROOT}/config/alluxio/setup_single.sh"
-args="${HOSTNAME_ARR[@]}"
+args="${HOSTNAMES}"
 # Install Alluxio on master and slaves
-for dns in "${PUBLIC_DNS_ARR[@]}"
+for dns in ${PUBLIC_DNS}
 do
   run_script_on_node ${dns} ${single_script} ${args} &
 done

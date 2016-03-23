@@ -12,10 +12,10 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
-SLAVE_DNS=($(get_public_dns_with_name_and_role ${CLUSTER_NAME} worker))
-MASTER_NAME=$(get_hostnames_with_name_and_role ${CLUSTER_NAME} master)
-SLAVE_NAME=($(get_hostnames_with_name_and_role ${CLUSTER_NAME} worker))
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
+
+HOSTNAMES=$(fetch_cluster_hostnames ${CLUSTER_NAME})
 
 # Enable passwordless SSH from local to master
 if ! [ -f ~/.ssh/id_rsa ]; then
@@ -25,11 +25,11 @@ cat ~/.ssh/id_rsa.pub | run_cmd_on_node ${MASTER_DNS} 'cat >> ~/.ssh/authorized_
 
 # Enable passwordless SSH from master to slaves
 SCRIPT=${PEG_ROOT}/config/ssh/setup_ssh.sh
-ARGS="${SLAVE_DNS[@]}"
+ARGS="${WORKER_DNS}"
 run_script_on_node ${MASTER_DNS} ${SCRIPT} "${ARGS}"
 
 # Add NameNode, DataNodes, and Secondary NameNode to known hosts
 SCRIPT=${PEG_ROOT}/config/ssh/add_to_known_hosts.sh
-ARGS="$MASTER_DNS $MASTER_NAME "${SLAVE_NAME[@]}""
+ARGS="$MASTER_DNS $HOSTNAME"
 run_script_on_node ${MASTER_DNS} ${SCRIPT} "${ARGS}"
 

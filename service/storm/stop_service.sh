@@ -9,18 +9,18 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
-WORKER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} worker)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
-for dns in ${WORKER_PUBLIC_DNS}; do
+for dns in ${WORKER_DNS}; do
   echo $dns
   cmd='tmux kill-session -t supervisor'
   run_cmd_on_node ${dns} ${cmd}
 done
 
-echo $MASTER_PUBLIC_DNS
+echo $MASTER_DNS
 cmd="tmux kill-session -t stormui; tmux kill-session -t nimbus"
-run_cmd_on_node ${MASTER_PUBLIC_DNS} ${cmd}
+run_cmd_on_node ${MASTER_DNS} ${cmd}
 
 echo "Storm Stopped!"
 

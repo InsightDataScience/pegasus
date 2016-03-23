@@ -9,12 +9,11 @@ fi
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 cmd='sudo /usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties &'
 # Start kafka broker on all nodes
-for dns in "${PUBLIC_DNS_ARR[@]}"
-do
+for dns in ${PUBLIC_DNS}; do
   echo $dns
   run_cmd_on_node ${dns} ${cmd} &
 done

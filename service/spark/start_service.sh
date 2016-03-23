@@ -10,7 +10,7 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 
 cmd='/usr/local/spark/sbin/start-all.sh'
 run_cmd_on_node ${MASTER_DNS} ${cmd}
