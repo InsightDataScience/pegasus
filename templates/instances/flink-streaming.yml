@@ -1,0 +1,9 @@
+purchase_type: spot
+subnet_id: subnet-b6812ac0
+price: 0.12
+num_instances: 4
+key_name: db-insight
+security_group_ids: sg-db9912a3
+instance_type: m4.large
+tag_name: flink-streaming
+vol_size: 100

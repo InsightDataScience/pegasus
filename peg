@@ -31,6 +31,8 @@ while getopts ":h" opt; do
       echo "    - service"
       echo "    - ssh"
       echo "    - retag"
+      echo "    - start"
+      echo "    - stop"
       exit 1
       ;;
 
@@ -313,6 +315,29 @@ case ${command} in
       echo "usage: peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>"
     fi
     ;;
+
+  start)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      CLUSTER_NAME=${parameters}
+      
+      start_instance ${CLUSTER_NAME}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg start <cluster-name>"
+    fi
+  ;;
+
+  stop)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      CLUSTER_NAME=${parameters}
+      
+      stop_instance ${CLUSTER_NAME}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg stop <cluster-name>"
+    fi
+
+  ;;
 
   *)
     echo "invalid command. use -h to see available commands"

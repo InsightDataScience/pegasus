@@ -40,7 +40,6 @@ function get_instance_types_with_name {
     --query Reservations[].Instances[].InstanceType
 }
 
-
 function get_instance_ids_with_name_and_role {
   local cluster_name=$1
   local cluster_role=$2
@@ -50,6 +49,7 @@ function get_instance_ids_with_name_and_role {
       --filters Name=tag:Name,Values=${cluster_name} \
                 Name=instance-state-name,Values=running \
       --query Reservations[].Instances[].InstanceId
+
   else
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
@@ -230,4 +230,20 @@ function retag_instance_with_name {
   ${AWS_CMD} create-tags \
     --resources ${instance_ids} \
     --tags Key=Name,Value=${new_cluster_name}
+}
+
+function start_instance {
+  local cluster_name=$1
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
+
+  ${AWS_CMD} start-instances \
+    --instance-ids ${instance_ids}
+}
+
+function stop_instance {
+  local cluster_name=$1
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
+
+  ${AWS_CMD} stop-instances \
+    --instance-ids ${instance_ids}
 }

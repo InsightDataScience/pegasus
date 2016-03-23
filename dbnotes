@@ -1,0 +1,68 @@
+### my personal notes about pegasus
+
+----------------- using
+
+Easy to add a new security group under "VPC" in the main AWS
+dashboard (on lower left under "Networks")
+
+Initially thought the AWS_DEFAULT_REGION could take a series of values
+
+should emphasize that only need key name, not `~/.ssh/key_name.pem`.
+It seems that it has to be stored in .ssh too?
+
+for spot instances, it takes a few minutes.
+
+cannot stop a spot instance! Action Item:  automate setting up spot instances
+along with tehnologies in one script by wrapping both into one script
+
+should emphasize that only need key name, not `~/.ssh/key_name.pem`.
+It seems that it has to be stored in .ssh too?
+
+for spot instances, it takes a few minutes.
+
+cannot stop a spot instance! Action Item:  automate setting up spot instances
+along with tehnologies in one script by wrapping both into one script
+
+does pegasus support stoppint?  seems only terminating or uninstalling
+technolobies
+
+---------------------------
+developing
+--------------------------
+all the main `peg` call options can be found in the beginning of peg: 
+
+      echo "    - region"
+      echo "    - fetch"
+      echo "    - up"
+      echo "    - down"
+      echo "    - install"
+...
+
+In these cases are calls to functions in util.sh
+
+---
+spark_hadoop.sh is an example that starts instances and spins up a cluster 
+with specified technologies. 
+
+-- it runs `peg up` and then a bunch of `peg install` calls
+
+Q:  once a cluster is up and running, how to stop and re-start the cluster. This basically automates 
+the process of manually clicking stop and start all the time on the AWS dashboard
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
