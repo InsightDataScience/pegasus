@@ -411,11 +411,25 @@ function fetch_cluster_public_dns {
 }
 
 function port_forward {
-  local cluster_name=$1; shift
-  local cluster_num=$1; shift
-  local port_cmd="$@"
+  local cluster_name=$1
+  local cluster_num=$2
+  local port_cmd=$3
 
-  local pid=$(lsof -i 4:7777 | awk '{print $2}' | sed 1d)
+  local ports=($(echo ${port_cmd} | tr ":" "\n"))
+  local local_port=${ports[0]}
+  local remote_port=${ports[1]}
+
+  if [ -z ${local_port} ]; then
+    echo "specify local port"
+    exit 1
+  fi
+
+  if [ -z ${remote_port} ]; then
+    echo "specify remote port"
+    exit 1
+  fi
+
+  local pid=$(lsof -i 4:${local_port} | awk '{print $2}' | sed 1d)
 
   if [ ! -z ${pid} ]; then
     kill ${pid}

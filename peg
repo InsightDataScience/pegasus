@@ -300,10 +300,25 @@ case ${command} in
     fi
     ;;
 
+  port-forward)
+    if [[ "${nfargs}" -eq "3" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      NODE_NUMBER=${PARAMETER_ARR[1]}
+      PORT_CMD=${PARAMETER_ARR[2]}
+
+      port_forward ${CLUSTER_NAME} ${NODE_NUMBER} ${PORT_CMD}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>"
+    fi
+    ;;
+
   *)
     echo "invalid command. use -h to see available commands"
     exit 1
     ;;
+
 esac
 
 
