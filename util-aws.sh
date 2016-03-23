@@ -47,14 +47,12 @@ function get_instance_ids_with_name_and_role {
   if [ -z ${cluster_role} ]; then
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
-                Name=instance-state-name,Values=running \
       --query Reservations[].Instances[].InstanceId
 
   else
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
                 Name=tag:Role,Values=${cluster_role} \
-                Name=instance-state-name,Values=running \
       --query Reservations[].Instances[].InstanceId
   fi
 }
