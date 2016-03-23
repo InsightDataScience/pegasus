@@ -6,6 +6,7 @@ source ${PEG_ROOT}/util-aws.sh
 
 REM_USER=${REM_USER:=ubuntu}
 
+# thanks to pkuczynski @ https://gist.github.com/pkuczynski/8665367
 function parse_yaml {
   local prefix=$2
   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
