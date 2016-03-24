@@ -167,7 +167,7 @@ The `technology` tag can be any of the following:
 * alluxio (default v1.0.0)
 * cassandra (default v2.2.5)
 * elasticsearch (default v2.1.0)
-* flink (default v0.10.1 with hadoop v2.7 and scala v2.10)
+* flink (default v1.0.0 with hadoop v2.7 and scala v2.10)
 * hadoop (default v2.7.1)
 * hbase (default v1.1.3)
 * hive (default v1.2.1)
