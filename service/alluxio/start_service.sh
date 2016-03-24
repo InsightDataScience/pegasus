@@ -13,10 +13,10 @@ CLUSTER_NAME=$1
 MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
-cmd='/usr/local/alluxio/bin/alluxio-start.sh master'
+cmd='. ~/.profile; /usr/local/alluxio/bin/alluxio-start.sh master'
 run_cmd_on_node ${MASTER_DNS} ${cmd}
 
-cmd='/usr/local/alluxio/bin/alluxio-start.sh worker SudoMount'
+cmd='. ~/.profile; /usr/local/alluxio/bin/alluxio-start.sh worker SudoMount'
 for dns in ${WORKER_DNS}; do
   run_cmd_on_node ${dns} ${cmd}
 done

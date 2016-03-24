@@ -33,6 +33,7 @@ while getopts ":h" opt; do
       echo "    - retag"
       echo "    - start"
       echo "    - stop"
+      echo "    - port-foward"
       exit 1
       ;;
 
@@ -319,7 +320,7 @@ case ${command} in
   start)
     if [[ "${nfargs}" -eq "1" ]]; then
       CLUSTER_NAME=${parameters}
-      
+
       start_instance ${CLUSTER_NAME}
     else
       echo "invalid number of arguments"
@@ -330,7 +331,7 @@ case ${command} in
   stop)
     if [[ "${nfargs}" -eq "1" ]]; then
       CLUSTER_NAME=${parameters}
-      
+
       stop_instance ${CLUSTER_NAME}
     else
       echo "invalid number of arguments"

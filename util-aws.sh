@@ -10,7 +10,7 @@ function get_public_dns_with_name_and_role {
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
               Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].NetworkInterfaces[].Association.PublicDnsName
 }
 
@@ -20,7 +20,7 @@ function get_private_dns_with_name_and_role {
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
               Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].NetworkInterfaces[].PrivateDnsName
 }
 
@@ -28,7 +28,7 @@ function get_pemkey_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].KeyName
 }
 
@@ -36,7 +36,7 @@ function get_instance_types_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].InstanceType
 }
 
@@ -47,12 +47,14 @@ function get_instance_ids_with_name_and_role {
   if [ -z ${cluster_role} ]; then
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
+                Name=instance-state-name,Values=running,stopped \
       --query Reservations[].Instances[].InstanceId
 
   else
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
                 Name=tag:Role,Values=${cluster_role} \
+                Name=instance-state-name,Values=running,stopped \
       --query Reservations[].Instances[].InstanceId
   fi
 }

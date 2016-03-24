@@ -11,6 +11,6 @@ CLUSTER_NAME=$1
 
 MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 
-run_cmd_on_node ${MASTER_DNS} '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &'
+run_cmd_on_node ${MASTER_DNS} '. ~/.profile; sudo $KIBANA_HOME/bin/kibana &' &
 
 echo "Kibana Started!"

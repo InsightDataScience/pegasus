@@ -60,11 +60,13 @@ check_folder () {
 
 curl_tech () {
   curl -sL $TECHNOLOGY_URL | gunzip | sudo tar xv -C /usr/local >> ~/peg_log.txt
-  sudo mv /usr/local/*$TECHNOLOGY* /usr/local/$TECHNOLOGY
-  echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
-  echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
-  sudo chown -R $USER /usr/local/$TECHNOLOGY
-  eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_VER" >> /usr/local/$TECHNOLOGY/tech_ver.txt
+  if [ ! -d /usr/local/*${TECHNOLOGY}* ]; then
+    sudo mv /usr/local/*$TECHNOLOGY* /usr/local/$TECHNOLOGY
+    echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
+    echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
+    sudo chown -R $USER /usr/local/$TECHNOLOGY
+    eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_VER" >> /usr/local/$TECHNOLOGY/tech_ver.txt
+  fi
 }
 
 check_folder

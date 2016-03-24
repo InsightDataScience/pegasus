@@ -14,7 +14,6 @@ PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 # Install and configure nodes for zookeeper
 SERVER_NUM=1
 for dns in ${PUBLIC_DNS}; do
-do
     echo $dns
     cmd=". ~/.profile; zkServer.sh stop"
     run_cmd_on_node ${dns} ${cmd} &
