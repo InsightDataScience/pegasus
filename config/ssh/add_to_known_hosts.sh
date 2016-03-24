@@ -2,14 +2,13 @@
 
 NAMENODE_DNS=$1; shift
 NAMENODE_HOSTNAME=$1; shift
-DATANODE_HOSTNAMES=( "$@" )
+DATANODE_HOSTNAMES="$@"
 
 # add NameNode to known_hosts
 ssh-keyscan -H -t ecdsa $NAMENODE_DNS >> ~/.ssh/known_hosts
 
 # add DataNodes to known_hosts
-for hostname in ${DATANODE_HOSTNAMES[@]}
-do
+for hostname in ${DATANODE_HOSTNAMES}; do
     echo "Adding $hostname to known hosts..."
     ssh-keyscan -H -t ecdsa $hostname >> ~/.ssh/known_hosts
 done

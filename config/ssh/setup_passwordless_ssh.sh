@@ -26,10 +26,10 @@ cat ~/.ssh/id_rsa.pub | run_cmd_on_node ${MASTER_DNS} 'cat >> ~/.ssh/authorized_
 # Enable passwordless SSH from master to slaves
 SCRIPT=${PEG_ROOT}/config/ssh/setup_ssh.sh
 ARGS="${WORKER_DNS}"
-run_script_on_node ${MASTER_DNS} ${SCRIPT} "${ARGS}"
+run_script_on_node ${MASTER_DNS} ${SCRIPT} ${ARGS}
 
 # Add NameNode, DataNodes, and Secondary NameNode to known hosts
 SCRIPT=${PEG_ROOT}/config/ssh/add_to_known_hosts.sh
-ARGS="$MASTER_DNS $HOSTNAME"
-run_script_on_node ${MASTER_DNS} ${SCRIPT} "${ARGS}"
+ARGS="${MASTER_DNS} ${HOSTNAMES}"
+run_script_on_node ${MASTER_DNS} ${SCRIPT} ${ARGS}
 

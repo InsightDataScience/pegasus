@@ -9,7 +9,7 @@ fi
 
 CLUSTER_NAME=$1
 
-PUBLIC_DNS=$(fetch_cluster_publicdns ${CLUSTER_NAME})
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 # Install and configure nodes for redis
 cmd='/usr/local/redis/src/redis-cli shutdown'
