@@ -14,3 +14,4 @@ MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 run_cmd_on_node ${MASTER_DNS} '. ~/.profile; $OPSCENTER_HOME/bin/opscenter'
 
 echo "Opscenter Started complete!"
+echo -e "${color_green}Opscenter WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:8888${color_norm}"

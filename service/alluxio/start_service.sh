@@ -22,3 +22,4 @@ for dns in ${WORKER_DNS}; do
 done
 
 echo "Alluxio Started!"
+echo -e "${color_green}Alluxio WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:19999${color_norm}"

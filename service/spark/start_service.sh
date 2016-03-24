@@ -19,3 +19,6 @@ script=${PEG_ROOT}/service/spark/setup_ipython.sh
 run_script_on_node ${MASTER_DNS} ${script}
 
 echo "Spark Started!"
+echo -e "${color_green}Spark Cluster WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:8080${color_norm}"
+echo -e "${color_green}Spark Job WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:4040${color_norm}"
+echo -e "${color_green}Spark Jupyter Notebook${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:7777${color_norm}"
