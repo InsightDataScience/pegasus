@@ -60,7 +60,7 @@ check_folder () {
 
 curl_tech () {
   curl -sL $TECHNOLOGY_URL | gunzip | sudo tar xv -C /usr/local >> ~/peg_log.txt
-  if [ ! -d /usr/local/*${TECHNOLOGY}* ]; then
+  if [ -d /usr/local/*${TECHNOLOGY}* ]; then
     sudo mv /usr/local/*$TECHNOLOGY* /usr/local/$TECHNOLOGY
     echo "export $TECHNOLOGY_HOME=/usr/local/$TECHNOLOGY" | cat >> ~/.profile
     echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile

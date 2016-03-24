@@ -198,6 +198,8 @@ function run_instances {
       local spot_request_ids=$(run_spot_instances)
 
       tag_resources Name ${tag_name} ${spot_request_ids}
+      tag_resources Owner ${USER} ${spot_request_ids}
+
 
       echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
@@ -216,6 +218,7 @@ function run_instances {
   esac
 
   tag_resources Name ${tag_name} ${INSTANCE_IDS}
+  tag_resources Owner ${USER} ${INSTANCE_IDS}
 
   if [ ! -z ${role} ]; then
     tag_resources Role ${role} ${INSTANCE_IDS}
@@ -224,7 +227,7 @@ function run_instances {
   echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} in status ok state..."
   wait_for_instances_status_ok ${INSTANCE_IDS}
 
-  echo "${INSTANCE_IDS} ready..."
+  echo "[${tag_name}] ${INSTANCE_IDS} ready..."
 }
 
 function check_remote_folder {
