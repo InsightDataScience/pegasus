@@ -2,6 +2,7 @@
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
+source ${PEG_ROOT}/colors.sh
 source ${PEG_ROOT}/util-aws.sh
 
 REM_USER=${REM_USER:=ubuntu}
@@ -146,7 +147,7 @@ function set_launch_config {
 }
 
 function select_ami {
-  case "${REGION}" in
+  case "${AWS_DEFAULT_REGION}" in
     us-west-2)
       AWS_IMAGE=ami-4342a723
       ;;
