@@ -18,7 +18,7 @@ while getopts ":h" opt; do
   case ${opt} in
     h)
       echo "peg"
-      echo "    - region"
+      echo "    - aws"
       echo "    - validate"
       echo "    - fetch"
       echo "    - describe"
@@ -48,13 +48,37 @@ parameters=${args[@]:1}
 nfargs=$(echo ${parameters} | wc -w)
 
 case ${command} in
-  region)
-    if [[ "${nfargs}" -eq "0" ]]; then
-      echo "region set to ${AWS_DEFAULT_REGION}"
-    else
-      echo "invalid number of arguments"
-      exit 1
-    fi
+  aws)
+      PARAMETER_ARR=(${parameters[@]})
+      PEG_AWS_CMD=${PARAMETER_ARR[0]}
+      VPC_NAME=${PARAMETER_ARR[1]}
+      case ${PEG_AWS_CMD} in
+        region)
+          echo "Pegasus is using AWS region ${AWS_DEFAULT_REGION}"
+          ;;
+
+        vpcs)
+          show_all_vpcs
+          ;;
+
+        subnets)
+          show_all_subnets ${VPC_NAME}
+          ;;
+
+        security-groups)
+          show_all_security_groups ${VPC_NAME}
+          ;;
+
+        *)
+          echo "invalid peg aws command"
+          echo "peg aws"
+          echo "        - region"
+          echo "        - vpcs"
+          echo "        - subnets"
+          echo "        - security-groups"
+          exit 1
+          ;;
+      esac
     ;;
 
   validate)
@@ -66,6 +90,7 @@ case ${command} in
       else
         set_launch_config ${YAML_FILE}
         validate_template
+        echo "Template validated successfully."
       fi
     else
       echo "invalid number of arguments"
