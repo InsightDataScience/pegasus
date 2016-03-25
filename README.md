@@ -6,7 +6,8 @@ We want to continue improving this tool by adding more features and other instal
 
 Supported commands:
 * `peg region` - show current region for aws-cli
-* `peg up <template-path>` - launch an AWS cluster
+* `peg validate <template-path>` - check if proper fields are set in the instance template yaml file
+* `peg up <template-path>` - launch an AWS cluster using the instance template yaml file
 * `peg fetch <cluster-name>` - fetch the hostnames and Public DNS of nodes in the AWS cluster and store locally
 * `peg describe <cluster-name>` - show the type of instances, hostnames, and Public DNS of nodes in the AWS cluster
 * `peg install <cluster-name> <technology>` - install a technology on the cluster
@@ -110,6 +111,8 @@ vol_size: integer
 * **instance_type** (*string*) - type of instances to deploy
 * **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. test-cluster
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
+
+You can check if the template file is valid with `peg validate <template-file`. If nothing is shown, then the file should work with `peg up`.
 
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
