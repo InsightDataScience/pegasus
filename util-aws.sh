@@ -2,7 +2,7 @@
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
-AWS_CMD="aws ec2 --region ${REGION:=us-west-2} --output text"
+AWS_CMD="aws ec2 --region ${AWS_DEFAULT_REGION:=us-west-2} --output text"
 
 function get_public_dns_with_name_and_role {
   local cluster_name=$1
