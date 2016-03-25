@@ -9,9 +9,11 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 
 run_cmd_on_node ${MASTER_DNS} '/usr/local/flink/bin/start-cluster.sh'
 run_cmd_on_node ${MASTER_DNS} '/usr/local/flink/bin/start-webclient.sh'
 
 echo "Flink Started!"
+echo -e "${color_green}Flink Job Tracker${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:8080${color_norm}"
+echo -e "${color_green}Flink WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:8081${color_norm}"

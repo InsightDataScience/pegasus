@@ -9,16 +9,16 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
-WORKER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} worker)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
 
-echo $MASTER_PUBLIC_DNS
+echo $MASTER_DNS
 script=${PEG_ROOT}/service/storm/start_master.sh
-run_script_on_node ${MASTER_PUBLIC_DNS} ${script}
+run_script_on_node ${MASTER_DNS} ${script}
 
 script=${PEG_ROOT}/service/storm/start_slave.sh
-for dns in ${WORKER_PUBLIC_DNS}; do
+for dns in ${WORKER_DNS}; do
   echo $dns
   run_script_on_node ${dns} ${script}
 done

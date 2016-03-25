@@ -1,17 +1,14 @@
 #!/bin/bash
 
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
 # check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify pem-key location and cluster name!" && exit 1
+if [ "$#" -ne 1 ]; then
+  echo "Please specify cluster name!" && exit 1
 fi
 
-# get input arguments [aws region, pem-key location]
-PEMLOC=$1
-INSTANCE_NAME=$2
+CLUSTER_NAME=$1
 
-# check if pem-key location is valid
-if [ ! -f $PEMLOC ]; then
-    echo "pem-key does not exist!" && exit 1
-fi
-
-ssh -i $PEMLOC ubuntu@$(head -n 1 tmp/$INSTANCE_NAME/public_dns) '. ~/.profile; zeppelin-daemon.sh stop'
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+run_cmd_on_node ${MASTER_DNS} '. ~/.profile; zeppelin-daemon.sh stop'

@@ -10,7 +10,7 @@ function get_public_dns_with_name_and_role {
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
               Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].NetworkInterfaces[].Association.PublicDnsName
 }
 
@@ -20,7 +20,7 @@ function get_private_dns_with_name_and_role {
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
               Name=tag:Role,Values=${cluster_role} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].NetworkInterfaces[].PrivateDnsName
 }
 
@@ -28,7 +28,7 @@ function get_pemkey_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].KeyName
 }
 
@@ -36,10 +36,9 @@ function get_instance_types_with_name {
   local cluster_name=$1
   ${AWS_CMD} describe-instances \
     --filters Name=tag:Name,Values=${cluster_name} \
-              Name=instance-state-name,Values=running \
+              Name=instance-state-name,Values=running,stopped \
     --query Reservations[].Instances[].InstanceType
 }
-
 
 function get_instance_ids_with_name_and_role {
   local cluster_name=$1
@@ -48,21 +47,23 @@ function get_instance_ids_with_name_and_role {
   if [ -z ${cluster_role} ]; then
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
-                Name=instance-state-name,Values=running \
+                Name=instance-state-name,Values=running,stopped \
       --query Reservations[].Instances[].InstanceId
+
   else
     ${AWS_CMD} describe-instances \
       --filters Name=tag:Name,Values=${cluster_name} \
                 Name=tag:Role,Values=${cluster_role} \
-                Name=instance-state-name,Values=running \
+                Name=instance-state-name,Values=running,stopped \
       --query Reservations[].Instances[].InstanceId
   fi
 }
 
 function show_all_vpcs {
+  echo -e "VPCID\t\tNAME"
   ${AWS_CMD} describe-vpcs \
-    --output json \
-    --query Vpcs[]
+    --output text \
+    --query Vpcs[].[VpcId,Tags[0].Value]
 }
 
 function get_vpcids_with_name {
@@ -72,35 +73,39 @@ function get_vpcids_with_name {
     --query Vpcs[].VpcId
 }
 
-function show_all_subnets_in_vpc {
+function show_all_subnets {
   local vpc_name=$1
   local vpc_id=$(get_vpcids_with_name ${vpc_name})
 
-  ${AWS_CMD} describe-subnets \
-    --output json \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"}
+  echo -e "VPCID\t\tAZ\t\tIPS\tSUBNETID\tNAME"
+  if [ -z ${vpc_name} ]; then
+    ${AWS_CMD} describe-subnets \
+      --output text \
+      --query Subnets[].[VpcId,AvailabilityZone,AvailableIpAddressCount,SubnetId,Tags[0].Value]
+  else
+    ${AWS_CMD} describe-subnets \
+      --output text \
+      --filters Name=vpc-id,Values=${vpc_id:?"no vpcid found for vpc ${vpc_name}"} \
+      --query Subnets[].[VpcId,AvailabilityZone,AvailableIpAddressCount,SubnetId,Tags[0].Value]
+  fi
 
 }
 
-function show_all_security_groups_in_vpc {
+function show_all_security_groups {
   local vpc_name=$1
   local vpc_id=$(get_vpcids_with_name ${vpc_name})
 
-  ${AWS_CMD} describe-security-groups \
-    --output json \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"} \
-    --query SecurityGroups[]
-}
-
-function get_security_groupids_in_vpc_with_name {
-  local vpc_name=$1
-  local vpc_id=$(get_vpcids_with_name ${vpc_name})
-  local security_group_name=$2
-
-  ${AWS_CMD} describe-security-groups \
-    --filters Name=vpc-id,Values=${vpc_id:?"vpc ${vpc_name} not found"} \
-              Name=group-name,Values=${security_group_name} \
-    --query SecurityGroups[].GroupId
+  echo -e "VPCID\t\tSGID\t\tGROUP NAME"
+    if [ -z ${vpc_name} ]; then
+      ${AWS_CMD} describe-security-groups \
+        --output text \
+        --query SecurityGroups[].[VpcId,GroupId,GroupName]
+    else
+      ${AWS_CMD} describe-security-groups \
+        --output text \
+        --filters Name=vpc-id,Values=${vpc_id:?"no vpcid found for vpc ${vpc_name}"} \
+        --query SecurityGroups[].[VpcId,GroupId,GroupName]
+    fi
 }
 
 function run_spot_instances {
@@ -230,4 +235,20 @@ function retag_instance_with_name {
   ${AWS_CMD} create-tags \
     --resources ${instance_ids} \
     --tags Key=Name,Value=${new_cluster_name}
+}
+
+function start_instance {
+  local cluster_name=$1
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
+
+  ${AWS_CMD} start-instances \
+    --instance-ids ${instance_ids}
+}
+
+function stop_instance {
+  local cluster_name=$1
+  local instance_ids=$(get_instance_ids_with_name_and_role ${cluster_name})
+
+  ${AWS_CMD} stop-instances \
+    --instance-ids ${instance_ids}
 }

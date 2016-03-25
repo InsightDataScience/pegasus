@@ -9,13 +9,13 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-get_cluster_publicdns_arr ${CLUSTER_NAME}
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
-MASTER_DNS=${PUBLIC_DNS_ARR[0]}
-WORKER_DNS=${PUBLIC_DNS_ARR[@]:1}
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
 # Install and configure Spark on all nodes
-for dns in "${PUBLIC_DNS_ARR[@]}"; do
+for dns in ${PUBLIC_DNS}; do
   single_script="${PEG_ROOT}/config/spark/setup_single.sh"
   args="${dns}"
   run_script_on_node ${dns} ${single_script} ${args} &

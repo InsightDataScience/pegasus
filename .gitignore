@@ -8,6 +8,8 @@ examples/*
 !examples/spark_master.yml
 !examples/spark_workers.yml
 
+templates
+
 util/sparklab
 
 # Byte-compiled / optimized / DLL files

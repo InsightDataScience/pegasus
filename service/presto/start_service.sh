@@ -9,14 +9,14 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
-WORKER_PUBLIC_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} worker)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
 cmd='. ~/.profile; $PRESTO_HOME/bin/launcher start'
-for dns in ${WORKER_PUBLIC_DNS}; do
+for dns in ${WORKER_DNS}; do
   run_cmd_on_node ${dns} ${cmd} &
 done
-run_cmd_on_node ${MASTER_PUBLIC_DNS} ${cmd}
+run_cmd_on_node ${MASTER_DNS} ${cmd}
 
 echo "Presto Started!"
 echo "NOTE: Presto versions after 0.86 require Java 8"

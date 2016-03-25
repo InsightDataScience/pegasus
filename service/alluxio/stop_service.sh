@@ -10,8 +10,9 @@ fi
 
 CLUSTER_NAME=$1
 
-MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 
-run_cmd_on_node ${MASTER_DNS} '/usr/local/tachyon/bin/tachyon-stop.sh'
+cmd='. ~/.profile; /usr/local/alluxio/bin/alluxio-stop.sh all'
+run_cmd_on_node ${MASTER_DNS} ${cmd}
 
-echo "Tachyon Stopped!"
+echo "Alluxio Stopped!"

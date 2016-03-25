@@ -2,10 +2,12 @@
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
+source ${PEG_ROOT}/colors.sh
 source ${PEG_ROOT}/util-aws.sh
 
 REM_USER=${REM_USER:=ubuntu}
 
+# thanks to pkuczynski @ https://gist.github.com/pkuczynski/8665367
 function parse_yaml {
   local prefix=$2
   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -22,6 +24,67 @@ function parse_yaml {
   }'
 }
 
+function validate_template {
+  if [ -z ${purchase_type} ]; then
+    echo "must specify purchase_type: spot or on_demand"
+    exit 1
+  elif [ "${purchase_type}" != "spot" ] && [ "${purchase_type}" != "on_demand" ]; then
+    echo "must specify spot or on_demand for purchase_type"
+    exit 1
+  fi
+
+  if [ -z ${subnet_id} ]; then
+    echo "must specify subnet_id"
+    exit 1
+  elif [[ ${subnet_id} != subnet-* ]]; then
+    echo "invalid subnet_id pattern: e.g. subnet-12345"
+    exit 1
+  fi
+
+  if [ -z ${num_instances} ]; then
+    echo "must specify num_instances"
+    exit 1
+  fi
+
+  if [ -z ${key_name} ]; then
+    echo "must specify key_name"
+    exit
+  fi
+
+  if [ -z ${security_group_ids} ]; then
+    echo "must specify security_group_ids"
+    exit 1
+  elif [[ ${security_group_ids} != sg-* ]]; then
+    echo "invalid security_group_ids pattern: e.g. sg-1a2b345"
+    exit 1
+  fi
+
+  if [ -z ${instance_type} ]; then
+    echo "must specify instance_type"
+    exit 1
+  fi
+
+  if [ -z ${tag_name} ]; then
+    echo "must specify tag_name"
+    exit 1
+  fi
+
+  if [ -z ${role} ]; then
+    echo "must specify role: master or worker"
+    exit 1
+  elif [ "${role}" != "master" ] && [ "${role}" != "worker" ]; then
+    echo "must specify master or worker for role"
+    exit 1
+  fi
+
+  if [ "${purchase_type}" == "spot" ]; then
+    if [ -z "${price}" ]; then
+      echo "must specify price when requesting spot purchase_type"
+      exit 1
+    fi
+  fi
+
+}
 
 function get_hostnames_with_name_and_role {
   local cluster_name=$1
@@ -32,7 +95,7 @@ function get_hostnames_with_name_and_role {
   for dns in ${private_dns[@]}; do
     hostnames+=${dns%%.*}\ 
   done
-  echo $hostnames
+  echo ${hostnames}
 }
 
 function store_public_dns {
@@ -146,7 +209,7 @@ function set_launch_config {
 }
 
 function select_ami {
-  case "${REGION}" in
+  case "${AWS_DEFAULT_REGION}" in
     us-west-2)
       AWS_IMAGE=ami-4342a723
       ;;
@@ -185,8 +248,6 @@ function terminate_instances_with_name {
   fi
 }
 
-
-
 function run_instances {
   local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
 
@@ -200,6 +261,8 @@ function run_instances {
       local spot_request_ids=$(run_spot_instances)
 
       tag_resources Name ${tag_name} ${spot_request_ids}
+      tag_resources Owner ${USER} ${spot_request_ids}
+
 
       echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
@@ -218,6 +281,7 @@ function run_instances {
   esac
 
   tag_resources Name ${tag_name} ${INSTANCE_IDS}
+  tag_resources Owner ${USER} ${INSTANCE_IDS}
 
   if [ ! -z ${role} ]; then
     tag_resources Role ${role} ${INSTANCE_IDS}
@@ -226,7 +290,7 @@ function run_instances {
   echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} in status ok state..."
   wait_for_instances_status_ok ${INSTANCE_IDS}
 
-  echo "${INSTANCE_IDS} ready..."
+  echo "[${tag_name}] ${INSTANCE_IDS} ready..."
 }
 
 function check_remote_folder {
@@ -309,21 +373,6 @@ function service_action {
   fi
 }
 
-function get_cluster_hostname_arr {
-  local cluster_name=$1
-  HOSTNAME_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames))
-}
-
-function get_cluster_privateip_arr {
-  local cluster_name=$1
-  PRIVATE_IP_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-))
-}
-
-function get_cluster_publicdns_arr {
-  local cluster_name=$1
-  PUBLIC_DNS_ARR=($(cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns))
-}
-
 function run_script_on_node {
   local public_dns=$1; shift
   local script="$1"; shift
@@ -363,4 +412,102 @@ function launch_more_workers_in {
   fi
 
   run_instances
+}
+
+function fetch_public_dns_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_hostname_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_private_ip_of_node_in_cluster {
+  local cluster_name=$1
+  local cluster_num=$2
+  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_master_public_dns {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_cluster_worker_public_dns {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function fetch_cluster_master_private_ip {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_worker_private_ips {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_master_hostname {
+  local cluster_name=$1
+  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_worker_hostnames {
+  local cluster_name=$1
+  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_hostnames {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+}
+
+function fetch_cluster_private_ips {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+}
+
+function fetch_cluster_public_dns {
+  local cluster_name=$1
+  cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+}
+
+function port_forward {
+  local cluster_name=$1
+  local cluster_num=$2
+  local port_cmd=$3
+
+  local ports=($(echo ${port_cmd} | tr ":" "\n"))
+  if [ "${#ports[@]}" != "2" ]; then
+    echo "Specify port command as <local-port>:<remote-port>"
+    exit 1
+  fi
+
+  local local_port=${ports[0]}
+  local remote_port=${ports[1]}
+
+  if [ -z ${local_port} ]; then
+    echo "specify local port"
+    exit 1
+  fi
+
+  if [ -z ${remote_port} ]; then
+    echo "specify remote port"
+    exit 1
+  fi
+
+  local pid=$(lsof -i 4:${local_port} | awk '{print $2}' | sed 1d)
+
+  if [ ! -z ${pid} ]; then
+    kill ${pid}
+  fi
+
+  local dns=$(fetch_public_dns_of_node_in_cluster ${cluster_name} ${cluster_num})
+
+  ssh -N -f -L localhost:${local_port}:localhost:${remote_port} ${REM_USER}@${dns}
 }

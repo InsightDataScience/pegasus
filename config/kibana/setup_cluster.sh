@@ -10,7 +10,7 @@ source ${PEG_ROOT}/util.sh
 
 CLUSTER_NAME=$1
 
-MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+MASTER_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
 
 # Install Kibana on master
 single_script="${PEG_ROOT}/config/kibana/setup_single.sh"

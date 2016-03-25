@@ -9,12 +9,10 @@ peg up ${PEG_ROOT}/examples/spark_workers.yml &
 
 wait
 
-peg fetch $CLUSTER_NAME
+peg fetch ${CLUSTER_NAME}
 
-peg install $CLUSTER_NAME ssh
-peg install $CLUSTER_NAME aws
-peg install $CLUSTER_NAME hadoop
-peg install $CLUSTER_NAME hive
-peg install $CLUSTER_NAME pig
-peg install $CLUSTER_NAME spark
+peg install ${CLUSTER_NAME} ssh
+peg install ${CLUSTER_NAME} aws
+peg install ${CLUSTER_NAME} spark
 
+peg port-forward ${CLUSTER_NAME} 1 7777:7777
