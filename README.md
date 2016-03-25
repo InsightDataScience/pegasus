@@ -5,7 +5,7 @@ This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazo
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
 Supported commands:
-* `peg region` - show current region for aws-cli
+* `peg aws <options>` - query AWS for information about vpcs, subnets, and security groups.
 * `peg validate <template-path>` - check if proper fields are set in the instance template yaml file
 * `peg up <template-path>` - launch an AWS cluster using the instance template yaml file
 * `peg fetch <cluster-name>` - fetch the hostnames and Public DNS of nodes in the AWS cluster and store locally
@@ -113,6 +113,55 @@ vol_size: integer
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
 
 You can check if the template file is valid with `peg validate <template-file`. If nothing is shown, then the file should work with `peg up`.
+
+If you are unsure about the subnet id and security group id, you can use `peg aws` to quickly find this information and paste it into your template yaml file.
+
+#### VPCs
+View all VPCs in your region with `peg aws vpcs`
+```bash
+$ peg aws vpcs
+VPCID		    NAME
+vpc-add2e6c3	default
+vpc-c2a496a1	my-vpc
+```
+#### Subnets
+View all Subnets in your region with `peg aws subnets`
+```bash
+$ peg aws subnets
+VPCID		    AZ		    IPS	    SUBNETID	    NAME
+vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
+vpc-add2e6c3	us-west-2b	4089	subnet-9fe6e3df	aws-us-west-2b
+```
+
+You can filter Subnets down to a specific VPC name with `peg aws subnets <vpc-name>`
+```bash
+$ peg aws subnets my-vpc
+VPCID		    AZ		    IPS	    SUBNETID	    NAME
+vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
+```
+
+#### Security groups
+View all Security Groups in your region with `peg aws security-groups`
+```bash
+$ peg aws security-groups
+VPCID		    SGID		GROUP NAME
+vpc-add2e6c3	sg-7cb78418	default
+vpc-c2a496a1	sg-5deed039	default
+```
+
+You can filter Security Groups down to a specific VPC name `peg aws security-groups <vpc-name>`
+```bash
+$ peg aws security-groups my-vpc
+VPCID		    SGID		GROUP NAME
+vpc-c2a496a1	sg-5deed039	default
+```
+
+#### Region
+Lastly you can double check which AWS region Pegasus is using with `peg aws region`. If the value is not what you expect, update your `AWS_DEFAULT_REGION` in your `.bash_profile` and source it before proceeding.
+```bash
+$ peg aws region
+Pegasus is using AWS region us-west-2
+```
 
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
