@@ -19,6 +19,7 @@ while getopts ":h" opt; do
     h)
       echo "peg"
       echo "    - region"
+      echo "    - validate"
       echo "    - fetch"
       echo "    - describe"
       echo "    - up"
@@ -50,6 +51,22 @@ case ${command} in
   region)
     if [[ "${nfargs}" -eq "0" ]]; then
       echo "region set to ${AWS_DEFAULT_REGION}"
+    else
+      echo "invalid number of arguments"
+      exit 1
+    fi
+    ;;
+
+  validate)
+    if [[ "${nfargs}" -eq "1" ]]; then
+      YAML_FILE=${parameters}
+      if [ ! -f ${YAML_FILE} ]; then
+        echo "${YAML_FILE} not found"
+        exit 1
+      else
+        set_launch_config ${YAML_FILE}
+        validate_template
+      fi
     else
       echo "invalid number of arguments"
       exit 1
@@ -94,6 +111,7 @@ case ${command} in
     if [[ "${nfargs}" -eq "1" ]]; then
       TEMPLATE_PATH=${parameters}
 
+      peg validate ${TEMPLATE_PATH}
       set_launch_config ${TEMPLATE_PATH}
       run_instances
     else

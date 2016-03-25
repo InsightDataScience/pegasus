@@ -24,6 +24,68 @@ function parse_yaml {
   }'
 }
 
+function validate_template {
+  if [ -z ${purchase_type} ]; then
+    echo "must specify purchase_type: spot or on_demand"
+    exit 1
+  elif [ "${purchase_type}" != "spot" ] && [ "${purchase_type}" != "on_demand" ]; then
+    echo "must specify spot or on_demand for purchase_type"
+    exit 1
+  fi
+
+  if [ -z ${subnet_id} ]; then
+    echo "must specify subnet_id"
+    exit 1
+  elif [[ ${subnet_id} != subnet-* ]]; then
+    echo "invalid subnet_id pattern: e.g. subnet-12345"
+    exit 1
+  fi
+
+  if [ -z ${num_instances} ]; then
+    echo "must specify num_instances"
+    exit 1
+  fi
+
+  if [ -z ${key_name} ]; then
+    echo "must specify key_name"
+    exit
+  fi
+
+  if [ -z ${security_group_ids} ]; then
+    echo "must specify security_group_ids"
+    exit 1
+  elif [[ ${security_group_ids} != sg-* ]]; then
+    echo "invalid security_group_ids pattern: e.g. sg-1a2b345"
+    exit 1
+  fi
+
+  if [ -z ${instance_type} ]; then
+    echo "must specify instance_type"
+    exit 1
+  fi
+
+  if [ -z ${tag_name} ]; then
+    echo "must specify tag_name"
+    exit 1
+  fi
+
+  if [ -z ${role} ]; then
+    echo "must specify role: master or worker"
+    exit 1
+  elif [ "${role}" != "master" ] && [ "${role}" != "worker" ]; then
+    echo "must specify master or worker for role"
+    exit 1
+  fi
+
+  if [ "${purchase_type}" == "spot" ]; then
+    if [ -z "${price}" ]; then
+      echo "must specify price when requesting spot purchase_type"
+      exit 1
+    fi
+  fi
+
+}
+
 function get_hostnames_with_name_and_role {
   local cluster_name=$1
   local cluster_role=$2
@@ -421,6 +483,11 @@ function port_forward {
   local port_cmd=$3
 
   local ports=($(echo ${port_cmd} | tr ":" "\n"))
+  if [ "${#ports[@]}" != "2" ]; then
+    echo "Specify port command as <local-port>:<remote-port>"
+    exit 1
+  fi
+
   local local_port=${ports[0]}
   local remote_port=${ports[1]}
 
@@ -442,5 +509,5 @@ function port_forward {
 
   local dns=$(fetch_public_dns_of_node_in_cluster ${cluster_name} ${cluster_num})
 
-  ssh -N -f -L ${port_cmd} ${REM_USER}@${dns}
+  ssh -N -f -L localhost:${local_port}:localhost:${remote_port} ${REM_USER}@${dns}
 }
