@@ -12,7 +12,7 @@ opscenter: cassandra
 pig: hadoop
 presto:
 redis:
-spark:
+spark: hadoop
 ssh:
 storm: zookeeper
 tachyon:

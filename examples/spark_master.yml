@@ -1,8 +1,8 @@
 purchase_type: on_demand
-subnet_id: subnet-446e3533
+subnet_id: subnet-bf1023da
 num_instances: 1
 key_name: insight-cluster
-security_group_ids: sg-23f7e147
+security_group_ids: sg-132ecf74
 instance_type: m4.large
 tag_name: test-cluster
 vol_size: 100
