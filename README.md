@@ -307,8 +307,10 @@ wait
 
 peg fetch $CLUSTER_NAME
 
-peg install $CLUSTER_NAME ssh
-peg install $CLUSTER_NAME aws
-peg install $CLUSTER_NAME hadoop
-peg install $CLUSTER_NAME spark
+peg install ${CLUSTER_NAME} ssh
+peg install ${CLUSTER_NAME} aws
+peg install ${CLUSTER_NAME} hadoop
+peg install ${CLUSTER_NAME} spark
+
+peg port-forward ${CLUSTER_NAME} 1 8888:8888
 ```
