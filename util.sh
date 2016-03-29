@@ -184,9 +184,12 @@ function store_pemkey {
   local num_unique_pemkeys=$(echo ${unique_pemkeys} | wc -w)
 
   # check if pem keys are unique in cluster
-  if [ ${num_unique_pemkeys} -ne 1 ]; then
+  if [ ${num_unique_pemkeys} -gt 1 ]; then
     echo "pem keys in $1 are not identical!"
     echo "found ${unique_pemkeys}"
+    exit 1
+  elif [ ${num_unique_pemkeys} -eq 0 ]; then
+    echo "no pem keys found"
     exit 1
   fi
 
