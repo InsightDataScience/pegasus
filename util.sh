@@ -277,14 +277,14 @@ function terminate_instances_with_name {
 
   if [[ "${num_instances}" -gt "0" ]]; then
     echo "terminating instances: ${instance_ids}"
-    ${AWS_CMD} terminate-instances \
-      --instance-ids ${instance_ids}
+    terminate_instances_with_ids ${instance_ids}
 
     if [[ "${num_spot_requests}" -gt "0" ]]; then
       echo "cancelling spot requests: ${spot_request_ids}"
-      ${AWS_CMD} cancel-spot-instance-requests \
-        --spot-instance-request-ids ${spot_request_ids}
+      cancel_spot_requests_with_ids ${spot_request_ids}
     fi
+
+    rm -rf ${PEG_ROOT}/tmp/${cluster_name}
   fi
 }
 
