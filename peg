@@ -111,6 +111,7 @@ case ${command} in
 
       store_public_dns ${CLUSTER_NAME}
       store_hostnames ${CLUSTER_NAME}
+      store_roles ${CLUSTER_NAME}
       store_pemkey ${CLUSTER_NAME}
       peg describe ${CLUSTER_NAME}
     else

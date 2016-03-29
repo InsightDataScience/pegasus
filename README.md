@@ -21,23 +21,23 @@ Supported commands:
 * `peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>` - port forward your local port to the remote cluster node's port
 
 # Table of Contents
-1. [Install Pegasus on your local machine](README.md#1-install-pegasus-on-your-local-machine)
-2. [Query for AWS VPC information](README.md#2-query-for-aws-vpc-information)
-3. [Spin up your cluster on AWS](README.md#3-spin-up-your-cluster-on-aws)
-4. [Fetching AWS cluster DNS and hostname information](README.md#4-fetching-aws-cluster-dns-and-hostname-information)
-5. [Describe cluster information](README.md#5-describe-cluster-information)
-6. [Setting up a newly provisioned AWS cluster](README.md#6-setting-up-a-newly-provisioned-aws-cluster)
-7. [Start installing!](README.md#7-start-installing)
-8. [Starting and stopping services](README.md#8-starting-and-stopping-services)
-9. [Uninstalling a technology](README.md#9-uninstalling-a-technology)
-10. [SSH into a node](README.md#10-ssh-into-a-node)
-11. [Terminate a cluster](README.md#11-terminate-a-cluster)
-12. [Retag a cluster](README.md#12-retag-a-cluster)
-13. [Starting and stopping on demand clusters](README.md#13-starting-stopping-on-demand-cluster)
-14. [Port forwarding to a node](README.md#14-port-forwarding-to-a-node)
-15. [Deployment Pipelines](README.md#15-deployment-pipelines)
+1. [Install Pegasus on your local machine](README.md#install-pegasus-on-your-local-machine)
+2. [Query for AWS VPC information](README.md#query-for-aws-vpc-information)
+3. [Spin up your cluster on AWS](README.md#spin-up-your-cluster-on-aws)
+4. [Fetching AWS cluster DNS and hostname information](README.md#fetching-aws-cluster-dns-and-hostname-information)
+5. [Describe cluster information](README.md#describe-a-cluster)
+6. [Setting up a newly provisioned AWS cluster](README.md#setting-up-a-newly-provisioned-aws-cluster)
+7. [Start installing!](README.md#start-installing)
+8. [Starting and stopping services](README.md#starting-and-stopping-services)
+9. [Uninstalling a technology](README.md#uninstalling-a-technology)
+10. [SSH into a node](README.md#ssh-into-a-node)
+11. [Terminate a cluster](README.md#terminate-a-cluster)
+12. [Retag a cluster](README.md#retag-a-cluster)
+13. [Starting and stopping on demand clusters](README.md#starting-stopping-on-demand-clusters)
+14. [Port forwarding to a node](README.md#port-forwarding-to-a-node)
+15. [Deployment Pipelines](README.md#deployment-pipelines)
 
-# 1. Install Pegasus on your local machine
+# Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account
 
 Clone the Pegasus project to your local computer and install awscli
@@ -76,7 +76,7 @@ $ aws ec2 --output json describe-regions --query Regions[].RegionName
 ]
 ```
 
-# 2. Query for AWS VPC information
+# Query for AWS VPC information
 ## VPCs
 View all VPCs in your region with `peg aws vpcs`
 ```bash
@@ -124,7 +124,7 @@ $ peg aws region
 Pegasus is using AWS region us-west-2
 ```
 
-# 3. Spin up your cluster on AWS
+# Spin up your cluster on AWS
 Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI.
 
 * Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
@@ -167,7 +167,7 @@ You can check if the template file is valid with `peg validate <template-file`. 
 
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
-# 4. Fetching AWS cluster DNS and hostname information
+# Fetching AWS cluster DNS and hostname information
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privileges:
 ```bash
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
@@ -198,13 +198,13 @@ You can always view the current cluster information stored locally with the `peg
 
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations.
 
-# 5. Describe a cluster
+# Describe a cluster
 Shows the hostname and Public DNS for a specified cluster and also show which nodes are the Master vs Workers.
 ```bash
 $ peg describe <cluster-name>
 ```
 
-# 6. Setting up a newly provisioned AWS cluster
+# Setting up a newly provisioned AWS cluster
 If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` script, since the packages have already been installed.
 
 1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using peg up)**
@@ -216,7 +216,7 @@ $ peg install <cluster-name> ssh
 $ peg install <cluster-name> aws
 ```
 
-# 7. Start installing!
+# Start installing!
 ```bash
 $ peg install <cluster-name> <technology>
 ```
@@ -245,38 +245,38 @@ If you wish to install a different version of these technologies, please go into
 
 Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) and also writing the appropriate configurations in the `config` folder.
 
-# 8. Starting and stopping services
+# Starting and stopping services
 A script has been provided to start and stop distributed services easily without having to manually SSH into each node
 ```bash
 $ peg service <cluster-name> <technology> <start|stop>
 ```
 
-# 9. Uninstalling a technology
+# Uninstalling a technology
 A script has been provided to uninstall a specific technology from all nodes in the declared cluster
 ```bash
 $ peg uninstall <cluster-name> <technology>
 ```
 
-# 10. SSH into a node
+# SSH into a node
 If you need to SSH into a specific node in a cluster, you can use `peg ssh` to easily reference nodes
 ```bash
 $ peg ssh <cluster-name> <node-number>
 ```
 where `node-number` is the order in which the nodes appear in the `hostnames` and `public_dns` files starting with 1 (master node)
 
-# 11. Terminate a cluster
+# Terminate a cluster
 Tears down an on-demand or spot cluster on AWS
 ```bash
 $ peg down <cluster-name>
 ```
 
-# 12. Retag a cluster
+# Retag a cluster
 Retag an existing cluster on AWS
 ```bash
 $ peg retag <cluster-name> <new-cluster-name>
 ```
 
-# 13. Starting and stopping on demand clusters
+# Starting and stopping on demand clusters
 Place a cluster into running and stop modes on AWS.
 ```bash
 $ peg start <cluster-name>
@@ -285,13 +285,13 @@ $ peg start <cluster-name>
 $ peg stop <cluster-name>
 ```
 
-# 14. Port forwarding to a node
+# Port forwarding to a node
 Forward your local port to a remote node's port
 ```bash
 $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 ```
 
-# 15. Deployment Pipelines
+# Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`examples/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_hadoop.sh) file.
 
 Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
@@ -312,10 +312,10 @@ wait
 
 peg fetch $CLUSTER_NAME
 
-peg install $CLUSTER_NAME ssh
-peg install $CLUSTER_NAME aws
-peg install $CLUSTER_NAME hadoop
-peg install $CLUSTER_NAME hive
-peg install $CLUSTER_NAME pig
-peg install $CLUSTER_NAME spark
+peg install ${CLUSTER_NAME} ssh
+peg install ${CLUSTER_NAME} aws
+peg install ${CLUSTER_NAME} hadoop
+peg install ${CLUSTER_NAME} spark
+
+peg port-forward ${CLUSTER_NAME} 1 8888:8888
 ```

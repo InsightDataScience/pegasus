@@ -22,7 +22,7 @@ WORKER_HOSTNAMES=$(fetch_cluster_worker_hostnames ${CLUSTER_NAME})
 
 # Configure base Hadoop master and slaves
 single_script="${PEG_ROOT}/config/hadoop/setup_single.sh"
-args="$MASTER_DNS"
+args="${MASTER_DNS} ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY}"
 for dns in ${PUBLIC_DNS}; do
   run_script_on_node ${dns} ${single_script} ${args} &
 done

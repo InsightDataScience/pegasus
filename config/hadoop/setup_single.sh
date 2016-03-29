@@ -3,11 +3,15 @@
 . ~/.profile
 
 MASTER_NAME=$1
+AWS_ACCESS_KEY_ID=$2
+AWS_SECRET_ACCESS_KEY=$3
 
 sed -i 's@${JAVA_HOME}@/usr@g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 # configure core-site.xml
 sed -i '20i <property>\n  <name>fs.defaultFS</name>\n  <value>hdfs://'"$MASTER_NAME"':9000</value>\n</property>' $HADOOP_HOME/etc/hadoop/core-site.xml
+sed -i '24i <property>\n  <name>fs.s3a.access.key</name>\n  <value>'"${AWS_ACCESS_KEY_ID}"'</value>\n</property>' $HADOOP_HOME/etc/hadoop/core-site.xml
+sed -i '28i <property>\n  <name>fs.s3a.secret.key</name>\n  <value>'"${AWS_SECRET_ACCESS_KEY}"'</value>\n</property>' $HADOOP_HOME/etc/hadoop/core-site.xml
 
 # configure yarn-site.xml
 sed -i '18i <property>\n  <name>yarn.nodemanager.aux-services</name>\n  <value>mapreduce_shuffle</value>\n</property>' $HADOOP_HOME/etc/hadoop/yarn-site.xml

@@ -3,7 +3,7 @@
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 
 source ${PEG_ROOT}/colors.sh
-source ${PEG_ROOT}/util-aws.sh
+source ${PEG_ROOT}/aws-queries.sh
 
 REM_USER=${REM_USER:=ubuntu}
 
@@ -108,10 +108,12 @@ function store_public_dns {
     rm ${public_dns_path}
   fi
 
+  touch ${public_dns_path}
+
   # add master node if labeled first to public_dns_path
-  if [ "${#master_public_dns[@]}" -eq "1" ]; then
-    echo ${master_public_dns[0]} >> ${public_dns_path}
-  fi
+  for dns in ${master_public_dns[@]}; do
+    echo ${dns} >> ${public_dns_path}
+  done
 
   # add workers
   for dns in ${worker_public_dns[@]}; do
@@ -119,6 +121,28 @@ function store_public_dns {
   done
 }
 
+function store_roles {
+  local cluster_name=$1
+  local master_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} master))
+  local worker_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} worker))
+  local roles_path=${PEG_ROOT}/tmp/${cluster_name}/roles
+
+  if [ -f ${roles_path} ]; then
+    rm ${roles_path}
+  fi
+
+  touch ${roles_path}
+
+  # add master node if labeled first to public_dns_path
+  for dns in ${master_public_dns[@]}; do
+    echo "master" >> ${roles_path}
+  done
+
+  # add workers
+  for dns in ${worker_public_dns[@]}; do
+    echo "worker" >> ${roles_path}
+  done
+}
 function store_hostnames {
   local cluster_name=$1
   local master_hostname=($(get_hostnames_with_name_and_role ${cluster_name} master))
@@ -129,16 +153,17 @@ function store_hostnames {
     rm ${hostnames_path}
   fi
 
-  # add master node if labeled first to hostnames_path
-  if [ "${#master_hostname[@]}" -eq "1" ]; then
-    echo ${master_hostname[0]} >> ${hostnames_path}
-  fi
+  touch ${hostnames_path}
+
+  # add master node if labeled to hostnames_path
+  for hostname in ${master_hostname[@]}; do
+    echo ${hostname} >> ${hostnames_path}
+  done
 
   for hostname in ${worker_hostnames[@]}; do
     echo ${hostname} >> ${hostnames_path}
   done
 }
-
 
 function get_unique_pemkey {
   local cluster_name=$1
@@ -159,9 +184,12 @@ function store_pemkey {
   local num_unique_pemkeys=$(echo ${unique_pemkeys} | wc -w)
 
   # check if pem keys are unique in cluster
-  if [ ${num_unique_pemkeys} -ne 1 ]; then
+  if [ ${num_unique_pemkeys} -gt 1 ]; then
     echo "pem keys in $1 are not identical!"
     echo "found ${unique_pemkeys}"
+    exit 1
+  elif [ ${num_unique_pemkeys} -eq 0 ]; then
+    echo "no pem keys found"
     exit 1
   fi
 
@@ -181,26 +209,38 @@ function get_instance_type_histo_with_name {
 
 function describe_cluster {
   local cluster_name=$1
-  local master_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} master))
-  local worker_public_dns=($(get_public_dns_with_name_and_role ${cluster_name} worker))
-  local master_hostnames=($(get_hostnames_with_name_and_role ${cluster_name} master))
-  local worker_hostnames=($(get_hostnames_with_name_and_role ${cluster_name} worker))
-  local master_instance_ids=($(get_instance_ids_with_name_and_role ${cluster_name} master))
-  local worker_instance_ids=($(get_instance_ids_with_name_and_role ${cluster_name} worker))
+  local public_dns=($(fetch_cluster_public_dns ${cluster_name}))
+  local hostnames=($(fetch_cluster_hostnames ${cluster_name}))
+  local roles=($(fetch_cluster_roles ${cluster_name}))
 
+  echo -e "${color_blue}${cluster_name}${color_norm} cluster instance type histogram"
   get_instance_type_histo_with_name ${cluster_name}
 
-  for index in ${!master_public_dns[@]}; do
-    echo "MASTER NODE: ${master_instance_ids[$index]}"
-    echo "    Hostname:   ${master_hostnames[$index]}"
-    echo "    Public DNS: ${master_public_dns[$index]}"
+  echo ""
+  for index in ${!public_dns[@]}; do
+    if [ "${roles[$index]}" == "master" ]; then
+      echo -e "${color_green}MASTER NODE${color_norm}:"
+      echo "    Hostname:   ${hostnames[$index]}"
+      echo -e "    Public DNS: ${public_dns[$index]}\n"
+    elif [ "${roles[$index]}" == "worker" ]; then
+      echo -e "${color_yellow}WORKER NODE${color_norm}:"
+      echo "    Hostname:   ${hostnames[$index]}"
+      echo -e "    Public DNS: ${public_dns[$index]}\n"
+    fi
   done
 
-  for index in ${!worker_public_dns[@]}; do
-    echo "WORKER NODE: ${worker_instance_ids[$index]}"
-    echo "    Hostname:   ${worker_hostnames[$index]}"
-    echo "    Public DNS: ${worker_public_dns[$index]}"
-  done
+  local num_masters=$(fetch_cluster_num_masters ${cluster_name})
+  local num_workers=$(fetch_cluster_num_workers ${cluster_name})
+
+  if [ -z ${num_masters} ] || [ "${num_masters}" -eq "0" ]; then
+    echo -e "WARNING: no master found in cluster ${color_blue}${cluster_name}${color_norm}"
+  elif [ "${num_masters}" -gt "1" ]; then
+    echo -e "WARNING: more than one master found in cluster ${color_blue}${cluster_name}${color_norm}"
+  fi
+
+  if [ -z ${num_workers} ] || [ "${num_workers}" -eq "0" ]; then
+    echo -e "WARNING: no workers found in cluster ${color_blue}${cluster_name}${color_norm}"
+  fi
 }
 
 function set_launch_config {
@@ -237,14 +277,14 @@ function terminate_instances_with_name {
 
   if [[ "${num_instances}" -gt "0" ]]; then
     echo "terminating instances: ${instance_ids}"
-    ${AWS_CMD} terminate-instances \
-      --instance-ids ${instance_ids}
+    terminate_instances_with_ids ${instance_ids}
 
     if [[ "${num_spot_requests}" -gt "0" ]]; then
       echo "cancelling spot requests: ${spot_request_ids}"
-      ${AWS_CMD} cancel-spot-instance-requests \
-        --spot-instance-request-ids ${spot_request_ids}
+      cancel_spot_requests_with_ids ${spot_request_ids}
     fi
+
+    rm -rf ${PEG_ROOT}/tmp/${cluster_name}
   fi
 }
 
@@ -414,67 +454,122 @@ function launch_more_workers_in {
   run_instances
 }
 
+function run_cmd_on_file {
+  local filename=$1; shift
+  local cmd="$@";
+
+  if [ -f ${filename} ]; then
+    eval ${cmd}
+  fi
+
+}
+
 function fetch_public_dns_of_node_in_cluster {
   local cluster_name=$1
   local cluster_num=$2
-  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local cmd='sed -n "${cluster_num}{p;q;}" ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_hostname_of_node_in_cluster {
   local cluster_name=$1
   local cluster_num=$2
-  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='sed -n "${cluster_num}{p;q;}" ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_private_ip_of_node_in_cluster {
   local cluster_name=$1
   local cluster_num=$2
-  sed -n "${cluster_num}{p;q;}" ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
-}
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='sed -n "${cluster_num}{p;q;}" ${filename} | tr - . | cut -b 4-'
+  run_cmd_on_file ${filename} ${cmd}
+ }
 
 function fetch_cluster_master_public_dns {
   local cluster_name=$1
-  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local cmd='head -n 1 ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_worker_public_dns {
   local cluster_name=$1
-  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local cmd='tail -n +2 ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_master_private_ip {
   local cluster_name=$1
-  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='head -n 1 ${filename} | tr - . | cut -b 4-'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_worker_private_ips {
   local cluster_name=$1
-  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='tail -n +2 ${filename} | tr - . | cut -b 4-'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_master_hostname {
   local cluster_name=$1
-  head -n 1 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='head -n 1 ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_worker_hostnames {
   local cluster_name=$1
-  tail -n +2 ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='tail -n +2 ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_hostnames {
   local cluster_name=$1
-  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='cat ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_private_ips {
   local cluster_name=$1
-  cat ${PEG_ROOT}/tmp/${cluster_name}/hostnames | tr - . | cut -b 4-
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/hostnames
+  local cmd='cat ${filename} | tr - . | cut -b 4-'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function fetch_cluster_public_dns {
   local cluster_name=$1
-  cat ${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/public_dns
+  local cmd='cat ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
+}
+
+function fetch_cluster_roles {
+  local cluster_name=$1
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/roles
+  local cmd='cat ${filename}'
+  run_cmd_on_file ${filename} ${cmd}
+}
+
+function fetch_cluster_num_masters {
+  local cluster_name=$1
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/roles
+  local cmd='cat ${filename} | grep master | wc -l'
+  run_cmd_on_file ${filename} ${cmd}
+}
+
+function fetch_cluster_num_workers {
+  local cluster_name=$1
+  local filename=${PEG_ROOT}/tmp/${cluster_name}/roles
+  local cmd='cat ${filename} | grep worker | wc -l'
+  run_cmd_on_file ${filename} ${cmd}
 }
 
 function port_forward {

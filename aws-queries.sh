@@ -252,3 +252,16 @@ function stop_instance {
   ${AWS_CMD} stop-instances \
     --instance-ids ${instance_ids}
 }
+
+function terminate_instances_with_ids {
+  local instance_ids="$@"
+  ${AWS_CMD} terminate-instances \
+    --instance-ids ${instance_ids}
+}
+
+function cancel_spot_requests_with_ids {
+  local spot_request_ids="$@"
+  ${AWS_CMD} cancel-spot-instance-requests \
+    --spot-instance-request-ids ${spot_request_ids}
+}
+
