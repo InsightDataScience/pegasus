@@ -25,7 +25,7 @@ Supported commands:
 2. [Query for AWS VPC information](README.md#query-for-aws-vpc-information)
 3. [Spin up your cluster on AWS](README.md#spin-up-your-cluster-on-aws)
 4. [Fetching AWS cluster DNS and hostname information](README.md#fetching-aws-cluster-dns-and-hostname-information)
-5. [Describe cluster information](README.md#describe-cluster-information)
+5. [Describe cluster information](README.md#describe-a-cluster)
 6. [Setting up a newly provisioned AWS cluster](README.md#setting-up-a-newly-provisioned-aws-cluster)
 7. [Start installing!](README.md#start-installing)
 8. [Starting and stopping services](README.md#starting-and-stopping-services)
@@ -33,7 +33,7 @@ Supported commands:
 10. [SSH into a node](README.md#ssh-into-a-node)
 11. [Terminate a cluster](README.md#terminate-a-cluster)
 12. [Retag a cluster](README.md#retag-a-cluster)
-13. [Starting and stopping on demand clusters](README.md#starting-stopping-on-demand-cluster)
+13. [Starting and stopping on demand clusters](README.md#starting-stopping-on-demand-clusters)
 14. [Port forwarding to a node](README.md#port-forwarding-to-a-node)
 15. [Deployment Pipelines](README.md#deployment-pipelines)
 
