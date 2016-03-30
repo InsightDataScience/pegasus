@@ -275,6 +275,10 @@ function terminate_instances_with_name {
   local num_instances=$(echo ${instance_ids} | wc -w)
   local num_spot_requests=$(echo ${spot_request_ids} | wc -w)
 
+  for instance_id in ${instance_ids}; do
+    release_eip ${instance_id}
+  done
+
   if [[ "${num_instances}" -gt "0" ]]; then
     echo "terminating instances: ${instance_ids}"
     terminate_instances_with_ids ${instance_ids}
@@ -327,10 +331,19 @@ function run_instances {
     tag_resources Role ${role} ${INSTANCE_IDS}
   fi
 
-  echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} in status ok state..."
+  echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} to be in status ok state..."
   wait_for_instances_status_ok ${INSTANCE_IDS}
 
   echo "[${tag_name}] ${INSTANCE_IDS} ready..."
+
+  for instance_id in ${INSTANCE_IDS}; do
+    association_status=$(allocate_and_associate_eip ${instance_id})
+    if [[ ${association_status} != eipassoc-* ]]; then
+      echo -e "${color_red}Elastic IP not associated with the instance ${instance_id}${color_norm}"
+    else
+      echo -e "${color_green}Elastic IP associated with the instacnce ${instance_id}${color_norm}"
+    fi
+  done
 }
 
 function check_remote_folder {
@@ -606,3 +619,5 @@ function port_forward {
 
   ssh -N -f -L localhost:${local_port}:localhost:${remote_port} ${REM_USER}@${dns}
 }
+
+

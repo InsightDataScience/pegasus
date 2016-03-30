@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o errexit
+
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:=us-west-2}
 
@@ -367,7 +369,7 @@ case ${command} in
       echo "invalid number of arguments"
       echo "usage: peg start <cluster-name>"
     fi
-  ;;
+    ;;
 
   stop)
     if [[ "${nfargs}" -eq "1" ]]; then
@@ -378,14 +380,11 @@ case ${command} in
       echo "invalid number of arguments"
       echo "usage: peg stop <cluster-name>"
     fi
-
-  ;;
+    ;;
 
   *)
     echo "invalid command. use -h to see available commands"
     exit 1
-    ;;
-
 esac
 
 

@@ -265,3 +265,40 @@ function cancel_spot_requests_with_ids {
     --spot-instance-request-ids ${spot_request_ids}
 }
 
+function allocate_eip {
+  ${AWS_CMD} allocate-address \
+  --domain vpc \
+  --query AllocationId
+}
+
+function allocate_and_associate_eip {
+  local instance_id=$1
+  local allocation_id=$(allocate_eip)
+
+  ${AWS_CMD} associate-address \
+  --allocation-id ${allocation_id} \
+  --instance-id ${instance_id} \
+  --query AssociationId
+}
+
+function describe_eip_with_instance_id {
+    local instance_id=$1
+
+    ${AWS_CMD} describe-addresses \
+    --filters Name=instance-id,Values=${instance_id} \
+    --query Addresses[0].[AssociationId,AllocationId]
+}
+
+function release_eip {
+  local instance_id=$1
+  local association_and_allocation_id=($(describe_eip_with_instance_id ${instance_id}))
+  local association_id=${association_and_allocation_id[0]}
+  local allocation_id=${association_and_allocation_id[1]}
+
+  if [ ! -z ${allocation_id} ]; then
+    ${AWS_CMD} disassociate-address --association-id ${association_id}
+    ${AWS_CMD} release-address --allocation-id ${allocation_id}
+
+    echo -e "${color_green}Released elastic IPs associated with the instance ${instance_id}${color_norm}"
+  fi
+}
