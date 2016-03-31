@@ -20,6 +20,7 @@ while getopts ":h" opt; do
   case ${opt} in
     h)
       echo "peg"
+      echo "    - config"
       echo "    - aws"
       echo "    - validate"
       echo "    - fetch"
@@ -50,37 +51,38 @@ parameters=${args[@]:1}
 nfargs=$(echo ${parameters} | wc -w)
 
 case ${command} in
+  config)
+    echo "AWS access key: ${AWS_ACCESS_KEY_ID}"
+    echo "AWS secret key: ${AWS_SECRET_ACCESS_KEY}"
+    echo "AWS region:     ${AWS_DEFAULT_REGION}"
+    echo "SSH User:       ${REM_USER}"
+    ;;
+
   aws)
-      PARAMETER_ARR=(${parameters[@]})
-      PEG_AWS_CMD=${PARAMETER_ARR[0]}
-      VPC_NAME=${PARAMETER_ARR[1]}
-      case ${PEG_AWS_CMD} in
-        region)
-          echo "Pegasus is using AWS region ${AWS_DEFAULT_REGION}"
-          ;;
+    PARAMETER_ARR=(${parameters[@]})
+    PEG_AWS_CMD=${PARAMETER_ARR[0]}
+    VPC_NAME=${PARAMETER_ARR[1]}
+    case ${PEG_AWS_CMD} in
+      vpcs)
+        show_all_vpcs
+        ;;
 
-        vpcs)
-          show_all_vpcs
-          ;;
+      subnets)
+        show_all_subnets ${VPC_NAME}
+        ;;
 
-        subnets)
-          show_all_subnets ${VPC_NAME}
-          ;;
+      security-groups)
+        show_all_security_groups ${VPC_NAME}
+        ;;
 
-        security-groups)
-          show_all_security_groups ${VPC_NAME}
-          ;;
-
-        *)
-          echo "invalid peg aws command"
-          echo "peg aws"
-          echo "        - region"
-          echo "        - vpcs"
-          echo "        - subnets"
-          echo "        - security-groups"
-          exit 1
-          ;;
-      esac
+      *)
+        echo "specify command for peg aws"
+        echo "peg aws"
+        echo "        - vpcs"
+        echo "        - subnets"
+        echo "        - security-groups"
+        exit 1
+    esac
     ;;
 
   validate)

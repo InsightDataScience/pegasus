@@ -5,7 +5,8 @@ This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazo
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
 Supported commands:
-* `peg aws <options>` - query AWS for information about vpcs, subnets, and security groups.
+* `peg config` - shows the current configurations pegasus is using
+* `peg aws <options>` - query AWS for information about vpcs, subnets, and security groups
 * `peg validate <template-path>` - check if proper fields are set in the instance template yaml file
 * `peg up <template-path>` - launch an AWS cluster using the instance template yaml file
 * `peg fetch <cluster-name>` - fetch the hostnames and Public DNS of nodes in the AWS cluster and store locally
@@ -57,6 +58,15 @@ export PATH=<path-to-pegasus>:$PATH
 Source the `.bash_profile` when finished.
 ```bash
 $ source ~/.bash_profile
+```
+
+You can verify the configurations pegasus sees with `peg config`
+```bash
+$ peg config
+AWS access key: ASDFQWER1234ZXCV
+AWS secret key: POIUYTERRLKJHGFSD123498735284hdb+H
+AWS region:     us-west-2
+SSH User:       ubuntu
 ```
 
 You can test your AWS-CLI access by querying for the available regions for your AWS account:
