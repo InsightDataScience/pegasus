@@ -267,8 +267,8 @@ function cancel_spot_requests_with_ids {
 
 function allocate_eip {
   ${AWS_CMD} allocate-address \
-  --domain vpc \
-  --query AllocationId
+    --domain vpc \
+    --query AllocationId
 }
 
 function allocate_and_associate_eip {
@@ -276,15 +276,15 @@ function allocate_and_associate_eip {
   local allocation_id=$(allocate_eip)
 
   ${AWS_CMD} associate-address \
-  --allocation-id ${allocation_id} \
-  --instance-id ${instance_id} \
-  --query AssociationId
+    --allocation-id ${allocation_id} \
+    --instance-id ${instance_id} \
+    --query AssociationId
 }
 
 function describe_eip_with_instance_id {
-    local instance_id=$1
+  local instance_id=$1
 
-    ${AWS_CMD} describe-addresses \
+  ${AWS_CMD} describe-addresses \
     --filters Name=instance-id,Values=${instance_id} \
     --query Addresses[0].[AssociationId,AllocationId]
 }

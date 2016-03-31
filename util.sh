@@ -321,7 +321,6 @@ function run_instances {
     *)
       echo "[${tag_name}] Invalid purchase type. Please select spot or on_demand."
       exit 1
-      ;;
   esac
 
   tag_resources Name ${tag_name} ${INSTANCE_IDS}
@@ -418,7 +417,6 @@ function service_action {
       *)
         echo -e "Invalid action for ${TECHNOLOGY}"
         exit 1
-        ;;
     esac
   else
     echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
