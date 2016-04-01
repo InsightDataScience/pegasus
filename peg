@@ -4,6 +4,7 @@ set -o errexit
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
 AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:=us-west-2}
+REM_USER=${REM_USER:=ubuntu}
 
 source ${PEG_ROOT}/util.sh
 
@@ -52,10 +53,29 @@ nfargs=$(echo ${parameters} | wc -w)
 
 case ${command} in
   config)
-    echo "AWS access key: ${AWS_ACCESS_KEY_ID}"
-    echo "AWS secret key: ${AWS_SECRET_ACCESS_KEY}"
-    echo "AWS region:     ${AWS_DEFAULT_REGION}"
-    echo "SSH User:       ${REM_USER}"
+    if [ -z ${AWS_ACCESS_KEY_ID} ]; then
+      echo -e "${color_red}[MISSING] AWS_ACCESS_KEY_ID${color_norm}"
+    else
+      echo "AWS access key: ${AWS_ACCESS_KEY_ID}"
+    fi
+
+    if [ -z ${AWS_SECRET_ACCESS_KEY} ]; then
+      echo -e "${color_red}[MISSING] AWS_SECRET_ACCESS_KEY${color_norm}"
+    else
+      echo "AWS secret key: ${AWS_SECRET_ACCESS_KEY}"
+    fi
+
+    if [ -z ${AWS_DEFAULT_REGION} ]; then
+      echo -e "${color_red}MISSING AWS_DEFAULT_REGION${color_norm}"
+    else
+      echo "AWS region: ${AWS_DEFAULT_REGION}"
+    fi
+
+    if [ -z ${REM_USER} ]; then
+      echo -e "${color_red}MISSING REM_USER${color_norm}"
+    else
+      echo "AWS SSH User: ${REM_USER}"
+    fi
     ;;
 
   aws)

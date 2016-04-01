@@ -1,9 +1,9 @@
 purchase_type: spot
-subnet_id: subnet-bf1023da
+subnet_id: subnet-9ae6e3ff
 price: 0.13
-num_instances: 2
+num_instances: 3
 key_name: insight-cluster
-security_group_ids: sg-132ecf74
+security_group_ids: sg-23f7e147
 instance_type: m4.large
 tag_name: test-cluster
 vol_size: 100
