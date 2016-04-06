@@ -128,7 +128,7 @@ case ${command} in
 
       CLUSTER_INFO_PATH=${PEG_ROOT}/tmp/${CLUSTER_NAME}
       if [ -d ${CLUSTER_INFO_PATH} ]; then
-        rm -rf ${CLUSTER_INFO_PATH}
+        rm -r ${CLUSTER_INFO_PATH}
       fi
 
       mkdir -p ${CLUSTER_INFO_PATH}
@@ -177,11 +177,7 @@ case ${command} in
       CLUSTER_NAME=${PARAMETER_ARR[0]}
       TECHNOLOGY=${PARAMETER_ARR[1]}
 
-      if [ ! -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
-        echo "cluster does not exist"
-        echo "run peg fetch <cluster-name> first"
-        exit 1
-      fi
+      check_cluster_exists ${CLUSTER_NAME}
 
       MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
       DEP_ROOT_FOLDER=/usr/local/
@@ -233,20 +229,11 @@ case ${command} in
       CLUSTER_NAME=${PARAMETER_ARR[0]}
       TECHNOLOGY=${PARAMETER_ARR[1]}
 
-      if [ ! -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
-        echo "cluster does not exist"
-        echo "run peg fetch <cluster-name> first"
-        exit 1
-      fi
+      check_cluster_exists ${CLUSTER_NAME}
 
-      MASTER_DNS=$(head -n 1 ${PEG_ROOT}/tmp/$CLUSTER_NAME/public_dns)
+      MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
       PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
       ROOT_FOLDER=/usr/local/
-
-      PUBLIC_DNS=()
-      while read line; do
-        PUBLIC_DNS+=(${line})
-      done < ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns
 
       case ${TECHNOLOGY} in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
@@ -279,11 +266,7 @@ case ${command} in
       TECHNOLOGY=${PARAMETER_ARR[1]}
       ACTION=${PARAMETER_ARR[2]}
 
-      if [ ! -d ${PEG_ROOT}/tmp/$CLUSTER_NAME ]; then
-          echo "cluster does not exist"
-          echo "run peg fetch <cluster-name> first"
-          exit 1
-      fi
+      check_cluster_exists ${CLUSTER_NAME}
 
       MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
       ROOT_FOLDER=/usr/local/
@@ -308,6 +291,9 @@ case ${command} in
   down)
     if [[ "${nfargs}" -eq "1" ]]; then
       CLUSTER_NAME=${parameters}
+
+      check_cluster_exists ${CLUSTER_NAME}
+
       INSTANCE_IDS=($(get_instance_ids_with_name_and_role ${CLUSTER_NAME}))
       echo -e "Are you sure you want to terminate ${color_blue}$CLUSTER_NAME${color_norm}?"
       for ids in ${INSTANCE_IDS[@]}; do
@@ -326,7 +312,6 @@ case ${command} in
         *)
           echo "respond with y or n."
           exit 1
-          ;;
       esac
     else
       echo "invalid number of arguments"
@@ -340,13 +325,9 @@ case ${command} in
       CLUSTER_NAME=${PARAMETER_ARR[0]}
       NODE_NUM=${PARAMETER_ARR[1]}
 
-      if [ -d ${PEG_ROOT}/tmp/${CLUSTER_NAME} ]; then
-        ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
-      else
-        echo "cluster does not exist"
-        echo "run peg fetch <cluster-name> first"
-        exit 1
-      fi
+      check_cluster_exists ${CLUSTER_NAME}
+
+      ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
     else
       echo "invalid number of arguments"
       echo "usage: peg ssh <cluster-name> <node-number>"
@@ -375,6 +356,8 @@ case ${command} in
       NODE_NUMBER=${PARAMETER_ARR[1]}
       PORT_CMD=${PARAMETER_ARR[2]}
 
+      check_cluster_exists ${CLUSTER_NAME}
+
       port_forward ${CLUSTER_NAME} ${NODE_NUMBER} ${PORT_CMD}
     else
       echo "invalid number of arguments"
@@ -385,6 +368,8 @@ case ${command} in
   start)
     if [[ "${nfargs}" -eq "1" ]]; then
       CLUSTER_NAME=${parameters}
+
+      check_cluster_exists ${CLUSTER_NAME}
 
       start_instance ${CLUSTER_NAME}
     else
@@ -397,7 +382,24 @@ case ${command} in
     if [[ "${nfargs}" -eq "1" ]]; then
       CLUSTER_NAME=${parameters}
 
-      stop_instance ${CLUSTER_NAME}
+      check_cluster_exists ${CLUSTER_NAME}
+
+      echo "All services should be stopped before stopping clusters."
+      echo -e "Are you sure you want to stop ${color_blue}$CLUSTER_NAME${color_norm}?"
+      echo -n "[y/n]: "
+      read RESPONSE
+
+      case $RESPONSE in
+        n)
+          exit 1
+          ;;
+        y)
+          stop_instance ${CLUSTER_NAME}
+          ;;
+        *)
+          echo "respond with y or n."
+          exit 1
+      esac
     else
       echo "invalid number of arguments"
       echo "usage: peg stop <cluster-name>"

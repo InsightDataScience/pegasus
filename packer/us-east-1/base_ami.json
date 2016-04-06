@@ -11,7 +11,7 @@
         "source_ami": "ami-d05e75b8",
         "instance_type": "m4.large",
         "ssh_username": "ubuntu",
-        "ami_name": "packer-base {{timestamp}}"
+        "ami_name": "pegasus-java7-{{timestamp}}"
     }],
     "provisioners": [{
       "type": "shell",

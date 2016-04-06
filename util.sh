@@ -276,8 +276,10 @@ function terminate_instances_with_name {
   local num_spot_requests=$(echo ${spot_request_ids} | wc -w)
 
   for instance_id in ${instance_ids}; do
-    release_eip ${instance_id}
+    release_eip ${instance_id} &
   done
+
+  wait
 
   if [[ "${num_instances}" -gt "0" ]]; then
     echo "terminating instances: ${instance_ids}"
@@ -288,7 +290,7 @@ function terminate_instances_with_name {
       cancel_spot_requests_with_ids ${spot_request_ids}
     fi
 
-    rm -rf ${PEG_ROOT}/tmp/${cluster_name}
+    rm -r ${PEG_ROOT}/tmp/${cluster_name}
   fi
 }
 
@@ -340,7 +342,7 @@ function run_instances {
     if [[ ${association_status} != eipassoc-* ]]; then
       echo -e "${color_red}Elastic IP not associated with the instance ${instance_id}${color_norm}"
     else
-      echo -e "${color_green}Elastic IP associated with the instacnce ${instance_id}${color_norm}"
+      echo -e "${color_green}Elastic IP associated with the instance ${instance_id}${color_norm}"
     fi
   done
 }
@@ -395,13 +397,15 @@ function get_dependencies {
 }
 
 function uninstall_tech {
-  for dns in ${PUBLIC_DNS[@]}; do
+  for dns in ${PUBLIC_DNS}; do
     echo ${dns}
     ssh -A ${REM_USER}@${dns} bash -c "'
       sudo rm -rf /usr/local/${TECHNOLOGY}
       sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
-    '"
+    '" &
   done
+
+  wait
 }
 
 function service_action {
@@ -618,4 +622,21 @@ function port_forward {
   ssh -N -f -L localhost:${local_port}:localhost:${remote_port} ${REM_USER}@${dns}
 }
 
+function check_cluster_exists {
+  local cluster_name=$1
+  if [ ! -d ${PEG_ROOT}/tmp/${cluster_name} ]; then
+    echo "cluster does not exist locally"
+    echo "run peg fetch <cluster-name> first"
+    exit 1
+  fi
+
+  local public_dns=$(fetch_cluster_public_dns ${cluster_name})
+  local instance_ids=($(get_instance_ids_with_public_dns ${public_dns}))
+
+  if [ ${#instance_ids[@]} -eq 0 ]; then
+    echo "cluster does not exist on AWS"
+    echo "run peg fetch <cluster-name>"
+    exit 1
+  fi
+}
 

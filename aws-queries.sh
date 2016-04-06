@@ -59,11 +59,20 @@ function get_instance_ids_with_name_and_role {
   fi
 }
 
+function get_instance_ids_with_public_dns {
+  local public_dns=$(echo "$@" | tr " " ",")
+  if [ -z ${public_dns} ]; then
+    exit 1
+  fi
+  ${AWS_CMD} describe-instances \
+    --filters Name=dns-name,Values=${public_dns} \
+    --query Reservations[].Instances[].InstanceId
+}
+
 function show_all_vpcs {
-  echo -e "VPCID\t\tNAME"
   ${AWS_CMD} describe-vpcs \
-    --output text \
-    --query Vpcs[].[VpcId,Tags[0].Value]
+    --output table \
+    --query 'Vpcs[].{VPC_ID:VpcId,VPC_NAME:Tags[0].Value}'
 }
 
 function get_vpcids_with_name {
@@ -77,16 +86,15 @@ function show_all_subnets {
   local vpc_name=$1
   local vpc_id=$(get_vpcids_with_name ${vpc_name})
 
-  echo -e "VPCID\t\tAZ\t\tIPS\tSUBNETID\tNAME"
   if [ -z ${vpc_name} ]; then
     ${AWS_CMD} describe-subnets \
-      --output text \
-      --query Subnets[].[VpcId,AvailabilityZone,AvailableIpAddressCount,SubnetId,Tags[0].Value]
+      --output table \
+      --query 'Subnets[].{VPC_ID:VpcId,AZ:AvailabilityZone,IPS:AvailableIpAddressCount,SUBNET_ID:SubnetId,SUBNET_NAME:Tags[0].Value}'
   else
     ${AWS_CMD} describe-subnets \
-      --output text \
+      --output table \
       --filters Name=vpc-id,Values=${vpc_id:?"no vpcid found for vpc ${vpc_name}"} \
-      --query Subnets[].[VpcId,AvailabilityZone,AvailableIpAddressCount,SubnetId,Tags[0].Value]
+      --query 'Subnets[].{VPC_ID:VpcId,AZ:AvailabilityZone,IPS:AvailableIpAddressCount,SUBNET_ID:SubnetId,SUBNET_NAME:Tags[0].Value}'
   fi
 
 }
@@ -95,17 +103,16 @@ function show_all_security_groups {
   local vpc_name=$1
   local vpc_id=$(get_vpcids_with_name ${vpc_name})
 
-  echo -e "VPCID\t\tSGID\t\tGROUP NAME"
-    if [ -z ${vpc_name} ]; then
-      ${AWS_CMD} describe-security-groups \
-        --output text \
-        --query SecurityGroups[].[VpcId,GroupId,GroupName]
-    else
-      ${AWS_CMD} describe-security-groups \
-        --output text \
-        --filters Name=vpc-id,Values=${vpc_id:?"no vpcid found for vpc ${vpc_name}"} \
-        --query SecurityGroups[].[VpcId,GroupId,GroupName]
-    fi
+  if [ -z ${vpc_name} ]; then
+    ${AWS_CMD} describe-security-groups \
+      --output table \
+      --query 'SecurityGroups[].{VPC_ID:VpcId,SG_ID:GroupId,SG_NAME:GroupName}'
+  else
+    ${AWS_CMD} describe-security-groups \
+      --output table \
+      --filters Name=vpc-id,Values=${vpc_id:?"no vpcid found for vpc ${vpc_name}"} \
+      --query 'SecurityGroups[].{VPC_ID:VpcId,SG_ID:GroupId,SG_NAME:GroupName}'
+  fi
 }
 
 function run_spot_instances {

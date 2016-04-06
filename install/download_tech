@@ -24,7 +24,7 @@ ALLUXIO_URL=http://alluxio.org/downloads/files/${ALLUXIO_VER}/alluxio-${ALLUXIO_
 CASSANDRA_URL=http://www.us.apache.org/dist/cassandra/$CASSANDRA_VER/apache-cassandra-$CASSANDRA_VER-bin.tar.gz
 ELASTICSEARCH_URL=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
 FLINK_URL=http://www.us.apache.org/dist/flink/flink-$FLINK_VER/flink-$FLINK_VER-bin-hadoop$FLINK_HADOOP_VER-scala_$FLINK_SCALA_VER.tgz
-HADOOP_URL=https://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz
+HADOOP_URL=http://www.us.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz
 HBASE_URL=http://www.us.apache.org/dist/hbase/$HBASE_VER/hbase-$HBASE_VER-bin.tar.gz
 HIVE_URL=http://apache.mirrors.pair.com/hive/stable/apache-hive-$HIVE_VER-bin.tar.gz
 KAFKA_URL=http://www.interior-dsgn.com/apache/kafka/$KAFKA_VER/kafka_$KAFKA_SCALA_VER-$KAFKA_VER.tgz
@@ -33,7 +33,7 @@ OPSCENTER_URL=http://downloads.datastax.com/community/opscenter.tar.gz
 PIG_URL=http://www.gtlib.gatech.edu/pig/pig-$PIG_VER.tar.gz
 PRESTO_URL=https://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VER/presto-server-$PRESTO_VER.tar.gz
 REDIS_URL=http://download.redis.io/releases/redis-$REDIS_VER.tar.gz
-SPARK_URL=http://apache.osuosl.org/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
+SPARK_URL=http://www.us.apache.org/dist/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
 STORM_URL=http://www.us.apache.org/dist/storm/apache-storm-$STORM_VER/apache-storm-$STORM_VER.tar.gz
 ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/zookeeper-$ZOOKEEPER_VER/zookeeper-$ZOOKEEPER_VER.tar.gz
 
