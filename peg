@@ -32,6 +32,8 @@ while getopts ":h" opt; do
       echo "    - uninstall"
       echo "    - service"
       echo "    - ssh"
+      echo "    - sshcmd"
+      echo "    - scp"
       echo "    - retag"
       echo "    - start"
       echo "    - stop"
@@ -331,6 +333,60 @@ case ${command} in
     else
       echo "invalid number of arguments"
       echo "usage: peg ssh <cluster-name> <node-number>"
+    fi
+    ;;
+
+  sshcmd)
+    if [[ "${nfargs}" -ge "3" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      NODE_NUM=${PARAMETER_ARR[1]}
+      CMD=${PARAMETER_ARR[@]:2}
+
+      check_cluster_exists ${CLUSTER_NAME}
+
+      PUBLIC_DNS=$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
+      run_cmd_on_node ${PUBLIC_DNS} ${CMD}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg sshcmd <cluster-name> <node-number> \"<cmd>\""
+    fi
+    ;;
+
+  scp)
+    if [[ "${nfargs}" -eq "5" ]]; then
+      PARAMETER_ARR=(${parameters})
+      SCP_OPTION=${PARAMETER_ARR[0]}
+      CLUSTER_NAME=${PARAMETER_ARR[1]}
+      NODE_NUM=${PARAMETER_ARR[2]}
+      LOCAL_PATH=${PARAMETER_ARR[3]}
+      REM_PATH=${PARAMETER_ARR[4]}
+
+      check_cluster_exists ${CLUSTER_NAME}
+
+      PUBLIC_DNS=$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
+      case ${SCP_OPTION} in
+        to-local|from-rem)
+          scp -r -i ${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem ${REM_USER}@${PUBLIC_DNS}:${REM_PATH} ${LOCAL_PATH}
+          ;;
+
+        to-rem|from-local)
+          scp -r -i ${PEG_ROOT}/tmp/${CLUSTER_NAME}/*.pem ${LOCAL_PATH} ${REM_USER}@${PUBLIC_DNS}:${REM_PATH}
+          ;;
+
+        *)
+          echo "invalid peg scp option"
+          echo "valid options:"
+          echo "  to-local"
+          echo "  from-local"
+          echo "  to-rem"
+          echo "  from-rem"
+          exit 1
+
+      esac
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>"
     fi
     ;;
 
