@@ -15,6 +15,8 @@ Supported commands:
 * `peg service <cluster-name> <technology> <start|stop>` - start and stop a service on the cluster
 * `peg uninstall <cluster-name> <technology>` - uninstall a specific technology from the cluster
 * `peg ssh <cluster-name> <node-number>` - SSH into a specific node in your AWS cluster
+* `peg sshcmd <cluster-name> <node-number> "<cmd>"` - run a bash command on a specific node in your AWS cluster
+* `peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>` - copy files or folders to and from a specific node in your AWS cluster
 * `peg down <cluster-name>` - terminate a cluster
 * `peg retag <cluster-name> <new-cluster-name>` - retag an existing cluster with a different name
 * `peg start <cluster-name>` - start an existing cluster with on demand instances and put into running mode
@@ -302,11 +304,11 @@ $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 ```
 
 # Deployment Pipelines
-If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`examples/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_hadoop.sh) file.
+If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`examples/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_hadoop.sh) file.
 
-Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
+Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
 ```bash
-$ examples/spark_hadoop.sh
+$ examples/spark/spark_hadoop.sh
 ```
 ```bash
 #!/bin/bash
@@ -326,6 +328,4 @@ peg install ${CLUSTER_NAME} ssh
 peg install ${CLUSTER_NAME} aws
 peg install ${CLUSTER_NAME} hadoop
 peg install ${CLUSTER_NAME} spark
-
-peg port-forward ${CLUSTER_NAME} 1 8888:8888
 ```
