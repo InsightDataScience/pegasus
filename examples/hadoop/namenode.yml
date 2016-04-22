@@ -1,9 +1,9 @@
 purchase_type: on_demand
-subnet_id: subnet-9ae6e3ff
+subnet_id: subnet-3a78835f
 num_instances: 1
 key_name: insight-cluster
-security_group_ids: sg-23f7e147
+security_group_ids: sg-9206aaf7
 instance_type: m4.large
-tag_name: test-cluster
+tag_name: hadoop-cluster
 vol_size: 100
 role: master

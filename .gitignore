@@ -1,16 +1,6 @@
 .DS_Store
-DataLabs
 tmp
 archive
-
-examples/*
-!examples/spark_hadoop.sh
-!examples/spark_master.yml
-!examples/spark_workers.yml
-
-templates
-
-util/sparklab
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

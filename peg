@@ -33,6 +33,7 @@ while getopts ":h" opt; do
       echo "    - service"
       echo "    - ssh"
       echo "    - sshcmd"
+      echo "    - scp"
       echo "    - retag"
       echo "    - start"
       echo "    - stop"
