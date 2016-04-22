@@ -68,7 +68,7 @@ $ peg config
 AWS access key: ASDFQWER1234ZXCV
 AWS secret key: POIUYTERRLKJHGFSD123498735284hdb+H
 AWS region:     us-west-2
-SSH User:       ubuntu
+AWS SSH User:       ubuntu
 ```
 
 You can test your AWS-CLI access by querying for the available regions for your AWS account:
@@ -129,23 +129,7 @@ VPCID		    SGID		GROUP NAME
 vpc-c2a496a1	sg-5deed039	default
 ```
 
-## Region
-Lastly you can double check which AWS region Pegasus is using with `peg aws region`. If the value is not what you expect, update your `AWS_DEFAULT_REGION` in your `.bash_profile` and source it before proceeding.
-```bash
-$ peg aws region
-Pegasus is using AWS region us-west-2
-```
-
 # Spin up your cluster on AWS
-Currently all installations only work with the Ubuntu Server 14.04 LTS (HVM) AMI.
-
-* Use the Ubuntu Server 14.04 LTS (HVM), SSD Volume Type AMI
-* To start we recommend deploying a 4 node cluster
-* Tag each instance with the same name through the AWS EC2 console (REQUIRED!!!)
-  * e.g. test-cluster (<cluster-name> in subsequent steps)
-
-Or
-
 Use `peg up` to deploy a cluster from the command line (recommended)
 ```bash
 $ peg up <instance-template-file>
@@ -185,20 +169,20 @@ Once the nodes are up and running on AWS, we'll need to grab the DNS and hostnam
 $ chmod 600 ~/.ssh/<your-aws-pem-key>
 ```
 
-Always run `peg fetch` to store the instance DNSs and hostnames onto your local machine before installation. DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
+Always run `peg fetch` to store the instance Public DNSs and hostnames onto your local machine before installation. Public DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
 ```bash
 $ peg fetch <cluster-name>
 ```
-Under the `tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
+Under the `${PEG_ROOT}/tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
-*tmp/\<cluster-name\>/public_dns*
+*${PEG_ROOT}/tmp/\<cluster-name\>/public_dns*
 ```bash
 ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
 ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
-*tmp/\<cluster-name\>/hostnames*
+*${PEG_ROOT}/tmp/\<cluster-name\>/hostnames*
 ```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
@@ -237,16 +221,16 @@ The `technology` tag can be any of the following:
 * cassandra (default v2.2.5)
 * elasticsearch (default v2.1.0)
 * flink (default v1.0.0 with hadoop v2.7 and scala v2.10)
-* hadoop (default v2.7.1)
+* hadoop (default v2.7.2)
 * hbase (default v1.1.3)
 * hive (default v1.2.1)
-* kafka (default v0.8.2.2 with scala v2.10)
+* kafka (default v0.9.0.1 with scala v2.10)
 * kibana (default v4.3.0)
 * opscenter
 * pig (default v0.15.0)
 * presto (default v0.86)
 * redis (default v3.0.6)
-* spark (default v1.5.2 with hadoop v2.4+)
+* spark (default v1.6.1 with hadoop v2.6+)
 * storm (default v0.10.0)
 * zeppelin
 * zookeeper (default v3.4.6)
