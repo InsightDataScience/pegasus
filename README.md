@@ -68,7 +68,7 @@ $ peg config
 AWS access key: ASDFQWER1234ZXCV
 AWS secret key: POIUYTERRLKJHGFSD123498735284hdb+H
 AWS region:     us-west-2
-AWS SSH User:       ubuntu
+AWS SSH User:   ubuntu
 ```
 
 You can test your AWS-CLI access by querying for the available regions for your AWS account:
@@ -138,23 +138,23 @@ $ peg up <instance-template-file>
 The `instance-template-file` is a yaml file that `peg up` uses. Within this file you should specify the following as shown:
 ```bash
 purchase_type: spot|on_demand
-subnet: string
+subnet_id: string
 price: string
 num_instances: integer
 key_name: string
 security_group_ids: string
-instance_type: t1.micro|m1.small|m1.medium|m1.large|m1.xlarge|m3.medium|m3.large|m3.xlarge|m3.2xlarge|m4.large|m4.xlarge|m4.2xlarge|m4.4xlarge|m4.10xlarge|t2.micro|t2.small|t2.medium|t2.large|m2.xlarge|m2.2xlarge|m2.4xlarge|cr1.8xlarge|i2.xlarge|i2.2xlarge|i2.4xlarge|i2.8xlarge|hi1.4xlarge|hs1.8xlarge|c1.medium|c1.xlarge|c3.large|c3.xlarge|c3.2xlarge|c3.4xlarge|c3.8xlarge|c4.large|c4.xlarge|c4.2xlarge|c4.4xlarge|c4.8xlarge|cc1.4xlarge|cc2.8xlarge|g2.2xlarge|cg1.4xlarge|r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|r3.8xlarge|d2.xlarge|d2.2xlarge|d2.4xlarge|d2.8xlarge
+instance_type: string
 tag_name: string
 vol_size: integer
 role: master|worker
 ```
 * **purchase_type** (*string*) - choose between on_demand or spot instances
-* **subnet** (*string*) - the VPC subnet id e.g. subnet-61c12804
+* **subnet_id** (*string*) - the VPC subnet id e.g. subnet-61c12804
 * **price** (*string*) - spot price you would like to set. Ignored if `purchase_type`=`on_demand` e.g. 0.25
 * **num_instances** (*integer*) - number of instances to deploy
 * **key_name** (*string*) - the pem key name to be used for all instances e.g. insight-cluster
 * **security_group_ids** (*string*) - security group id e.g. sg-e9f17e8c (does not support multiple security group ids yet)
-* **instance_type** (*string*) - type of instances to deploy
+* **instance_type** (*string*) - type of instances to deploy (e.g. m4.large)
 * **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. test-cluster
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
 * **role** (*string*) - role of the instances e.g. master or worker
@@ -166,7 +166,7 @@ The AMIs used in the `peg up` script have some basic packages baked in such as J
 # Fetching AWS cluster DNS and hostname information
 Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privileges:
 ```bash
-$ chmod 600 ~/.ssh/<your-aws-pem-key>
+$ chmod 400 ~/.ssh/<your-aws-pem-key>
 ```
 
 Always run `peg fetch` to store the instance Public DNSs and hostnames onto your local machine before installation. Public DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
