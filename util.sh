@@ -397,7 +397,7 @@ function get_dependencies {
 }
 
 function uninstall_tech {
-  for dns in ${PUBLIC_DNS}; do
+  for dns in ${PUBLIC_DNS[@]}; do
     echo ${dns}
     ssh -A ${REM_USER}@${dns} bash -c "'
       sudo rm -rf /usr/local/${TECHNOLOGY}
