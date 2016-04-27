@@ -233,7 +233,9 @@ case ${command} in
 
       check_cluster_exists ${CLUSTER_NAME}
 
-      MASTER_DNS=$(get_public_dns_with_name_and_role ${CLUSTER_NAME} master)
+      PUBLIC_DNS=($(fetch_cluster_public_dns ${CLUSTER_NAME}))
+      MASTER_DNS=${PUBLIC_DNS[0]}
+
       PEMLOC=${PEG_ROOT}/tmp/$CLUSTER_NAME/*.pem
       ROOT_FOLDER=/usr/local/
 
