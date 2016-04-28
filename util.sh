@@ -175,6 +175,8 @@ function pemkey_exists_locally {
   if [ ! -f ~/.ssh/${pemkey_name}.pem ]; then
     echo "pem key ${pemkey_name} does not exists locally in ~/.ssh/"
     exit 1
+  else
+    echo "pem key ${pemkey_name} found locally"
   fi
 }
 
@@ -195,11 +197,22 @@ function store_pemkey {
 
   pemkey_exists_locally ${unique_pemkeys}
 
-  chmod 600 ~/.ssh/${unique_pemkeys}.pem
+  chmod 400 ~/.ssh/${unique_pemkeys}.pem
+
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
 
-  ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
-  echo "${unique_pemkeys}.pem has been added to your ssh-agent"
+  sshagent_pid_cnt=$(pgrep ssh-agent | wc -l)
+  if [ "${sshagent_pid_cnt}" -ne "0" ]; then
+    ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
+    echo "${unique_pemkeys}.pem has been added to your ssh-agent"
+  else
+    echo -e "ssh-agent not started. Run ${color_red}eval \`ssh-agent -s\`${color_norm}"
+    echo -e "rerun ${color_red}peg fetch ${cluster_name}${color_norm}"
+    if [ -d ${PEG_ROOT}/tmp/${cluster_name} ]; then
+      rm -rf ${PEG_ROOT}/tmp/${cluster_name}
+    fi
+    exit 1
+  fi
 }
 
 function get_instance_type_histo_with_name {
@@ -290,7 +303,7 @@ function terminate_instances_with_name {
       cancel_spot_requests_with_ids ${spot_request_ids}
     fi
 
-    rm -r ${PEG_ROOT}/tmp/${cluster_name}
+    rm -rf ${PEG_ROOT}/tmp/${cluster_name}
   fi
 }
 
@@ -306,12 +319,11 @@ function run_instances {
       echo "[${tag_name}] requesting spot instances..."
       local spot_request_ids=$(run_spot_instances)
 
-      tag_resources Name ${tag_name} ${spot_request_ids}
-      tag_resources Owner ${USER} ${spot_request_ids}
-
-
       echo "[${tag_name}] waiting for spot requests ${spot_request_ids} to be fulfilled..."
       wait_for_spot_requests ${spot_request_ids}
+
+      tag_resources Name ${tag_name} ${spot_request_ids}
+      tag_resources Owner ${USER} ${spot_request_ids}
 
       INSTANCE_IDS=$(get_instance_ids_of_spot_request_ids ${spot_request_ids})
       ;;
@@ -325,17 +337,17 @@ function run_instances {
       exit 1
   esac
 
+  echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} to be in status ok state..."
+  wait_for_instances_status_ok ${INSTANCE_IDS}
+
+  echo "[${tag_name}] ${INSTANCE_IDS} ready..."
+
   tag_resources Name ${tag_name} ${INSTANCE_IDS}
   tag_resources Owner ${USER} ${INSTANCE_IDS}
 
   if [ ! -z ${role} ]; then
     tag_resources Role ${role} ${INSTANCE_IDS}
   fi
-
-  echo "[${tag_name}] waiting for instances ${INSTANCE_IDS} to be in status ok state..."
-  wait_for_instances_status_ok ${INSTANCE_IDS}
-
-  echo "[${tag_name}] ${INSTANCE_IDS} ready..."
 
   for instance_id in ${INSTANCE_IDS}; do
     association_status=$(allocate_and_associate_eip ${instance_id})
