@@ -19,7 +19,7 @@ Supported commands:
 * `peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>` - copy files or folders to and from a specific node in your AWS cluster
 * `peg down <cluster-name>` - terminate a cluster
 * `peg retag <cluster-name> <new-cluster-name>` - retag an existing cluster with a different name
-* `peg start <cluster-name>` - start an existing cluster with on demand instances and put into running mode
+* `peg start <cluster-name>` - start an existing cluster with on demand instances and put into running mode 
 * `peg stop <cluster-name>` - stop and existing cluster with on demand instances and put into stop mode
 * `peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>` - port forward your local port to the remote cluster node's port
 
@@ -41,19 +41,39 @@ Supported commands:
 15. [Deployment Pipelines](README.md#deployment-pipelines)
 
 # Install Pegasus on your local machine
-This will allow you to programatically interface with your AWS account
+This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
+
+1. Docker
+
+Add the following to your `~/.bash_profile`.
+```bash
+export AWS_ACCESS_KEY_ID=XXXX
+export AWS_SECRET_ACCESS_KEY=XXXX
+export AWS_DEFAULT_REGION=XX-XXXX-X
+```
+Source the `.bash_profile` when finished.
+```bash
+$ source ~/.bash_profile
+```
+
+Execute the `run_peg_docker.sh` script
+```bash
+$ ./run_peg_docker.sh <pem-key-name> <path-to-folder-with-instance-template-files>
+```
+
+2. Manual
 
 Clone the Pegasus project to your local computer and install awscli
 ```bash
 $ git clone https://github.com/InsightDataScience/pegasus.git
-$ sudo pip install awscli
+$ pip install awscli
 ```
 
 Next we need to add the following to your `~/.bash_profile`.
 ```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
-export AWS_DEFAULT_REGION=us-east-1|us-west-1|us-west-2|eu-central-1|eu-west-1|ap-southeast-1|ap-southeast-2|ap-northeast-1|sa-east-1
+export AWS_DEFAULT_REGION=XX-XXXX-X
 export REM_USER=ubuntu
 export PATH=<path-to-pegasus>:$PATH
 ```
@@ -62,13 +82,13 @@ Source the `.bash_profile` when finished.
 $ source ~/.bash_profile
 ```
 
-You can verify the configurations pegasus sees with `peg config`
+Once the Docker container is running or you have set up Pegasus manually, you can verify the current configurations in Pegasus with `peg config`
 ```bash
 $ peg config
 AWS access key: ASDFQWER1234ZXCV
 AWS secret key: POIUYTERRLKJHGFSD123498735284hdb+H
 AWS region:     us-west-2
-AWS SSH User:       ubuntu
+AWS SSH User:   ubuntu
 ```
 
 You can test your AWS-CLI access by querying for the available regions for your AWS account:
@@ -89,24 +109,29 @@ $ aws ec2 --output json describe-regions --query Regions[].RegionName
 ```
 
 # Query for AWS VPC information
+The following queries can help you quickly determine which subnet-id and security-group-id to use in your instance deployments.
+
 ## VPCs
-View all VPCs in your region with `peg aws vpcs`
+Let's say we want to deploy our instances in the VPC named `my-vpc`. We can view all VPCs in my region with `peg aws vpcs`
 ```bash
 $ peg aws vpcs
 VPCID		    NAME
 vpc-add2e6c3	default
 vpc-c2a496a1	my-vpc
 ```
+We can see that `vpc-c2a496a1` is the VPC id we would need my subnet-id and security-group-id associated with.
+
 ## Subnets
-View all Subnets in your region with `peg aws subnets`
+To choose the specific subnet-id we will use in my deployment, we can view all Subnets in our region with `peg aws subnets`
 ```bash
 $ peg aws subnets
 VPCID		    AZ		    IPS	    SUBNETID	    NAME
 vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
 vpc-add2e6c3	us-west-2b	4089	subnet-9fe6e3df	aws-us-west-2b
 ```
+We see here that the first subnet is associated with the same VPC id we specified previously, so `subnet-6ac0bd26` is the subnet-id I will need to use in my instance deployment later on.
 
-You can filter Subnets down to a specific VPC name with `peg aws subnets <vpc-name>`
+We can also filter the Subnets down to a specific VPC name with `peg aws subnets <vpc-name>` if we have too many subnets to search through
 ```bash
 $ peg aws subnets my-vpc
 VPCID		    AZ		    IPS	    SUBNETID	    NAME
@@ -114,15 +139,16 @@ vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
 ```
 
 ## Security groups
-View all Security Groups in your region with `peg aws security-groups`
+The last network related information we would need for our instance deployment is the security-group-id. We can view all Security Groups in our region with `peg aws security-groups`
 ```bash
 $ peg aws security-groups
 VPCID		    SGID		GROUP NAME
 vpc-add2e6c3	sg-7cb78418	default
 vpc-c2a496a1	sg-5deed039	default
 ```
+We would choose the `sg-5deed039` in this example, since it is also associated with the VPC that we wish to deploy in. 
 
-You can filter Security Groups down to a specific VPC name `peg aws security-groups <vpc-name>`
+We can also filter Security Groups down to a specific VPC name `peg aws security-groups <vpc-name>` if there are too many security groups to search through
 ```bash
 $ peg aws security-groups my-vpc
 VPCID		    SGID		GROUP NAME
@@ -135,39 +161,36 @@ Use `peg up` to deploy a cluster from the command line (recommended)
 $ peg up <instance-template-file>
 ```
 
-The `instance-template-file` is a yaml file that `peg up` uses. Within this file you should specify the following as shown:
+The `instance-template-file` is a yaml file that `peg up` uses. Examples of these can be found under `${PEG_ROOT}/examples`. Within this file you should specify the following as shown:
 ```bash
-purchase_type: spot|on_demand
-subnet: string
+purchase_type: spot or on_demand
+subnet_id: string
 price: string
 num_instances: integer
 key_name: string
 security_group_ids: string
-instance_type: t1.micro|m1.small|m1.medium|m1.large|m1.xlarge|m3.medium|m3.large|m3.xlarge|m3.2xlarge|m4.large|m4.xlarge|m4.2xlarge|m4.4xlarge|m4.10xlarge|t2.micro|t2.small|t2.medium|t2.large|m2.xlarge|m2.2xlarge|m2.4xlarge|cr1.8xlarge|i2.xlarge|i2.2xlarge|i2.4xlarge|i2.8xlarge|hi1.4xlarge|hs1.8xlarge|c1.medium|c1.xlarge|c3.large|c3.xlarge|c3.2xlarge|c3.4xlarge|c3.8xlarge|c4.large|c4.xlarge|c4.2xlarge|c4.4xlarge|c4.8xlarge|cc1.4xlarge|cc2.8xlarge|g2.2xlarge|cg1.4xlarge|r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|r3.8xlarge|d2.xlarge|d2.2xlarge|d2.4xlarge|d2.8xlarge
+instance_type: string
 tag_name: string
 vol_size: integer
-role: master|worker
+role: master or worker
 ```
 * **purchase_type** (*string*) - choose between on_demand or spot instances
-* **subnet** (*string*) - the VPC subnet id e.g. subnet-61c12804
-* **price** (*string*) - spot price you would like to set. Ignored if `purchase_type`=`on_demand` e.g. 0.25
+* **subnet_id** (*string*) - the VPC subnet id (e.g. subnet-61c12804)
+* **price** (*string*) - spot price you would like to set. Ignored if `purchase_type`=`on_demand` (e.g. 0.25)
 * **num_instances** (*integer*) - number of instances to deploy
-* **key_name** (*string*) - the pem key name to be used for all instances e.g. insight-cluster
-* **security_group_ids** (*string*) - security group id e.g. sg-e9f17e8c (does not support multiple security group ids yet)
-* **instance_type** (*string*) - type of instances to deploy
-* **tag_name** (*string*) - tag all your instances with this name. This will be known as the `cluster-name` throughout the rest of the README e.g. test-cluster
-* **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage
-* **role** (*string*) - role of the instances e.g. master or worker
+* **key_name** (*string*) - the pem key name to be used for all instances (e.g. insight-cluster)
+* **security_group_ids** (*string*) - security group id (e.g. sg-e9f17e8c, does not support multiple security group ids yet)
+* **instance_type** (*string*) - type of instances to deploy (e.g. m4.xlarge)
+* **tag_name** (*string*) - tag all your instances with this name. Instances with the same `tag_name` will be associated with the same cluster.  This will be known as the `cluster-name` throughout the rest of the README (e.g. test-cluster)
+* **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage. (e.g. 100)
+* **role** (*string*) - role of the instances (e.g. master)
 
-You can check if the template file is valid with `peg validate <template-file`. If nothing is shown, then the file should work with `peg up`.
+You can check if the template file is valid with `peg validate <template-file`.
 
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
 # Fetching AWS cluster DNS and hostname information
-Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine. Make sure your `.pem` key has the proper privileges:
-```bash
-$ chmod 600 ~/.ssh/<your-aws-pem-key>
-```
+Once the nodes are up and running on AWS, we'll need to grab the DNS and hostname information about the cluster you wish to work with on your local machine.
 
 Always run `peg fetch` to store the instance Public DNSs and hostnames onto your local machine before installation. Public DNSs and hostnames will be saved into the `tmp` folder under the specified cluster name as `public_dns` and `hostnames` respectively
 ```bash
@@ -175,14 +198,14 @@ $ peg fetch <cluster-name>
 ```
 Under the `${PEG_ROOT}/tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
-*${PEG_ROOT}/tmp/\<cluster-name\>/public_dns*
+`${PEG_ROOT}/tmp/\<cluster-name\>/public_dns`
 ```bash
 ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
 ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
-*${PEG_ROOT}/tmp/\<cluster-name\>/hostnames*
+`${PEG_ROOT}/tmp/\<cluster-name\>/hostnames`
 ```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
@@ -195,13 +218,13 @@ You can always view the current cluster information stored locally with the `peg
 Once the cluster IPs have been saved to the tmp folder, we can begin with installations.
 
 # Describe a cluster
-Shows the hostname and Public DNS for a specified cluster and also show which nodes are the Master vs Workers.
+Shows the hostname and Public DNS for a specified cluster and also show which nodes are the Master and Workers.
 ```bash
 $ peg describe <cluster-name>
 ```
 
 # Setting up a newly provisioned AWS cluster
-If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` script, since the packages have already been installed.
+If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` command, since the packages have already been installed.
 
 1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using peg up)**
 1. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS. This is needed for some of the technologies.
@@ -217,32 +240,32 @@ $ peg install <cluster-name> aws
 $ peg install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
-* alluxio (default v1.0.0)
-* cassandra (default v2.2.5)
-* elasticsearch (default v2.1.0)
-* flink (default v1.0.0 with hadoop v2.7 and scala v2.10)
-* hadoop (default v2.7.2)
-* hbase (default v1.1.3)
-* hive (default v1.2.1)
-* kafka (default v0.9.0.1 with scala v2.10)
-* kibana (default v4.3.0)
+* alluxio (v1.0.0)
+* cassandra (v2.2.5)
+* elasticsearch (v2.1.0)
+* flink (v1.0.0 with hadoop v2.7 and scala v2.10)
+* hadoop (v2.7.2)
+* hbase (v1.1.3)
+* hive (v1.2.1)
+* kafka (v0.9.0.1 with scala v2.10)
+* kibana (v4.3.0)
 * opscenter
-* pig (default v0.15.0)
-* presto (default v0.86)
-* redis (default v3.0.6)
-* spark (default v1.6.1 with hadoop v2.6+)
-* storm (default v0.10.0)
+* pig (v0.15.0)
+* presto (v0.86)
+* redis (v3.0.6)
+* spark (v1.6.1 with hadoop v2.6+)
+* storm (v0.10.0)
 * zeppelin
-* zookeeper (default v3.4.6)
+* zookeeper (v3.4.6)
 
 All environment variables relating to technology folder paths are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
-If you wish to install a different version of these technologies, please go into the [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) script and update the technology version and technology binary download URL.
+If you wish to install a different version of these technologies, go into the [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) script and update the technology version and technology binary download URL.
 
-Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) and also writing the appropriate configurations in the `config` folder.
+Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech), writing the appropriate configurations in the `config` folder and writing the appropriate service scripts in the `service` folder if appropriate.
 
 # Starting and stopping services
-A script has been provided to start and stop distributed services easily without having to manually SSH into each node
+User the `service` option to start and stop distributed services easily without having to manually SSH into each node
 ```bash
 $ peg service <cluster-name> <technology> <start|stop>
 ```
@@ -267,13 +290,13 @@ $ peg down <cluster-name>
 ```
 
 # Retag a cluster
-Retag an existing cluster on AWS
+Rename an existing cluster on AWS
 ```bash
 $ peg retag <cluster-name> <new-cluster-name>
 ```
 
 # Starting and stopping on demand clusters
-Place a cluster into running and stop modes on AWS.
+Place a cluster into running and stop modes on AWS. This is particularly useful if you don't want to reinstall technologies each time you begin your workflow. Stopped instances are not charged to your account; however the Elastic IPs and EBS volumes will still incur charges.
 ```bash
 $ peg start <cluster-name>
 ```
@@ -282,7 +305,7 @@ $ peg stop <cluster-name>
 ```
 
 # Port forwarding to a node
-Forward your local port to a remote node's port
+Forward your local port to a remote node's port. This is useful if you have any services that can only be accessed through port-forwarding. 
 ```bash
 $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 ```
@@ -290,7 +313,7 @@ $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 # Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`examples/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_hadoop.sh) file.
 
-Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by running the following:
+Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by changine the subnet-id and security-group-ids in the instance-template-files and then running the following:
 ```bash
 $ examples/spark/spark_hadoop.sh
 ```
