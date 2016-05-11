@@ -241,7 +241,7 @@ $ peg install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
 * alluxio (v1.0.0)
-* cassandra (v2.2.5)
+* cassandra (v2.2.6)
 * elasticsearch (v2.1.0)
 * flink (v1.0.0 with hadoop v2.7 and scala v2.10)
 * hadoop (v2.7.2)
