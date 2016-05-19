@@ -275,6 +275,26 @@ function select_ami {
       AWS_IMAGE=ami-a20d2bc8
       ;;
 
+    eu-west-1)
+      AWS_IMAGE=ami-1555c266
+      ;;
+
+    eu-central-1)
+      AWS_IMAGE=ami-cc35d9a3
+      ;;
+
+    ap-northeast-1)
+      AWS_IMAGE=ami-3ac1215b
+      ;;
+
+    ap-southeast-1)
+      AWS_IMAGE=ami-cf6eb8ac
+      ;;
+
+    ap-southeast-2)
+      AWS_IMAGE=ami-c0e3cca3
+      ;;
+
     *)
       echo "unrecognized AWS region"
       exit 1

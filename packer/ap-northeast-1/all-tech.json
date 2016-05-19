@@ -1,0 +1,21 @@
+{
+    "variables": {
+        "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+        "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}"
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-west-2",
+        "source_ami": "ami-5189a661",
+        "instance_type": "m4.large",
+        "ssh_username": "ubuntu",
+        "ami_name": "packer-spark {{timestamp}}"
+    }],
+    "provisioners": [{
+      "type": "shell",
+      "script": "download.sh",
+      "pause_before": "30s"
+    }]
+}
