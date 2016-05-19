@@ -61,6 +61,11 @@ Execute the `run_peg_docker.sh` script
 $ ./run_peg_docker.sh <pem-key-name> <path-to-folder-with-instance-template-files>
 ```
 
+Everytime the container is started fresh, you will need to enable the ssh-agent otherwise you will not be able to SSH into your AWS nodes
+```bash
+root@containerid$ eval `ssh-agent -s`
+```
+
 ### Manual
 
 Clone the Pegasus project to your local computer and install awscli
