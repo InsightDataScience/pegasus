@@ -43,7 +43,7 @@ Supported commands:
 # Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
 
-1. Docker
+### Docker
 
 Add the following to your `~/.bash_profile`.
 ```bash
@@ -61,7 +61,7 @@ Execute the `run_peg_docker.sh` script
 $ ./run_peg_docker.sh <pem-key-name> <path-to-folder-with-instance-template-files>
 ```
 
-2. Manual
+### Manual
 
 Clone the Pegasus project to your local computer and install awscli
 ```bash
