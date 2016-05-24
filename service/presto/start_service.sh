@@ -19,5 +19,4 @@ done
 run_cmd_on_node ${MASTER_DNS} ${cmd}
 
 echo "Presto Started!"
-echo "NOTE: Presto versions after 0.86 require Java 8"
 

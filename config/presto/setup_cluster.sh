@@ -39,5 +39,4 @@ cli_script="${PEG_ROOT}/config/presto/setup_cli.sh"
 run_script_on_node ${MASTER_DNS} ${cli_script}
 
 echo "Presto configuration complete!"
-echo "NOTE: Presto versions after 0.86 require Java 8"
 
