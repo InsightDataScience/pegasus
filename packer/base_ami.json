@@ -7,16 +7,20 @@
         "type": "amazon-ebs",
         "access_key": "{{user `aws_access_key`}}",
         "secret_key": "{{user `aws_secret_key`}}",
-        "region": "us-east-1",
-        "source_ami": "ami-d05e75b8",
+        "region": "us-west-2",
+        "source_ami": "ami-5189a661",
         "instance_type": "m4.large",
         "ssh_username": "ubuntu",
-        "ami_name": "pegasus-java7-{{timestamp}}"
+        "ami_name": "pegasus-java8-{{timestamp}}",
+        "ami_groups": "all",
+        "tags": {
+              "Name": "pegasus-base"
+        }
     }],
     "provisioners": [{
       "type": "shell",
       "scripts": [
-        "../../install/Environment/install_env.sh"
+        "../install/environment/install_env.sh"
       ],
       "pause_before": "30s"
     }]

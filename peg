@@ -130,7 +130,7 @@ case ${command} in
 
       CLUSTER_INFO_PATH=${PEG_ROOT}/tmp/${CLUSTER_NAME}
       if [ -d ${CLUSTER_INFO_PATH} ]; then
-        rm -r ${CLUSTER_INFO_PATH}
+        rm -rf ${CLUSTER_INFO_PATH}
       fi
 
       mkdir -p ${CLUSTER_INFO_PATH}
