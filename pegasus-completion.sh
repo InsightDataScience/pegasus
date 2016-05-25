@@ -28,6 +28,7 @@ _peg()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     clusters=$(ls ${PEGASUS_HOME}/tmp)
+    services=$(ls ${PEGASUS_HOME}/service)
     
     opts=" 
       config 
@@ -47,7 +48,8 @@ _peg()
       start
       stop
       port-foward
-      ${clusters}"
+      ${clusters}
+      ${services}"
 
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
     return 0
