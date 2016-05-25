@@ -84,6 +84,14 @@ function validate_template {
     fi
   fi
 
+  if [ -z ${use_eips} ]; then
+    echo "must specify use_eips"
+    exit 1
+  elif [ ${use_eips} != true ] && [ ${use_eips} != false ]; then
+    echo "must specify true or false for use_eips"
+    exit 1
+  fi
+
 }
 
 function get_hostnames_with_name_and_role {
@@ -377,14 +385,16 @@ function run_instances {
     tag_resources Role ${role} ${INSTANCE_IDS}
   fi
 
-  for instance_id in ${INSTANCE_IDS}; do
-    association_status=$(allocate_and_associate_eip ${instance_id})
-    if [[ ${association_status} != eipassoc-* ]]; then
-      echo -e "${color_red}Elastic IP not associated with the instance ${instance_id}${color_norm}"
-    else
-      echo -e "${color_green}Elastic IP associated with the instance ${instance_id}${color_norm}"
-    fi
-  done
+  if ${use_eips}; then
+    for instance_id in ${INSTANCE_IDS}; do
+      association_status=$(allocate_and_associate_eip ${instance_id})
+      if [[ ${association_status} != eipassoc-* ]]; then
+        echo -e "${color_red}Elastic IP not associated with the instance ${instance_id}${color_norm}"
+      else
+        echo -e "${color_green}Elastic IP associated with the instance ${instance_id}${color_norm}"
+      fi
+    done
+  fi
 }
 
 function check_remote_folder {
