@@ -1,18 +1,21 @@
 # Bash completion for peg commands
-# Usage: Put "source pegasus-completion.sh" into your .bash_profile (on mac) or .bashrc (on linux)
+# Usage:
+#     - Export PEGASUS_HOME as an environment variable as follows - in your .bash_profile (for mac) and .bashrc (for linux)
+#           export PEGASUS_HOME=[Path to Pegasus] 
+#     - Put "source pegasus-completion.sh" into your .bash_profile (on mac) or .bashrc (on linux)
 # 
 # OR
 #
-# If you are using bash_completion, 
-#    for linux
-#           place this script under /etc/bash_completion.d folder (for linux)
-#    and add the following lines to your .profile
+# If you have bash_completion installed, 
+#    [for linux]
+#    - place this script under /etc/bash_completion.d folder (for linux)
+#    and add the following lines to your .bashrc
 #    if [ -f /etc/bash_completion ]; then 
 #        . /etc/bash_completion 
 #    fi
 #
-#    for mac
-#           place this script under `brew --prefix`/etc/bash_completion.d (for mac)
+#    [for mac]
+#    - place this script under `brew --prefix`/etc/bash_completion.d (for mac)
 #    and add the following lines to your .bash_profile
 #    if [ -f `brew --prefix`/etc/bash_completion ]; then 
 #        . `brew --prefix`/etc/bash_completion 
