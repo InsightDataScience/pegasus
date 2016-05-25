@@ -57,7 +57,7 @@ _peg()
 }
 complete -F _peg peg
 
-# END tmux completion
+# END peg completion
 
 
  	  	 
