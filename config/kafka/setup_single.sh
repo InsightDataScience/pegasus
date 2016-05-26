@@ -9,6 +9,7 @@ DNS=( "$@" )
 
 sudo sed -i 's@broker.id=0@broker.id='"$ID"'@g' /usr/local/kafka/config/server.properties
 sudo sed -i 's@#advertised.host.name=<hostname routable by clients>@advertised.host.name='"$PUBLIC_DNS"'@g' /usr/local/kafka/config/server.properties
+sudo sed -i '1i export JMX_PORT=${JMX_PORT:-9999}' /usr/local/kafka/bin/kafka-server-start.sh
 
 ZK_SERVERS=""
 for dns in ${DNS[@]}

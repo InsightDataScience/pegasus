@@ -264,35 +264,43 @@ function set_launch_config {
 function select_ami {
   case "${AWS_DEFAULT_REGION}" in
     us-west-2)
-      AWS_IMAGE=ami-4342a723
+      AWS_IMAGE=ami-62e01e02
       ;;
 
     us-west-1)
-      AWS_IMAGE=ami-cb97e3ab
+      AWS_IMAGE=ami-071e6567
       ;;
 
     us-east-1)
-      AWS_IMAGE=ami-a20d2bc8
+      AWS_IMAGE=ami-d839ceb5
       ;;
 
     eu-west-1)
-      AWS_IMAGE=ami-1555c266
+      AWS_IMAGE=ami-5a039529
       ;;
 
     eu-central-1)
-      AWS_IMAGE=ami-cc35d9a3
+      AWS_IMAGE=ami-c7a34ca8
       ;;
 
     ap-northeast-1)
-      AWS_IMAGE=ami-3ac1215b
+      AWS_IMAGE=ami-907c9ff1
+      ;;
+
+    ap-northeast-2)
+      AWS_IMAGE=ami-79ba7117
       ;;
 
     ap-southeast-1)
-      AWS_IMAGE=ami-cf6eb8ac
+      AWS_IMAGE=ami-bfde0fdc
       ;;
 
     ap-southeast-2)
-      AWS_IMAGE=ami-c0e3cca3
+      AWS_IMAGE=ami-d6b897b5
+      ;;
+
+    sa-east-1)
+      AWS_IMAGE=ami-ba34bcd6
       ;;
 
     *)
