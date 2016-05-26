@@ -51,6 +51,27 @@ This will allow you to programatically interface with your AWS account. There ar
 * Security group accepting all inbound and outbound traffic (recommend locking down ports depending on technologies)
 * AWS Access Key ID and AWS Secret Access Key ID
 
+### Manual
+
+Clone the Pegasus project to your local computer and install awscli
+```bash
+$ git clone https://github.com/InsightDataScience/pegasus.git
+$ pip install awscli
+```
+
+Next we need to add the following to your `~/.bash_profile`.
+```bash
+export AWS_ACCESS_KEY_ID=XXXX
+export AWS_SECRET_ACCESS_KEY=XXXX
+export AWS_DEFAULT_REGION=XX-XXXX-X
+export REM_USER=ubuntu
+export PATH=<path-to-pegasus>:$PATH
+```
+Source the `.bash_profile` when finished.
+```bash
+$ source ~/.bash_profile
+```
+
 ### Docker
 
 Add the following to your `~/.bash_profile`.
@@ -74,27 +95,7 @@ Everytime the container is started fresh, you will need to enable the ssh-agent 
 root@containerid$ eval `ssh-agent -s`
 ```
 
-### Manual
-
-Clone the Pegasus project to your local computer and install awscli
-```bash
-$ git clone https://github.com/InsightDataScience/pegasus.git
-$ pip install awscli
-```
-
-Next we need to add the following to your `~/.bash_profile`.
-```bash
-export AWS_ACCESS_KEY_ID=XXXX
-export AWS_SECRET_ACCESS_KEY=XXXX
-export AWS_DEFAULT_REGION=XX-XXXX-X
-export REM_USER=ubuntu
-export PATH=<path-to-pegasus>:$PATH
-```
-Source the `.bash_profile` when finished.
-```bash
-$ source ~/.bash_profile
-```
-
+## Verify installation
 Once the Docker container is running or you have set up Pegasus manually, you can verify the current configurations in Pegasus with `peg config`
 ```bash
 $ peg config
