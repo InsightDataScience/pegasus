@@ -1,4 +1,5 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
+![pegasus_logo](Pegasus_small.jpg)
 
 This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
 
@@ -42,6 +43,13 @@ Supported commands:
 
 # Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
+
+#### Prerequisites
+* AWS account
+* VPC with DNS Resolution enabled
+* Subnet in VPC 
+* Security group accepting all inbound and outbound traffic (recommend locking down ports depending on technologies)
+* AWS Access Key ID and AWS Secret Access Key ID
 
 ### Docker
 
@@ -178,6 +186,7 @@ instance_type: string
 tag_name: string
 vol_size: integer
 role: master or worker
+use_eips: true or false
 ```
 * **purchase_type** (*string*) - choose between on_demand or spot instances
 * **subnet_id** (*string*) - the VPC subnet id (e.g. subnet-61c12804)
@@ -189,6 +198,7 @@ role: master or worker
 * **tag_name** (*string*) - tag all your instances with this name. Instances with the same `tag_name` will be associated with the same cluster.  This will be known as the `cluster-name` throughout the rest of the README (e.g. test-cluster)
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage. (e.g. 100)
 * **role** (*string*) - role of the instances (e.g. master)
+* **use_eips** (*boolean*) - use Elastic IPs with instances or not
 
 You can check if the template file is valid with `peg validate <template-file`.
 
@@ -203,14 +213,14 @@ $ peg fetch <cluster-name>
 ```
 Under the `${PEG_ROOT}/tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
-`${PEG_ROOT}/tmp/\<cluster-name\>/public_dns`
+`${PEG_ROOT}/tmp/<cluster-name>/public_dns`
 ```bash
 ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
 ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
-`${PEG_ROOT}/tmp/\<cluster-name\>/hostnames`
+`${PEG_ROOT}/tmp/<cluster-name>/hostnames`
 ```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
@@ -325,7 +335,7 @@ $ examples/spark/spark_hadoop.sh
 ```bash
 #!/bin/bash
 
-PEG_ROOT=$(dirname ${BASH_SOURCE})/..
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
 
 CLUSTER_NAME=test-cluster
 
