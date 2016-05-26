@@ -1,4 +1,5 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
+![pegasus_logo](Pegasus_small.jpg)
 
 This project enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
 
