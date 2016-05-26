@@ -1,4 +1,4 @@
-purchase_type: spot
+purchase_type: on_demand
 subnet_id: subnet-3a78835f
 price: 0.13
 num_instances: 3
@@ -8,3 +8,4 @@ instance_type: m4.large
 tag_name: hadoop-cluster
 vol_size: 100
 role: worker
+use_eips: true

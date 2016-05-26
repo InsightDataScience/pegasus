@@ -8,3 +8,4 @@ instance_type: m4.large
 tag_name: spark-cluster
 vol_size: 100
 role: worker
+use_eips: true

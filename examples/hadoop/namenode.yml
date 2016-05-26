@@ -7,3 +7,4 @@ instance_type: m4.large
 tag_name: hadoop-cluster
 vol_size: 100
 role: master
+use_eips: true
