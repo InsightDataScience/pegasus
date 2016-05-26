@@ -44,6 +44,13 @@ Supported commands:
 # Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
 
+##### Prerequisites
+* AWS account
+* VPC with DNS Resolution enabled
+* Subnet in VPC 
+* Security group accepting all inbound and outbound traffic (recommend locking down ports depending on technologies)
+* AWS Access Key ID and AWS Secret Access Key ID
+
 ### Docker
 
 Add the following to your `~/.bash_profile`.
@@ -179,6 +186,7 @@ instance_type: string
 tag_name: string
 vol_size: integer
 role: master or worker
+use_eips: true or false
 ```
 * **purchase_type** (*string*) - choose between on_demand or spot instances
 * **subnet_id** (*string*) - the VPC subnet id (e.g. subnet-61c12804)
@@ -190,6 +198,7 @@ role: master or worker
 * **tag_name** (*string*) - tag all your instances with this name. Instances with the same `tag_name` will be associated with the same cluster.  This will be known as the `cluster-name` throughout the rest of the README (e.g. test-cluster)
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage. (e.g. 100)
 * **role** (*string*) - role of the instances (e.g. master)
+* **use_eips** (*boolean*) - use Elastic IPs with instances or not
 
 You can check if the template file is valid with `peg validate <template-file`.
 
