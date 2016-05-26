@@ -21,3 +21,4 @@ ENV REM_USER ubuntu
 COPY . /root/pegasus
 
 WORKDIR /root
+
