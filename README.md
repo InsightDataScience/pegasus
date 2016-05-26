@@ -44,7 +44,7 @@ Supported commands:
 # Install Pegasus on your local machine
 This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
 
-##### Prerequisites
+#### Prerequisites
 * AWS account
 * VPC with DNS Resolution enabled
 * Subnet in VPC 
@@ -213,14 +213,14 @@ $ peg fetch <cluster-name>
 ```
 Under the `${PEG_ROOT}/tmp/<cluster-name>` folder you will find the `public_dns` and `hostnames` files. The first record in each file is considered the Master node for any cluster technology that has a Master-Worker setup.
 
-`${PEG_ROOT}/tmp/\<cluster-name\>/public_dns`
+`${PEG_ROOT}/tmp/<cluster-name>/public_dns`
 ```bash
 ec2-52-32-227-84.us-west-2.compute.amazonaws.com  **MASTER**
 ec2-52-10-128-74.us-west-2.compute.amazonaws.com  **WORKER1**
 ec2-52-35-15-97.us-west-2.compute.amazonaws.com   **WORKER2**
 ec2-52-35-11-46.us-west-2.compute.amazonaws.com   **WORKER3**
 ```
-`${PEG_ROOT}/tmp/\<cluster-name\>/hostnames`
+`${PEG_ROOT}/tmp/<cluster-name>/hostnames`
 ```bash
 ip-172-31-38-105 **MASTER**
 ip-172-31-39-193 **WORKER1**
@@ -335,7 +335,7 @@ $ examples/spark/spark_hadoop.sh
 ```bash
 #!/bin/bash
 
-PEG_ROOT=$(dirname ${BASH_SOURCE})/..
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
 
 CLUSTER_NAME=test-cluster
 
