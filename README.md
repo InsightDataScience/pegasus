@@ -65,7 +65,8 @@ export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
 export AWS_DEFAULT_REGION=XX-XXXX-X
 export REM_USER=ubuntu
-export PATH=<path-to-pegasus>:$PATH
+export PEGASUS_HOME=<path-to-pegasus>
+export PATH=$PEGASUS_HOME:$PATH
 ```
 Source the `.bash_profile` when finished.
 ```bash
