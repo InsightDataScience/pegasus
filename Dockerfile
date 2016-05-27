@@ -15,10 +15,13 @@ RUN apt-get update \
 
 RUN pip install awscli
 
-ENV PATH /root/pegasus:$PATH
+ENV PEGASUS_HOME /root/pegasus
+ENV PATH $PEGASUS_HOME:$PATH
 ENV REM_USER ubuntu
 
 COPY . /root/pegasus
+
+RUN echo "source pegasus-completion.sh" >> /root/.bashrc
 
 WORKDIR /root
 
