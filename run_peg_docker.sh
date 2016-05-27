@@ -1,5 +1,7 @@
 #!/bin/bash
 
+tag=0.1.3
+
 nargs="$#"
 
 if [ "${nargs}" -ne 2 ]; then
@@ -31,4 +33,4 @@ docker run -it --rm --name peg \
   -e USER=${USER:=pegasus} \
   -v ~/.ssh/${pem_key_name}.pem:/root/.ssh/${pem_key_name}.pem \
   -v ${instance_template_folder}:/root/${folder_name} \
-  insightdatascience/pegasus:0.1.2
+  insightdatascience/pegasus:${tag}
