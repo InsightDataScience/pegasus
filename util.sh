@@ -427,10 +427,12 @@ function get_dependencies {
     if [ "$KEY" == "$TECHNOLOGY" ]; then
       if [ -z $VALUE ]; then
         DEP=()
+        echo ${DEP}
         break
       else
-        DEP_RAW=${VALUE/,/ }
+        DEP_RAW=${VALUE//,/ }
         DEP=($DEP_RAW)
+        echo ${DEP[@]}
       fi
     fi
   done < ${PEG_ROOT}/dependencies.txt

@@ -196,7 +196,7 @@ case ${command} in
           ;;
 
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
-          get_dependencies
+          get_dependencies >> /dev/null
           install_tech
           peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
@@ -211,6 +211,11 @@ case ${command} in
           ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${CLUSTER_NAME}
           peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
+          ;;
+
+        secor)
+          ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
           ;;
 
         *)
@@ -251,6 +256,20 @@ case ${command} in
           fi
           ;;
 
+        secor)
+          INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+          if [ "$INSTALLED" = "installed" ]; then
+            peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
+            ssh -A ${REM_USER}@${MASTER_DNS} bash -c "'
+              sudo rm -rf /usr/local/${TECHNOLOGY}
+              sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
+            '" &
+          else
+            echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
+            exit 1
+          fi
+          ;;
+
         *)
           echo "Invalid technology to uninstall."
           exit 1
@@ -276,7 +295,7 @@ case ${command} in
       ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
-        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kibana|opscenter|presto|redis|spark|storm|zeppelin|zookeeper)
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kibana|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
           service_action
           ;;
 

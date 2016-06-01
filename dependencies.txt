@@ -12,6 +12,7 @@ opscenter: cassandra
 pig: hadoop
 presto:
 redis:
+secor: zookeeper,kafka,hadoop
 spark: hadoop
 ssh:
 storm: zookeeper
