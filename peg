@@ -264,6 +264,7 @@ case ${command} in
               sudo rm -rf /usr/local/${TECHNOLOGY}
               sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
             '" &
+            echo "${TECHNOLOGY} uninstalled!"
           else
             echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
             exit 1
