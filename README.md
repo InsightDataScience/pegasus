@@ -254,13 +254,15 @@ The `technology` tag can be any of the following:
 * hbase (v1.1.3)
 * hive (v1.2.1)
 * kafka (v0.9.0.1 with scala v2.10)
+* kafka-manager (v1.3.0.8)
 * kibana (v4.3.0)
 * opscenter
 * pig (v0.15.0)
 * presto (v0.86)
 * redis (v3.0.6)
+* secor (v0.21)
 * spark (v1.6.1 with hadoop v2.6+)
-* storm (v0.10.0)
+* storm (v1.0.1)
 * zeppelin
 * zookeeper (v3.4.6)
 
