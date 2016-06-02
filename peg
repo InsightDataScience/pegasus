@@ -254,7 +254,8 @@ case ${command} in
           INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
-            uninstall_tech
+            uninstall_tech "cluster"
+            echo "${TECHNOLOGY} uninstalled!"
           else
             echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
             exit 1
@@ -265,10 +266,7 @@ case ${command} in
           INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
-            ssh -A ${REM_USER}@${MASTER_DNS} bash -c "'
-              sudo rm -rf /usr/local/${TECHNOLOGY}
-              sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
-            '" &
+            uninstall_tech "master"
             echo "${TECHNOLOGY} uninstalled!"
           else
             echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"

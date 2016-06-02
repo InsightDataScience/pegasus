@@ -439,15 +439,29 @@ function get_dependencies {
 }
 
 function uninstall_tech {
-  for dns in ${PUBLIC_DNS[@]}; do
-    echo ${dns}
-    ssh -A ${REM_USER}@${dns} bash -c "'
-      sudo rm -rf /usr/local/${TECHNOLOGY}
-      sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
-    '" &
-  done
+  flag=$1
+  case ${flag} in
+    master)
+      echo ${MASTER_DNS}
+      ssh -A ${REM_USER}@${MASTER_DNS} bash -c "'
+        sudo rm -rf /usr/local/${TECHNOLOGY}
+        sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
+        '" &
+      wait
+      ;;
 
-  wait
+    cluster) 
+      for dns in ${PUBLIC_DNS[@]}; do
+        echo ${dns}
+        ssh -A ${REM_USER}@${dns} bash -c "'
+          sudo rm -rf /usr/local/${TECHNOLOGY}
+          sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
+        '" &
+      done
+      wait
+      ;;
+
+  esac
 }
 
 function service_action {
