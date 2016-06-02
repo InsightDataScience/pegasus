@@ -10,7 +10,7 @@ source ${PEG_ROOT}/util.sh
 source ${PEG_ROOT}/colors.sh
 
 CLUSTER_NAME=$1
-MASTER_PUBLIC_DNS=$(fetch_cluster_master_public_dns ${CLUSTER_NAME})
+MASTER_PUBLIC_DNS=$(fetch_public_dns_of_node_in_cluster ${CLUSTER_NAME} 1)
 TECHNOLOGY="secor"
 DEP_ROOT_FOLDER=/usr/local/
 
