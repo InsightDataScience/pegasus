@@ -267,7 +267,7 @@ case ${command} in
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
             ssh -A ${REM_USER}@${MASTER_DNS} bash -c "'
               sudo rm -rf /usr/local/${TECHNOLOGY}
-              sed -i \"/$(echo ${TECHNOLOGY} | tr a-z A-Z)/d\" ~/.profile
+              sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
             '" &
             echo "${TECHNOLOGY} uninstalled!"
           else
