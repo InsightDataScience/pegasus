@@ -7,6 +7,7 @@ hadoop:
 hbase: zookeeper,hadoop
 hive: hadoop
 kafka: zookeeper
+kafka-manager: zookeeper,kafka
 kibana: elasticsearch
 opscenter: cassandra
 pig: hadoop
