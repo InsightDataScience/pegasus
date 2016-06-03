@@ -7,11 +7,13 @@ hadoop:
 hbase: zookeeper,hadoop
 hive: hadoop
 kafka: zookeeper
+kafka-manager: zookeeper,kafka
 kibana: elasticsearch
 opscenter: cassandra
 pig: hadoop
 presto:
 redis:
+secor: zookeeper,kafka,hadoop
 spark: hadoop
 ssh:
 storm: zookeeper
