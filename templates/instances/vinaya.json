@@ -1,0 +1,15 @@
+{
+    "purchase_type": "on_demand",
+    "region": "us-east-1",
+    "subnet": "subnet-ace448da",
+    "image": "ami-d05e75b8",
+    "price": "0.25",
+    "num_instances": 2,
+    "key_name": "vinaya-ms",
+    "security_group_ids": [
+        "sg-4305793a"
+    ],
+    "instance_type": "r3.large",
+    "tag_name": "vinaya-redis",
+    "vol_size": 100
+}

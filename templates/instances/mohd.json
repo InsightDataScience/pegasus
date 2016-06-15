@@ -1,0 +1,15 @@
+{
+    "purchase_type": "on_demand",
+    "region": "us-east-1",
+    "subnet": "subnet-a0e448d6",
+    "image": "ami-d05e75b8",
+    "price": "0.25",
+    "num_instances": 3,
+    "key_name": "mohd-danish",
+    "security_group_ids": [
+        "sg-4305793a"
+    ],
+    "instance_type": "r3.large",
+    "tag_name": "danish-cluster-druid",
+    "vol_size": 100
+}
