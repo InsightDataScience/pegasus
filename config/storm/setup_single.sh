@@ -26,7 +26,7 @@ done
 cat >> $STORM_HOME/conf/storm.yaml << EOL
 storm.zookeeper.servers:
 $ZK_SERVERS
-numbus.host: "${CLUSTER_DNS[0]}"
+nimbus.host: "${CLUSTER_DNS[0]}"
 storm.local.dir: "$STORM_LOCAL_DIR"
 supervisor.slots.ports:
 $SUPERVISOR_PORTS
