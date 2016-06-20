@@ -12,6 +12,8 @@ mkdir $ELASTICSEARCH_HOME/logs
 mkdir $ELASTICSEARCH_HOME/plugins
 
 sudo $ELASTICSEARCH_HOME/bin/plugin install cloud-aws
+sudo $ELASTICSEARCH_HOME/bin/plugin install license
+sudo $ELASTICSEARCH_HOME/bin/plugin install marvel-agent
 
 sudo sed -i '1i discovery.type: ec2' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 sudo sed -i '1i cluster.name: '"$ES_NAME"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
