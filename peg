@@ -198,7 +198,6 @@ case ${command} in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
           get_dependencies >> /dev/null
           install_tech
-          peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
 
         ssh)
@@ -210,7 +209,6 @@ case ${command} in
           echo "Installing Zeppelin on Master Node in ${CLUSTER_NAME}"
           ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${CLUSTER_NAME}
-          peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
           ;;
 
         secor)
