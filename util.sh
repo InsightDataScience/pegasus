@@ -6,7 +6,7 @@ source ${PEG_ROOT}/colors.sh
 source ${PEG_ROOT}/aws-queries.sh
 
 REM_USER=${REM_USER:=ubuntu}
-vol_type="standard"
+DEFAULT_TEMPLATE_FILE=defaults.yml
 
 # thanks to pkuczynski @ https://gist.github.com/pkuczynski/8665367
 function parse_yaml {
@@ -271,6 +271,7 @@ function describe_cluster {
 
 function set_launch_config {
   local template_file=$1
+  eval $(parse_yaml ${DEFAULT_TEMPLATE_FILE})
   eval $(parse_yaml ${template_file})
 }
 
