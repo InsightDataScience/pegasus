@@ -6,6 +6,7 @@ source ${PEG_ROOT}/colors.sh
 source ${PEG_ROOT}/aws-queries.sh
 
 REM_USER=${REM_USER:=ubuntu}
+vol_type="standard"
 
 # thanks to pkuczynski @ https://gist.github.com/pkuczynski/8665367
 function parse_yaml {
@@ -92,6 +93,10 @@ function validate_template {
     exit 1
   fi
 
+  if [ ! -z ${vol_type} ] && [ ${vol_type} != "standard" ] && [ ${vol_type} != "gp2" ] && [ ${vol_type} != "io2" ]; then
+    echo "vol_type must be standard, gp2, or io2"
+    exit 1
+  fi
 }
 
 function get_hostnames_with_name_and_role {
@@ -344,7 +349,7 @@ function terminate_instances_with_name {
 }
 
 function run_instances {
-  local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"standard\"}}]"
+  local block_device_mappings="[{\"DeviceName\":\"/dev/sda1\",\"Ebs\":{\"DeleteOnTermination\":true,\"VolumeSize\":${vol_size:?"specify root volume size in GB"},\"VolumeType\":\"${vol_type:?"specify root volume type: standard, gp2, or io1"}\"}}]"
 
   local monitoring="{\"Enabled\":false}"
 
