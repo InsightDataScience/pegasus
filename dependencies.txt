@@ -2,7 +2,7 @@ aws:
 cassandra:
 elasticsearch:
 environment:
-flink:
+flink: hadoop
 hadoop:
 hbase: zookeeper,hadoop
 hive: hadoop
