@@ -195,9 +195,24 @@ case ${command} in
           ${PEG_ROOT}/install/environment/install_env_cluster.sh ${CLUSTER_NAME}
           ;;
 
-        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zookeeper)
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|opscenter|pig|presto|redis|spark|storm|zookeeper)
           get_dependencies >> /dev/null
-          install_tech
+          install_tech "cluster"
+          ;;
+
+        kafka-manager)
+          ${PEG_ROOT}/install/kafka-manager/install_kafka_manager_cluster.sh ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/kafka-manager/setup_cluster.sh ${CLUSTER_NAME}
+          ;;
+
+        kibana)
+          get_dependencies >> /dev/null
+          install_tech "single"
+          ;;
+
+        secor)
+          ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
           ;;
 
         ssh)
@@ -209,16 +224,6 @@ case ${command} in
           echo "Installing Zeppelin on Master Node in ${CLUSTER_NAME}"
           ${PEG_ROOT}/install/zeppelin/install_zeppelin_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/zeppelin/setup_cluster.sh ${CLUSTER_NAME}
-          ;;
-
-        secor)
-          ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
-          ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
-          ;;
-
-        kafka-manager)
-          ${PEG_ROOT}/install/kafka-manager/install_kafka_manager_cluster.sh ${CLUSTER_NAME}
-          ${PEG_ROOT}/config/kafka-manager/setup_cluster.sh ${CLUSTER_NAME}
           ;;
 
         *)
@@ -248,23 +253,23 @@ case ${command} in
       ROOT_FOLDER=/usr/local/
 
       case ${TECHNOLOGY} in
-        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|kibana|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|hive|kafka|opscenter|pig|presto|redis|spark|storm|zeppelin|zookeeper)
           INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
             uninstall_tech "cluster"
-            echo "${TECHNOLOGY} uninstalled!"
+            echo -e "${color_green}${TECHNOLOGY} uninstalled!${color_norm}"
           else
             echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"
             exit 1
           fi
           ;;
 
-        secor|kafka-manager)
+        secor|kafka-manager|kibana)
           INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} stop
-            uninstall_tech "master"
+            uninstall_tech "single"
             echo "${TECHNOLOGY} uninstalled!"
           else
             echo "${TECHNOLOGY} is not installed in ${ROOT_FOLDER}"

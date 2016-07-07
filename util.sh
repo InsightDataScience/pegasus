@@ -416,16 +416,17 @@ function check_remote_folder {
 }
 
 function install_tech {
+  MODE=$1
   if [ -z "${DEP}" ]; then
     echo "Installing ${TECHNOLOGY} on ${CLUSTER_NAME}"
-    ${PEG_ROOT}/install/cluster_download ${CLUSTER_NAME} ${TECHNOLOGY}
+    ${PEG_ROOT}/install/cluster_download ${CLUSTER_NAME} ${TECHNOLOGY} ${MODE}
     ${PEG_ROOT}/config/${TECHNOLOGY}/setup_cluster.sh ${CLUSTER_NAME}
   else
     INSTALLED=$(check_remote_folder ${MASTER_DNS} ${DEP_ROOT_FOLDER}${DEP})
     if [ "${INSTALLED}" = "installed" ]; then
       DEP=(${DEP[@]:1})
       echo ${DEP}
-      install_tech
+      install_tech ${MODE}
     else
       echo "${DEP} is not installed in ${DEP_ROOT_FOLDER}"
       echo "Please install ${DEP} and then proceed with ${TECHNOLOGY}"
@@ -457,8 +458,8 @@ function get_dependencies {
 function uninstall_tech {
   flag=$1
   case ${flag} in
-    master)
-      echo ${MASTER_DNS}
+    single)
+      echo -e "${color_yellow}Uninstalling from node ${MASTER_DNS}${color_norm}"
       ssh -A ${REM_USER}@${MASTER_DNS} bash -c "'
         sudo rm -rf /usr/local/${TECHNOLOGY}
         sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
@@ -468,7 +469,7 @@ function uninstall_tech {
 
     cluster) 
       for dns in ${PUBLIC_DNS[@]}; do
-        echo ${dns}
+        echo -e "${color_yellow}Uninstalling from node ${dns}${color_norm}"
         ssh -A ${REM_USER}@${dns} bash -c "'
           sudo rm -rf /usr/local/${TECHNOLOGY}
           sed -i \"/$(echo ${TECHNOLOGY//-/_} | tr a-z A-Z)/d\" ~/.profile
