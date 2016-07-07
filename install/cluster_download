@@ -2,7 +2,7 @@
 
 # check input arguments
 if [ "$#" -ne 3 ]; then
-    echo "Please specify cluster name, technology and mode (distributed or centralized)!" && exit 1
+    echo "Please specify cluster name, technology and mode (cluster or single)!" && exit 1
 fi
 
 PEG_ROOT=$(dirname ${BASH_SOURCE})/..
