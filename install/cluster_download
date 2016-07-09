@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # check input arguments
-if [ "$#" -ne 2 ]; then
-    echo "Please specify cluster name, and technology!" && exit 1
+if [ "$#" -ne 3 ]; then
+    echo "Please specify cluster name, technology and mode (cluster or single)!" && exit 1
 fi
 
 PEG_ROOT=$(dirname ${BASH_SOURCE})/..
@@ -12,13 +12,23 @@ source ${PEG_ROOT}/util.sh
 # get input arguments [aws region, pem-key location]
 CLUSTER_NAME=$1
 TECHNOLOGY=$2
+MODE=$3
 
-PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
+case ${MODE} in 
+  single)
+    PUBLIC_DNS=$(fetch_public_dns_of_node_in_cluster ${CLUSTER_NAME} 1)
+    ;;
+
+  cluster)
+    PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
+    ;;
+esac
 
 script="${PEG_ROOT}/install/download_tech"
 args="${TECHNOLOGY}"
 
 for dns in ${PUBLIC_DNS}; do
+  echo -e "${color_yellow}Checking node ${dns}${color_norm}"
   run_script_on_node ${dns} ${script} ${args} &
 done
 

@@ -14,7 +14,7 @@ PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
 cmd='pkill -f elasticsearch'
 for dns in ${PUBLIC_DNS}; do
-  echo $dns
+  echo -e "${color_yellow}Stopping Elasticsearch on node $dns${color_norm}"
   run_cmd_on_node ${dns} ${cmd}
 done
 
