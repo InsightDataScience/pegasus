@@ -1,1 +1,4 @@
 vol_type: standard
+purchase_type: spot
+price: 0.13
+use_eips: true
