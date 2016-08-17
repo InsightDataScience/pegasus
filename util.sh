@@ -271,7 +271,7 @@ function describe_cluster {
 
 function set_launch_config {
   local template_file=$1
-  eval $(parse_yaml ${DEFAULT_TEMPLATE_FILE})
+  eval $(parse_yaml ${PEG_ROOT}/${DEFAULT_TEMPLATE_FILE})
   eval $(parse_yaml ${template_file})
 }
 
