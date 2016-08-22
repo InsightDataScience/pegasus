@@ -281,6 +281,14 @@ case ${command} in
           fi
           ;;
 
+        memsql)
+          INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+          if [ "$INSTALLED" = "installed" ]; then
+            peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
+            peg sshcmd ${CLUSTER_NAME} 1 '. ~/.profile; yes DELETE | sudo memsql-ops memsql-delete --all; yes DELETE | sudo memsql-ops agent-uninstall --all; rmdir /usr/local/memsql; rmdir /usr/local/memsql-ops-data'
+          fi
+          ;;
+
         *)
           echo "Invalid technology to uninstall."
           exit 1
@@ -306,7 +314,7 @@ case ${command} in
       ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
-        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kafka-manager|kibana|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kafka-manager|kibana|memsql|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
           service_action
           ;;
 
