@@ -210,6 +210,10 @@ case ${command} in
           install_tech "single"
           ;;
 
+        memsql)
+          ${PEG_ROOT}/install/memsql/install_memsql_cluster.sh ${CLUSTER_NAME}
+          ;;
+
         secor)
           ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
