@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Copyright 2015 Insight Data Science
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 set -o errexit
 
 PEG_ROOT=$(dirname "${BASH_SOURCE}")
@@ -58,25 +72,25 @@ case ${command} in
     if [ -z ${AWS_ACCESS_KEY_ID} ]; then
       echo -e "${color_red}[MISSING] AWS_ACCESS_KEY_ID${color_norm}"
     else
-      echo "AWS access key: ${AWS_ACCESS_KEY_ID}"
+      echo "access key: ${AWS_ACCESS_KEY_ID}"
     fi
 
     if [ -z ${AWS_SECRET_ACCESS_KEY} ]; then
       echo -e "${color_red}[MISSING] AWS_SECRET_ACCESS_KEY${color_norm}"
     else
-      echo "AWS secret key: ${AWS_SECRET_ACCESS_KEY}"
+      echo "secret key: ${AWS_SECRET_ACCESS_KEY}"
     fi
 
     if [ -z ${AWS_DEFAULT_REGION} ]; then
       echo -e "${color_red}MISSING AWS_DEFAULT_REGION${color_norm}"
     else
-      echo "AWS region: ${AWS_DEFAULT_REGION}"
+      echo "    region: ${AWS_DEFAULT_REGION}"
     fi
 
     if [ -z ${REM_USER} ]; then
       echo -e "${color_red}MISSING REM_USER${color_norm}"
     else
-      echo "AWS SSH User: ${REM_USER}"
+      echo "  SSH User: ${REM_USER}"
     fi
     ;;
 
@@ -210,6 +224,10 @@ case ${command} in
           install_tech "single"
           ;;
 
+        memsql)
+          ${PEG_ROOT}/install/memsql/install_memsql_cluster.sh ${CLUSTER_NAME}
+          ;;
+
         secor)
           ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
@@ -277,6 +295,22 @@ case ${command} in
           fi
           ;;
 
+        memsql)
+          INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+          if [ "$INSTALLED" = "installed" ]; then
+            peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
+            peg sshcmd ${CLUSTER_NAME} 1 "
+              . ~/.profile;
+              yes DELETE | sudo memsql-ops memsql-delete --all;
+              yes DELETE | sudo memsql-ops agent-uninstall --all;
+              sudo rmdir /usr/local/memsql;
+              sudo rmdir /usr/local/memsql-ops-data;
+              sudo rmdir /var/lib/memsql-ops;
+              sudo rm -r /home/ubuntu/memsql-ops*;
+            "
+          fi
+          ;;
+
         *)
           echo "Invalid technology to uninstall."
           exit 1
@@ -302,7 +336,7 @@ case ${command} in
       ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
-        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kafka-manager|kibana|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
+        alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kafka-manager|kibana|memsql|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
           service_action
           ;;
 
