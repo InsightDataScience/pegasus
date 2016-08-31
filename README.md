@@ -1,6 +1,8 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
 ![pegasus_logo](Pegasus_small.jpg)
+
 [![Build Status](http://52.41.136.144:8080/buildStatus/icon?job=pegasus)](http://jenkins.insightdataprod.com:8080/job/pegasus/)
+
 Pegasus is released under Apache License v2.0 and enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
 
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
