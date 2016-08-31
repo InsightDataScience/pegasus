@@ -15,6 +15,10 @@ RUN apt-get update \
 
 RUN pip install awscli
 
+RUN git clone https://github.com/sstephenson/bats.git /root/bats
+
+RUN /root/bats/install.sh /usr/local
+
 ENV PEGASUS_HOME /root/pegasus
 ENV PATH $PEGASUS_HOME:$PATH
 ENV REM_USER ubuntu
