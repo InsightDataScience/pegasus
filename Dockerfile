@@ -11,7 +11,8 @@ RUN apt-get update \
     && apt-get install -y openssh-client \
     && apt-get install -y python \
     && apt-get install -y python-dev \
-    && apt-get install -y python-pip
+    && apt-get install -y python-pip \
+    $$ apt-get install -y git
 
 RUN pip install awscli
 
