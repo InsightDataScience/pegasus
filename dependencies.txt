@@ -13,6 +13,7 @@ opscenter: cassandra
 pig: hadoop
 presto:
 redis:
+riak:
 secor: zookeeper,kafka,hadoop
 spark: hadoop
 ssh:
