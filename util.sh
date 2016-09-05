@@ -535,8 +535,9 @@ function run_cmd_on_cluster {
   cluster_public_dns=($(fetch_cluster_public_dns ${cluster_name}))
   for dns in ${cluster_public_dns[@]}; do
     echo -e "${color_yellow}running ${cmd} on ${dns}${color_norm}"
-    run_cmd_on_node ${dns} ${cmd}
+    run_cmd_on_node ${dns} ${cmd} &
   done
+  wait
 }
 
 function launch_more_workers_in {

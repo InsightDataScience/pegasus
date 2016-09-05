@@ -58,7 +58,8 @@ _peg()
       uninstall
       service
       ssh
-      sshcmd
+      sshcmd-node
+      sshcmd-cluster
       scp
       retag
       start
