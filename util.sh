@@ -529,6 +529,17 @@ function run_cmd_on_node {
   ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@${public_dns} ${cmd}
 }
 
+function run_cmd_on_cluster {
+  local cluster_name=$1; shift
+  local cmd="$@"
+  cluster_public_dns=($(fetch_cluster_public_dns ${cluster_name}))
+  for dns in ${cluster_public_dns[@]}; do
+    echo -e "${color_yellow}running ${cmd} on ${dns}${color_norm}"
+    run_cmd_on_node ${dns} ${cmd} &
+  done
+  wait
+}
+
 function launch_more_workers_in {
   local cluster_name=$1
   local num=$2
