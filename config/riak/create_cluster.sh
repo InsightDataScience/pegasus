@@ -18,7 +18,6 @@ node=$1
 
 node=${node//-/.}
 node=${node:3}
-echo ${node}
 HOSTNAME=`hostname`
 HOSTNAME=${HOSTNAME//-/.}
 HOSTNAME=${HOSTNAME:3}
@@ -26,4 +25,4 @@ echo "adding $node to $HOSTNAME"
 sudo riak-admin cluster join riak@${node}
 sudo riak-admin cluster plan
 sudo riak-admin cluster commit
-# sudo riak-admin status | grep ring_members
+sudo riak-admin status | grep ring_members

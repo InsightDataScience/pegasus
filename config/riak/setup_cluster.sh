@@ -15,6 +15,7 @@
 # limitations under the License.
 
 # check input arguments
+
 if [ "$#" -ne 1 ]; then
     echo "Please specify cluster name!" && exit 1
 fi
@@ -44,11 +45,16 @@ PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 PUBLIC_DNS=($PUBLIC_DNS)
 PUBLIC_DNS=(${PUBLIC_DNS[@]:1})
 
+echo -e "Configuring nodes to form a cluster"
+
+for i in {0..20}; do echo "."; sleep 0.5; done
+
 for dns in ${PUBLIC_DNS[@]}; do
-  echo ${dns}
-	run_script_on_node ${dns} ${single_script} ${args} &
+  run_script_on_node ${dns} ${single_script} ${args} &
   wait
 done
+
+for i in {0..10}; do echo "."; sleep 0.5; done
 
 PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 stop_cmd="sudo riak stop"
