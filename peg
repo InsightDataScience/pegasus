@@ -380,7 +380,7 @@ case ${command} in
       esac
     else
       echo "invalid number of arguments"
-      echo "usage: peg terminate <cluster-name>"
+      echo "usage: peg down <cluster-name>"
     fi
     ;;
 
