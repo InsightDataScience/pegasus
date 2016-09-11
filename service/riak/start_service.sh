@@ -14,11 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ -f /usr/sbin/riak ]; then
-  echo "Riak installed."
-else
-  echo "Riak missing."
-  echo "installing Riak ..."
-  curl -s https://packagecloud.io/install/repositories/basho/riak/script.deb.sh | sudo bash
-	sudo apt-get install riak=2.0.7-1
+PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
+source ${PEG_ROOT}/util.sh
+
+# check input arguments
+if [ "$#" -ne 1 ]; then
+    echo "Please specify cluster name!" && exit 1
 fi
+
+CLUSTER_NAME=$1
+
+PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
+
+cmd='sudo riak start'
+
+for dns in ${PUBLIC_DNS}; do
+  run_cmd_on_node ${dns} ${cmd} &
+done
+
+wait
+
+echo -e "${color_green}Riak Started!${color_norm}"
