@@ -22,4 +22,6 @@ sudo sed -i 's@listener.protobuf.internal = 127.0.0.1:8087@listener.protobuf.int
 sudo sed -i 's@listener.http.internal = 127.0.0.1:8098@listener.http.internal = '"$HOSTNAME"':8098@g' /etc/riak/riak.conf
 sudo sed -i 's@nodename = riak\@127.0.0.1@nodename = riak\@'"$HOSTNAME"'@g' /etc/riak/riak.conf
 
-sudo riak start
+echo "ulimit -n 200000" | sudo tee -a /etc/default/riak
+
+sudo /etc/init.d/riak start
