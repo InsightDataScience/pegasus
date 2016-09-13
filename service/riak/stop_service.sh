@@ -26,7 +26,7 @@ CLUSTER_NAME=$1
 
 PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 
-cmd='sudo riak stop'
+cmd='sudo /etc/init.d/riak stop'
 
 for dns in ${PUBLIC_DNS}; do
   run_cmd_on_node ${dns} ${cmd} &

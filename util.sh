@@ -517,7 +517,7 @@ function service_action {
     file)
       INSTALLED=$(check_remote_file ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
       ;;
-    esac
+  esac
     
   if [ "${INSTALLED}" = "installed" ]; then
     case ${ACTION} in

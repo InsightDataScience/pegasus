@@ -317,7 +317,7 @@ case ${command} in
           ;;
 
         riak)
-          INSTALLED=$(check_remote_folder ${MASTER_DNS} "/usr/sbin/riak")
+          INSTALLED=$(check_remote_file ${MASTER_DNS} "/usr/sbin/riak")
           if [ "$INSTALLED" = "installed" ]; then
             for dns in ${PUBLIC_DNS[@]}; do
               run_cmd_on_node ${dns} sudo dpkg --purge riak

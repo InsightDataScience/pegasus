@@ -51,7 +51,8 @@ function check_dependencies_and_install_riak {
 }
 
 # Check if dependencies are installed
-# If yes, then install secor  
+# If yes, then install riak  
+
 DEP=($(get_dependencies))
 check_dependencies_and_install_riak
 

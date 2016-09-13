@@ -37,9 +37,13 @@ done
 
 wait
 
+# wait for riak to start on individual nodes
+for i in {0..20}; do echo "."; sleep 0.5; done
+
 hostnames=($(fetch_cluster_hostnames ${CLUSTER_NAME}))
 args=(${hostnames[0]})
 
+# script to form a riak cluster from individual riak nodes 
 single_script="${PEG_ROOT}/config/riak/create_cluster.sh"
 PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
 PUBLIC_DNS=($PUBLIC_DNS)
@@ -47,20 +51,22 @@ PUBLIC_DNS=(${PUBLIC_DNS[@]:1})
 
 echo -e "Configuring nodes to form a cluster"
 
-for i in {0..20}; do echo "."; sleep 0.5; done
-
 for dns in ${PUBLIC_DNS[@]}; do
   run_script_on_node ${dns} ${single_script} ${args} &
   wait
 done
 
+# wait for riak cluster formation to complete
 for i in {0..10}; do echo "."; sleep 0.5; done
 
+# stop riak after setup
 PUBLIC_DNS=$(fetch_cluster_public_dns ${CLUSTER_NAME})
-stop_cmd="sudo riak stop"
+stop_cmd="sudo /etc/init.d/riak stop"
 for dns in ${PUBLIC_DNS}; do
   run_cmd_on_node ${dns} ${stop_cmd} &
 done
+
+wait
 
 echo "Riak configuration complete!"
 

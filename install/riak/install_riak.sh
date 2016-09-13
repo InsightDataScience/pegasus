@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# check if Riak is installed
+# if not, install it from the package manager
+
 if [ -f /usr/sbin/riak ]; then
   echo "Riak installed."
 else
