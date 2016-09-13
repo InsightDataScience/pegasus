@@ -46,7 +46,8 @@ while getopts ":h" opt; do
       echo "    - uninstall"
       echo "    - service"
       echo "    - ssh"
-      echo "    - sshcmd"
+      echo "    - sshcmd-node"
+      echo "    - sshcmd-cluster"
       echo "    - scp"
       echo "    - retag"
       echo "    - start"
@@ -304,7 +305,7 @@ case ${command} in
           INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
           if [ "$INSTALLED" = "installed" ]; then
             peg service ${CLUSTER_NAME} ${TECHNOLOGY} start
-            peg sshcmd ${CLUSTER_NAME} 1 "
+            peg sshcmd-node ${CLUSTER_NAME} 1 "
               . ~/.profile;
               yes DELETE | sudo memsql-ops memsql-delete --all;
               yes DELETE | sudo memsql-ops agent-uninstall --all;
@@ -401,7 +402,7 @@ case ${command} in
       esac
     else
       echo "invalid number of arguments"
-      echo "usage: peg terminate <cluster-name>"
+      echo "usage: peg down <cluster-name>"
     fi
     ;;
 
@@ -420,7 +421,7 @@ case ${command} in
     fi
     ;;
 
-  sshcmd)
+  sshcmd-node)
     if [[ "${nfargs}" -ge "3" ]]; then
       PARAMETER_ARR=(${parameters})
       CLUSTER_NAME=${PARAMETER_ARR[0]}
@@ -433,7 +434,22 @@ case ${command} in
       run_cmd_on_node ${PUBLIC_DNS} ${CMD}
     else
       echo "invalid number of arguments"
-      echo "usage: peg sshcmd <cluster-name> <node-number> \"<cmd>\""
+      echo "usage: peg sshcmd-node <cluster-name> <node-number> \"<cmd>\""
+    fi
+    ;;
+
+  sshcmd-cluster)
+    if [[ "${nfargs}" -ge "2" ]]; then
+      PARAMETER_ARR=(${parameters})
+      CLUSTER_NAME=${PARAMETER_ARR[0]}
+      CMD=${PARAMETER_ARR[@]:1}
+
+      check_cluster_exists ${CLUSTER_NAME}
+
+      run_cmd_on_cluster ${CLUSTER_NAME} ${CMD}
+    else
+      echo "invalid number of arguments"
+      echo "usage: peg sshcmd-cluster <cluster-name> \"<cmd>\""
     fi
     ;;
 
