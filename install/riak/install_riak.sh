@@ -23,5 +23,5 @@ else
   echo "Riak missing."
   echo "installing Riak ..."
   curl -s https://packagecloud.io/install/repositories/basho/riak/script.deb.sh | sudo bash
-	sudo apt-get install riak=2.0.7-1
+  sudo apt-get install riak=2.0.7-1
 fi
