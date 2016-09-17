@@ -22,6 +22,8 @@ AWS_SECRET_ACCESS_KEY=$3
 
 sed -i 's@${JAVA_HOME}@/usr@g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
+sed -i '$a # Update Hadoop classpath to include share folder \nif [ \"$HADOOP_CLASSPATH\" ]; then \n export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_HOME/share/hadoop/tools/lib/* \nelse \n export HADOOP_CLASSPATH=$HADOOP_HOME/share/hadoop/tools/lib/* \nfi' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
 # configure core-site.xml
 sed -i '20i <property>\n  <name>fs.defaultFS</name>\n  <value>hdfs://'"$MASTER_NAME"':9000</value>\n</property>' $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i '24i <property>\n  <name>fs.s3.impl</name>\n  <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>\n</property>' $HADOOP_HOME/etc/hadoop/core-site.xml
@@ -39,4 +41,4 @@ sed -i '34i <property>\n  <name>yarn.resourcemanager.address</name>\n  <value>'"
 cp $HADOOP_HOME/etc/hadoop/mapred-site.xml.template $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i '20i <property>\n  <name>mapreduce.jobtracker.address</name>\n  <value>'"$MASTER_NAME"':54311</value>\n</property>' $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i '24i <property>\n  <name>mapreduce.framework.name</name>\n  <value>yarn</value>\n</property>' $HADOOP_HOME/etc/hadoop/mapred-site.xml
-
+sed -i '28i <property>\n <name>mapreduce.application.classpath</name>\n <value>'"$HADOOP_HOME"'/share/hadoop/mapreduce/*,'"$HADOOP_HOME"'/share/hadoop/mapreduce/lib/*,'"$HADOOP_HOME"'/share/hadoop/common/*,'"$HADOOP_HOME"'/share/hadoop/common/lib/*,'"$HADOOP_HOME"'/share/hadoop/tools/lib/*</value> \n </property>' $HADOOP_HOME/etc/hadoop/mapred-site.xml
