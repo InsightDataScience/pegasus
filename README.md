@@ -18,7 +18,8 @@ Supported commands:
 * `peg service <cluster-name> <technology> <start|stop>` - start and stop a service on the cluster
 * `peg uninstall <cluster-name> <technology>` - uninstall a specific technology from the cluster
 * `peg ssh <cluster-name> <node-number>` - SSH into a specific node in your AWS cluster
-* `peg sshcmd <cluster-name> <node-number> "<cmd>"` - run a bash command on a specific node in your AWS cluster
+* `peg sshcmd-node <cluster-name> <node-number> "<cmd>"` - run a bash command on a specific node in your AWS cluster
+* `peg sshcmd-cluster <cluster-name> "<cmd>"` - run a bash command on every node in your AWS cluster
 * `peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>` - copy files or folders to and from a specific node in your AWS cluster
 * `peg down <cluster-name>` - terminate a cluster
 * `peg retag <cluster-name> <new-cluster-name>` - retag an existing cluster with a different name
