@@ -40,7 +40,6 @@ sed -i '9i export DEFAULT_HADOOP_HOME='${HADOOP_HOME}'' ${SPARK_HOME}/conf/spark
 # configure spark-defaults.conf
 hadoop_aws_jar=$(find ${spark_lib} -type f | grep hadoop-aws)
 aws_java_sdk_jar=$(find ${spark_lib} -type f | grep aws-java-sdk)
-hadoop_conf_dir=$(find ${HADOOP_HOME} -type f | grep -v templates | grep hdfs-site.xml | sed "s/hdfs-site.xml//")
 sed -i '21i spark.hadoop.fs.s3a.impl org.apache.hadoop.fs.s3a.S3AFileSystem' ${SPARK_HOME}/conf/spark-defaults.conf
-sed -i '22i spark.executor.extraClassPath '"${hadoop_conf_dir}"':'"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
-sed -i '23i spark.driver.extraClassPath '"${hadoop_conf_dir}"':'"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
+sed -i '22i spark.executor.extraClassPath '"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
+sed -i '23i spark.driver.extraClassPath '"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
