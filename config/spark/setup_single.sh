@@ -16,8 +16,14 @@
 
 . ~/.profile
 
-cp ${HADOOP_HOME}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${SPARK_HOME}/lib
-cp ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-aws-*.jar ${SPARK_HOME}/lib
+spark_lib=${SPARK_HOME}/lib/
+
+if [ ! -d ${spark_lib} ]; then
+	mkdir ${spark_lib}
+fi
+
+cp ${HADOOP_HOME}/share/hadoop/tools/lib/aws-java-sdk-*.jar ${spark_lib}
+cp ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-aws-*.jar ${spark_lib}
 
 cp ${SPARK_HOME}/conf/spark-env.sh.template ${SPARK_HOME}/conf/spark-env.sh
 cp ${SPARK_HOME}/conf/spark-defaults.conf.template ${SPARK_HOME}/conf/spark-defaults.conf
@@ -32,8 +38,8 @@ sed -i '9i export DEFAULT_HADOOP_HOME='${HADOOP_HOME}'' ${SPARK_HOME}/conf/spark
 
 
 # configure spark-defaults.conf
-hadoop_aws_jar=$(find /usr/local/spark/lib -type f | grep hadoop-aws)
-aws_java_sdk_jar=$(find /usr/local/spark/lib -type f | grep aws-java-sdk)
+hadoop_aws_jar=$(find ${spark_lib} -type f | grep hadoop-aws)
+aws_java_sdk_jar=$(find ${spark_lib} -type f | grep aws-java-sdk)
 sed -i '21i spark.hadoop.fs.s3a.impl org.apache.hadoop.fs.s3a.S3AFileSystem' ${SPARK_HOME}/conf/spark-defaults.conf
 sed -i '22i spark.executor.extraClassPath '"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
 sed -i '23i spark.driver.extraClassPath '"${aws_java_sdk_jar}"':'"${hadoop_aws_jar}"'' ${SPARK_HOME}/conf/spark-defaults.conf
