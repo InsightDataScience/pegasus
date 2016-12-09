@@ -430,6 +430,18 @@ function check_remote_folder {
     '"
 }
 
+function check_remote_file {
+  local remote_dns=$1
+  local dependency_path=$2
+  ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@${remote_dns} bash -c "'
+    if [ -f ${dependency_path} ]; then
+      echo "installed"
+    else
+      echo "missing"
+    fi
+    '"
+}
+
 function install_tech {
   MODE=$1
   if [ -z "${DEP}" ]; then
@@ -497,7 +509,16 @@ function uninstall_tech {
 }
 
 function service_action {
-  INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+  case ${INSTALL_PATH} in
+    folder)
+      INSTALLED=$(check_remote_folder ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+      ;;
+
+    file)
+      INSTALLED=$(check_remote_file ${MASTER_DNS} ${ROOT_FOLDER}${TECHNOLOGY})
+      ;;
+  esac
+    
   if [ "${INSTALLED}" = "installed" ]; then
     case ${ACTION} in
       start)

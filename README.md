@@ -274,6 +274,7 @@ The `technology` tag can be any of the following:
 * pig (v0.15.0)
 * presto (v0.147)
 * redis (v3.0.6)
+* riak (v2.7.0)
 * secor (v0.21)
 * spark (v1.6.1 with hadoop v2.6+)
 * storm (v1.0.1)

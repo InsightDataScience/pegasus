@@ -229,6 +229,11 @@ case ${command} in
           ${PEG_ROOT}/install/memsql/install_memsql_cluster.sh ${CLUSTER_NAME}
           ;;
 
+        riak)
+          ${PEG_ROOT}/install/riak/install_riak_cluster.sh ${CLUSTER_NAME}
+          ${PEG_ROOT}/config/riak/setup_cluster.sh ${CLUSTER_NAME}
+          ;;
+
         secor)
           ${PEG_ROOT}/install/secor/install_secor_cluster.sh ${CLUSTER_NAME}
           ${PEG_ROOT}/config/secor/setup_cluster.sh ${CLUSTER_NAME}
@@ -312,6 +317,16 @@ case ${command} in
           fi
           ;;
 
+        riak)
+          INSTALLED=$(check_remote_file ${MASTER_DNS} "/usr/sbin/riak")
+          if [ "$INSTALLED" = "installed" ]; then
+            for dns in ${PUBLIC_DNS[@]}; do
+              run_cmd_on_node ${dns} sudo dpkg --purge riak
+              run_cmd_on_node ${dns} sudo rm -rf /var/lib/riak
+            done
+          fi
+          ;;
+
         *)
           echo "Invalid technology to uninstall."
           exit 1
@@ -334,10 +349,17 @@ case ${command} in
       check_cluster_exists ${CLUSTER_NAME}
 
       MASTER_DNS=$(fetch_public_dns_of_node_in_cluster ${CLUSTER_NAME} 1)
-      ROOT_FOLDER=/usr/local/
 
       case $TECHNOLOGY in
         alluxio|cassandra|elasticsearch|flink|hadoop|hbase|kafka|kafka-manager|kibana|memsql|opscenter|presto|redis|secor|spark|storm|zeppelin|zookeeper)
+          ROOT_FOLDER=/usr/local/
+          INSTALL_PATH="folder"
+          service_action
+          ;;
+
+        riak)
+          ROOT_FOLDER=/usr/sbin/
+          INSTALL_PATH="file"
           service_action
           ;;
 
