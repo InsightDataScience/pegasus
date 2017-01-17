@@ -76,7 +76,7 @@ Source the `.bash_profile` when finished.
 $ source ~/.bash_profile
 ```
 
-### Docker
+### Docker (If Manual doesn't work)
 
 Add the following to your `~/.bash_profile`.
 ```bash
@@ -103,10 +103,10 @@ root@containerid$ eval `ssh-agent -s`
 Once the Docker container is running or you have set up Pegasus manually, you can verify the current configurations in Pegasus with `peg config`
 ```bash
 $ peg config
-AWS access key: ASDFQWER1234ZXCV
-AWS secret key: POIUYTERRLKJHGFSD123498735284hdb+H
-AWS region:     us-west-2
-AWS SSH User:   ubuntu
+access key: ASDFQWER1234ZXCV
+secret key: POIUYTERRLKJHGFSD123498735284hdb+H
+    region: us-west-2
+  SSH User: ubuntu
 ```
 
 You can test your AWS-CLI access by querying for the available regions for your AWS account:
@@ -133,9 +133,13 @@ The following queries can help you quickly determine which subnet-id and securit
 Let's say we want to deploy our instances in the VPC named `my-vpc`. We can view all VPCs in my region with `peg aws vpcs`
 ```bash
 $ peg aws vpcs
-VPCID		    NAME
-vpc-add2e6c3	default
-vpc-c2a496a1	my-vpc
+--------------------------------------
+|            DescribeVpcs            |
++---------------+--------------------+
+|    VPC_ID     |     VPC_NAME       |
++---------------+--------------------+
+|  vpc-add2e6c3	|  default           |
+|  vpc-c2a496a1	|  my-vpc            |
 ```
 We can see that `vpc-c2a496a1` is the VPC id we would need my subnet-id and security-group-id associated with.
 
@@ -143,34 +147,50 @@ We can see that `vpc-c2a496a1` is the VPC id we would need my subnet-id and secu
 To choose the specific subnet-id we will use in my deployment, we can view all Subnets in our region with `peg aws subnets`
 ```bash
 $ peg aws subnets
-VPCID		    AZ		    IPS	    SUBNETID	    NAME
-vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
-vpc-add2e6c3	us-west-2b	4089	subnet-9fe6e3df	aws-us-west-2b
+------------------------------------------------------------------------------------------
+|                                     DescribeSubnets                                    |
++------------+-------+------------------+-------------------------------+----------------+
+|     AZ     |  IPS  |    SUBNET_ID     |          SUBNET_NAME          |    VPC_ID      |
++------------+-------+------------------+-------------------------------+----------------+
+|vpc-c2a496a1|  251	 |  subnet-6ac0bd26 |  private-subnet-west-2c       |  us-west-2c	 |	    	
+|vpc-add2e6c3|  4089 |  subnet-9fe6e3df |  aws-us-west-2b               |  us-west-2b	 |
 ```
 We see here that the first subnet is associated with the same VPC id we specified previously, so `subnet-6ac0bd26` is the subnet-id I will need to use in my instance deployment later on.
 
 We can also filter the Subnets down to a specific VPC name with `peg aws subnets <vpc-name>` if we have too many subnets to search through
 ```bash
 $ peg aws subnets my-vpc
-VPCID		    AZ		    IPS	    SUBNETID	    NAME
-vpc-c2a496a1	us-west-2c	251	    subnet-6ac0bd26	private-subnet-west-2c
+-------------------------------------------------------------------------------------
+|                              DescribeSubnets                                      |
++------------+-------+-------------------+-------------------------+----------------+
+|     AZ     |  IPS  |     SUBNET_ID     |   SUBNET_NAME           |    VPC_ID      |
++------------+-------+-------------------+-------------------------+----------------+
+|  us-west-2c|  251  |  subnet-6ac0bd26  |  private-subnet-west-2c |  vpc-c2a496a1	|
 ```
 
 ## Security groups
 The last network related information we would need for our instance deployment is the security-group-id. We can view all Security Groups in our region with `peg aws security-groups`
 ```bash
 $ peg aws security-groups
-VPCID		    SGID		GROUP NAME
-vpc-add2e6c3	sg-7cb78418	default
-vpc-c2a496a1	sg-5deed039	default
+--------------------------------------------
+|          DescribeSecurityGroups          |
++-------------+-----------+----------------+
+|    SG_ID    |  SG_NAME  |    VPC_ID      |
++-------------+-----------+----------------+
+|  sg-7cb78418|  default  |  vpc-add2e6c3  |
+|  sg-5deed039|  default  |  vpc-c2a496a1  |
 ```
 We would choose the `sg-5deed039` in this example, since it is also associated with the VPC that we wish to deploy in. 
 
 We can also filter Security Groups down to a specific VPC name `peg aws security-groups <vpc-name>` if there are too many security groups to search through
 ```bash
 $ peg aws security-groups my-vpc
-VPCID		    SGID		GROUP NAME
-vpc-c2a496a1	sg-5deed039	default
+--------------------------------------------
+|          DescribeSecurityGroups          |
++-------------+-----------+----------------+
+|    SG_ID    |  SG_NAME  |    VPC_ID      |
++-------------+-----------+----------------+
+|  sg-5deed039|  default  |  vpc-c2a496a1  |
 ```
 
 # Spin up your cluster on AWS
@@ -260,26 +280,26 @@ $ peg install <cluster-name> aws
 $ peg install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
-* alluxio (v1.0.0)
-* cassandra (v3.6)
-* elasticsearch (v2.3.3)
-* flink (v1.0.0 with hadoop v2.7 and scala v2.10)
+* alluxio (v1.3.0)
+* cassandra (v3.9)
+* elasticsearch (v5.1.2)
+* flink (v1.1.4 with hadoop v2.7 and scala v2.10)
 * hadoop (v2.7.2)
-* hbase (v1.2.1)
-* hive (v1.2.1)
-* kafka (v0.9.0.1 with scala v2.10)
+* hbase (v1.2.4)
+* hive (v2.1.1)
+* kafka (v0.10.1.1 with scala v2.10)
 * kafka-manager (v1.3.0.8)
-* kibana (v4.5.1)
+* kibana (v5.1.1)
 * opscenter
 * pig (v0.15.0)
-* presto (v0.147)
-* redis (v3.0.6)
+* presto (v0.162)
+* redis (v3.2.6)
 * riak (v2.7.0)
 * secor (v0.21)
-* spark (v1.6.1 with hadoop v2.6+)
-* storm (v1.0.1)
+* spark (v2.1.0 with hadoop v2.7+)
+* storm (v1.0.2)
 * zeppelin
-* zookeeper (v3.4.6)
+* zookeeper (v3.4.9)
 
 All environment variables relating to technology folder paths are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
