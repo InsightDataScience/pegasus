@@ -39,4 +39,4 @@ done
 
 
 echo "Storm Started!"
-
+echo -e "${color_green}Storm Cluster WebUI${color_norm} is running at ${color_yellow}http://${MASTER_DNS}:8080${color_norm}"

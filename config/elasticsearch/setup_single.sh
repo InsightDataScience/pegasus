@@ -27,9 +27,9 @@ HOSTNAMES=( "$@" )
 mkdir $ELASTICSEARCH_HOME/logs
 mkdir $ELASTICSEARCH_HOME/plugins
 
-sudo $ELASTICSEARCH_HOME/bin/plugin install cloud-aws
-sudo $ELASTICSEARCH_HOME/bin/plugin install license
-sudo $ELASTICSEARCH_HOME/bin/plugin install marvel-agent
+sudo $ELASTICSEARCH_HOME/bin/elasticsearch-plugin install discovery-ec2
+sudo $ELASTICSEARCH_HOME/bin/elasticsearch-plugin install repository-s3
+sudo $ELASTICSEARCH_HOME/bin/elasticsearch-plugin install x-pack
 
 sudo sed -i '1i discovery.type: ec2' $ELASTICSEARCH_HOME/config/elasticsearch.yml
 sudo sed -i '1i cluster.name: '"$ES_NAME"'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
@@ -46,5 +46,8 @@ do
 done
 
 sudo sed -i '1i discovery.zen.ping.unicast.hosts: '\["${ES_HOSTS:0:-1}"\]'' $ELASTICSEARCH_HOME/config/elasticsearch.yml
+
+sudo sysctl -w vm.max_map_count=262144
+sudo bash -c "echo '* hard nofile 65536' >> /etc/security/limits.conf"
 
 sudo chown -R ubuntu $ELASTICSEARCH_HOME

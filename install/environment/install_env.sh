@@ -38,3 +38,5 @@ if ! grep "export JAVA_HOME" ~/.profile; then
   echo -e "\nexport JAVA_HOME=/usr" | cat >> ~/.profile
   echo -e "export PATH=\$PATH:\$JAVA_HOME/bin" | cat >> ~/.profile
 fi
+
+

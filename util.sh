@@ -297,39 +297,39 @@ function select_ami {
       ;;
 
     us-west-1)
-      AWS_IMAGE=ami-071e6567
+      AWS_IMAGE=ami-1acb987a
       ;;
 
     us-east-1)
-      AWS_IMAGE=ami-d839ceb5
+      AWS_IMAGE=ami-0e32dc18
       ;;
 
     eu-west-1)
-      AWS_IMAGE=ami-5a039529
+      AWS_IMAGE=ami-e3546090
       ;;
 
     eu-central-1)
-      AWS_IMAGE=ami-c7a34ca8
+      AWS_IMAGE=ami-c75f93a8
       ;;
 
     ap-northeast-1)
-      AWS_IMAGE=ami-907c9ff1
+      AWS_IMAGE=ami-11d5aa76
       ;;
 
     ap-northeast-2)
-      AWS_IMAGE=ami-79ba7117
+      AWS_IMAGE=ami-38ba6b56
       ;;
 
     ap-southeast-1)
-      AWS_IMAGE=ami-bfde0fdc
+      AWS_IMAGE=ami-aa00abc9
       ;;
 
     ap-southeast-2)
-      AWS_IMAGE=ami-d6b897b5
+      AWS_IMAGE=ami-15ceca76
       ;;
 
     sa-east-1)
-      AWS_IMAGE=ami-ba34bcd6
+      AWS_IMAGE=ami-fa56cc96
       ;;
 
     *)

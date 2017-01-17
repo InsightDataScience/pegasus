@@ -18,6 +18,7 @@ ELASTICSEARCH_DNS=$1
 
 . ~/.profile
 
-sudo $KIBANA_HOME/bin/kibana plugin --install elasticsearch/marvel/2.3.3
+sudo $KIBANA_HOME/bin/kibana-plugin install x-pack
 
-sed -i 's@elasticsearch_url: "localhost:9200"@elasticsearch_url: "'"$ELASTICSEARCH_DNS"':9200"@g' $KIBANA_HOME/config/kibana.yml
+sed -i 's@#elasticsearch.url: "http://localhost:9200"@elasticsearch.url: "http://'"$ELASTICSEARCH_DNS"':9200"@g' $KIBANA_HOME/config/kibana.yml
+sed -i 's@#server.host: "localhost"@server.host: "0.0.0.0"@g' $KIBANA_HOME/config/kibana.yml
