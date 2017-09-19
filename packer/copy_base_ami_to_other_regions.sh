@@ -3,19 +3,7 @@
 SOURCE_REGION=us-west-2
 BASE_AMI_ID=ami-62e01e02
 DEST_REGIONS=(
-    ap-south-1
-    eu-west-2
-    eu-west-1
-    ap-northeast-2
-    ap-northeast-1
-    sa-east-1
-    ca-central-1
-    ap-southeast-1
-    ap-southeast-2
-    eu-central-1
     us-east-1
-    us-east-2
-    us-west-1
     )
 
 function copy_ami {
@@ -26,7 +14,7 @@ function copy_ami {
     aws ec2 copy-image \
         --source-region $source_region \
         --source-image-id $base_ami_id \
-        --name pegasus-java8-$(date +%s) \
+        --name pegasus-ubuntu16-java8-$(date +%s) \
         --region $dest_region \
         --output text
 }
@@ -35,7 +23,7 @@ function make_ami_public {
     local base_ami_id=$1
 
     aws ec2 modify-image-attribute \
-        --image-id $ami_id \
+        --image-id "$base_ami_id" \
         --launch-permission "{\"Add\": [{\"Group\":\"all\"}]}"
 }
 
