@@ -18,7 +18,7 @@ sudo add-apt-repository ppa:openjdk-r/ppa -y
 
 sudo apt-get update
 
-sudo apt-get --yes --force-yes install ssh rsync openjdk-8-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran git supervisor ruby
+sudo apt-get --yes --force-yes install ssh rsync openjdk-8-jdk scala python-dev python-pip python-numpy python-scipy python-pandas gfortran git supervisor ruby bc
 
 # get sbt repository
 wget https://dl.bintray.com/sbt/debian/sbt-0.13.7.deb -P ~/Downloads
@@ -32,7 +32,7 @@ sudo apt-get --yes --force-yes install maven3
 
 sudo update-java-alternatives -s java-1.8.0-openjdk-amd64
 
-sudo pip install nose seaborn boto scikit-learn "ipython[notebook]"
+sudo pip install nose seaborn boto scikit-learn "ipython[notebook]==5.5.0"
 
 if ! grep "export JAVA_HOME" ~/.profile; then
   echo -e "\nexport JAVA_HOME=/usr" | cat >> ~/.profile
