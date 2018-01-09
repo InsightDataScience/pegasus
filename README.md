@@ -283,7 +283,7 @@ The `technology` tag can be any of the following:
 * alluxio (v1.3.0)
 * cassandra (v3.11.0)
 * elasticsearch (v5.1.2)
-* flink (v1.1.4 with hadoop v2.7 and scala v2.10)
+* flink (v1.4.0 with hadoop v2.7 and scala v2.11)
 * hadoop (v2.7.4)
 * hbase (v1.2.4)
 * hive (v2.1.1)
