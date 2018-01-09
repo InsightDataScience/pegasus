@@ -293,7 +293,8 @@ function set_launch_config {
 function select_ami {
   case "${AWS_DEFAULT_REGION}" in
     us-west-2)
-      AWS_IMAGE=ami-c02ed2b8
+      #AWS_IMAGE=ami-c02ed2b8
+      AWS_IMAGE=ami-0d50a275
       ;;
 
     us-east-1)
