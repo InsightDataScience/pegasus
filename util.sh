@@ -297,7 +297,8 @@ function select_ami {
       ;;
 
     us-east-1)
-      AWS_IMAGE=ami-82876ff8
+      #AWS_IMAGE=ami-82876ff8
+      AWS_IMAGE=ami-3508e54f
       ;;
 
     *)
