@@ -219,7 +219,7 @@ use_eips: true or false
 * **num_instances** (*integer*) - number of instances to deploy
 * **key_name** (*string*) - the pem key name to be used for all instances (e.g. insight-cluster)
 * **security_group_ids** (*string*) - security group id (e.g. sg-e9f17e8c, does not support multiple security group ids yet)
-* **instance_type** (*string*) - type of instances to deploy (e.g. m4.xlarge)
+* **instance_type** (*string*) - type of instances to deploy (e.g. m4.large)
 * **tag_name** (*string*) - tag all your instances with this name. Instances with the same `tag_name` will be associated with the same cluster.  This will be known as the `cluster-name` throughout the rest of the README (e.g. test-cluster)
 * **vol_size** (*integer*) - size of the EBS volume in GB. Uses magnetic storage. (e.g. 100)
 * **role** (*string*) - role of the instances (e.g. master)
