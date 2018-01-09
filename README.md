@@ -266,11 +266,11 @@ $ peg describe <cluster-name>
 # Setting up a newly provisioned AWS cluster
 If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` command, since the packages have already been installed.
 
-1. **Environment/Packages** - installs basic packages for Python, Java and many others **(not needed if using peg up)**
+1. **Environment/Packages** - installs basic packages for Python, Java and many others 
 1. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS. This is needed for some of the technologies.
 2. **AWS Credentials** - places AWS keys onto all machines under `~/.profile`
 ```bash
-$ peg install <cluster-name> environment    # not needed if using peg up!!!
+$ peg install <cluster-name> environment    
 $ peg install <cluster-name> ssh
 $ peg install <cluster-name> aws
 ```
@@ -281,13 +281,13 @@ $ peg install <cluster-name> <technology>
 ```
 The `technology` tag can be any of the following:
 * alluxio (v1.3.0)
-* cassandra (v3.9)
+* cassandra (v3.11.0)
 * elasticsearch (v5.1.2)
 * flink (v1.1.4 with hadoop v2.7 and scala v2.10)
-* hadoop (v2.7.2)
+* hadoop (v2.7.4)
 * hbase (v1.2.4)
 * hive (v2.1.1)
-* kafka (v0.10.1.1 with scala v2.10)
+* kafka (v1.0.0 with scala v2.11)
 * kafka-manager (v1.3.0.8)
 * kibana (v5.1.1)
 * opscenter
@@ -296,10 +296,10 @@ The `technology` tag can be any of the following:
 * redis (v3.2.6)
 * riak (v2.7.0)
 * secor (v0.21)
-* spark (v2.1.0 with hadoop v2.7+)
+* spark (v2.2.1 with hadoop v2.7+)
 * storm (v1.0.2)
 * zeppelin
-* zookeeper (v3.4.9)
+* zookeeper (v3.4.11)
 
 All environment variables relating to technology folder paths are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
