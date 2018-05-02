@@ -52,7 +52,7 @@ while getopts ":h" opt; do
       echo "    - retag"
       echo "    - start"
       echo "    - stop"
-      echo "    - port-foward"
+      echo "    - port-forward"
       exit 1
       ;;
 
