@@ -152,8 +152,8 @@ $ peg aws subnets
 +------------+-------+------------------+-------------------------------+----------------+
 |     AZ     |  IPS  |    SUBNET_ID     |          SUBNET_NAME          |    VPC_ID      |
 +------------+-------+------------------+-------------------------------+----------------+
-|vpc-c2a496a1|  251	 |  subnet-6ac0bd26 |  private-subnet-west-2c       |  us-west-2c	 |	    	
-|vpc-add2e6c3|  4089 |  subnet-9fe6e3df |  aws-us-west-2b               |  us-west-2b	 |
+|us-west-2c  |  251	 |  subnet-6ac0bd26 |  private-subnet-west-2c       |  vpc-c2a496a1	 |	    	
+|us-west-2b  |  4089 |  subnet-9fe6e3df |  aws-us-west-2b               |  vpc-add2e6c3  |
 ```
 We see here that the first subnet is associated with the same VPC id we specified previously, so `subnet-6ac0bd26` is the subnet-id I will need to use in my instance deployment later on.
 
