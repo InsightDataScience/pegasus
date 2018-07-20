@@ -27,5 +27,6 @@ peg fetch ${CLUSTER_NAME}
 
 peg install ${CLUSTER_NAME} ssh
 peg install ${CLUSTER_NAME} aws
+peg install ${CLUSTER_NAME} environment
 peg install ${CLUSTER_NAME} hadoop
 peg install ${CLUSTER_NAME} spark
