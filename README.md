@@ -108,8 +108,8 @@ root@containerid$ eval `ssh-agent -s`
 Once the Docker container is running or you have set up Pegasus manually, you can verify the current configurations in Pegasus with `peg config`
 ```bash
 $ peg config
-access key: ASDFQWER1234ZXCV
-secret key: POIUYTERRLKJHGFSD123498735284hdb+H
+access key: XXXX
+secret key: XXXX
     region: us-west-2
   SSH User: ubuntu
 ```
