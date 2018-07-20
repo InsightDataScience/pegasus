@@ -1,9 +1,10 @@
 ## Project Pegasus - Flying in the Cloud with Automated AWS Deployment
-![pegasus_logo](Pegasus_small.jpg)
 
-[![Build Status](http://52.41.136.144:8080/buildStatus/icon?job=MASTER-pegasus)](http://jenkins.insightdataprod.com:8080/job/MASTER-pegasus/)
+<div style="text-align:center; margin: 50px 0"><img src ="Pegasus_small.jpg" height="150"/></div>
 
-Pegasus is released under Apache License v2.0 and enables anyone with an Amazon Web Services ([AWS] (http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast protoyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
+<!--- [![Build Status](http://52.41.136.144:8080/buildStatus/icon?job=MASTER-pegasus)](http://jenkins.insightdataprod.com:8080/job/MASTER-pegasus/) --->
+
+Pegasus is released under Apache License v2.0 and enables anyone with an Amazon Web Services ([AWS](http://aws.amazon.com/)) account to quickly deploy a number of distributed technologies all from their laptop or personal computer. The installation is fairly basic and should not be used for production. The purpose of this project is to enable fast prototyping of various distributed data pipelines and also help others explore distributed technologies without the headache of installing them.
 
 We want to continue improving this tool by adding more features and other installations, so send us your pull requests or suggestions!
 
@@ -23,7 +24,7 @@ Supported commands:
 * `peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>` - copy files or folders to and from a specific node in your AWS cluster
 * `peg down <cluster-name>` - terminate a cluster
 * `peg retag <cluster-name> <new-cluster-name>` - retag an existing cluster with a different name
-* `peg start <cluster-name>` - start an existing cluster with on demand instances and put into running mode 
+* `peg start <cluster-name>` - start an existing cluster with on demand instances and put into running mode
 * `peg stop <cluster-name>` - stop and existing cluster with on demand instances and put into stop mode
 * `peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>` - port forward your local port to the remote cluster node's port
 
@@ -45,12 +46,12 @@ Supported commands:
 15. [Deployment Pipelines](README.md#deployment-pipelines)
 
 # Install Pegasus on your local machine
-This will allow you to programatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
+This will allow you to programmatically interface with your AWS account. There are two methods to install Pegasus: using a pre-baked Docker image or manually installing it into your environment.
 
 #### Prerequisites
 * AWS account
 * VPC with DNS Resolution enabled
-* Subnet in VPC 
+* Subnet in VPC
 * Security group accepting all inbound and outbound traffic (recommend locking down ports depending on technologies)
 * AWS Access Key ID and AWS Secret Access Key ID
 
@@ -63,6 +64,7 @@ $ pip install awscli
 ```
 
 Next we need to add the following to your `~/.bash_profile`.
+
 ```bash
 export AWS_ACCESS_KEY_ID=XXXX
 export AWS_SECRET_ACCESS_KEY=XXXX
@@ -75,6 +77,9 @@ Source the `.bash_profile` when finished.
 ```bash
 $ source ~/.bash_profile
 ```
+
+> It is essential you store the key information in your `~/.bash_profile` and not push it to GitHub. AWS scans github to see keys that are being stored. AWS will block your account and revoke all access if it finds it.
+
 
 ### Docker (If Manual doesn't work)
 
@@ -127,6 +132,9 @@ $ aws ec2 --output json describe-regions --query Regions[].RegionName
 ```
 
 # Query for AWS VPC information
+
+> Note: You can find all these information at in your AWS UI at aws.amazon.com console. Here is how pegasus can help you.
+
 The following queries can help you quickly determine which subnet-id and security-group-id to use in your instance deployments.
 
 ## VPCs
@@ -180,7 +188,7 @@ $ peg aws security-groups
 |  sg-7cb78418|  default  |  vpc-add2e6c3  |
 |  sg-5deed039|  default  |  vpc-c2a496a1  |
 ```
-We would choose the `sg-5deed039` in this example, since it is also associated with the VPC that we wish to deploy in. 
+We would choose the `sg-5deed039` in this example, since it is also associated with the VPC that we wish to deploy in.
 
 We can also filter Security Groups down to a specific VPC name `peg aws security-groups <vpc-name>` if there are too many security groups to search through
 ```bash
@@ -225,7 +233,7 @@ use_eips: true or false
 * **role** (*string*) - role of the instances (e.g. master)
 * **use_eips** (*boolean*) - use Elastic IPs with instances or not
 
-You can check if the template file is valid with `peg validate <template-file`.
+You can check if the template file is valid with `peg validate <template-file>`.
 
 The AMIs used in the `peg up` script have some basic packages baked in such as Java 7, Python, Maven 3, and many others. You can refer to the [`install/environment/setup_single.sh`](https://github.com/InsightDataScience/pegasus/blob/master/install/environment/install_env.sh) to view all the packages that have been installed. This should save quite a bit of time whenever you provision a new cluster. Reinstalling these packages can take anywhere from 10-30 minutes.
 
@@ -264,54 +272,58 @@ $ peg describe <cluster-name>
 ```
 
 # Setting up a newly provisioned AWS cluster
-If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. You can skip the first step if you are using the `peg up` command, since the packages have already been installed.
+If this is a newly provisioned AWS cluster, always start with at least the following 3 steps in the following order before proceeding with other installations. It is essential to do this else it will cause problems when installing software.
 
-1. **Environment/Packages** - installs basic packages for Python, Java and many others 
+<!--- You can skip the first step if you are using the `peg up` command, since the packages have already been installed. --->
+
 1. **Passwordless SSH** - enables passwordless SSH from your computer to the MASTER and the MASTER to all the WORKERS. This is needed for some of the technologies.
-2. **AWS Credentials** - places AWS keys onto all machines under `~/.profile`
+1. **AWS Credentials** - places AWS keys onto all machines under `~/.profile`
+1. **Environment/Packages** - installs basic packages for Python, Java and many others
 ```bash
-$ peg install <cluster-name> environment    
 $ peg install <cluster-name> ssh
 $ peg install <cluster-name> aws
+$ peg install <cluster-name> environment
 ```
 
 # Start installing!
 ```bash
 $ peg install <cluster-name> <technology>
 ```
-The `technology` tag can be any of the following:
-* alluxio (v1.3.0)
-* cassandra (v3.11.0)
-* elasticsearch (v5.1.2)
-* flink (v1.4.0 with hadoop v2.7 and scala v2.11)
-* hadoop (v2.7.4)
-* hbase (v1.2.4)
-* hive (v2.1.1)
-* kafka (v1.0.0 with scala v2.11)
-* kafka-manager (v1.3.0.8)
-* kibana (v5.1.1)
-* opscenter
-* pig (v0.15.0)
-* presto (v0.162)
-* redis (v3.2.6)
-* riak (v2.7.0)
-* secor (v0.21)
-* spark (v2.2.1 with hadoop v2.7+)
-* storm (v1.0.2)
-* zeppelin
-* zookeeper (v3.4.11)
+The `technology` tag can be any of the following (version set in configuration is **bolded**):
+* cassandra (v3.11.1, **v3.11.2**)
+* elasticsearch (v5.1.2, **v6.2.4**)
+* flink (**v1.4.2** with hadoop **v2.7** and scala **v2.11**)
+* hadoop (**v2.7.6**)
+* hbase (**v1.2.6**)
+* hive (**v2.3.3**)
+* kafka (v1.0.0 and **v1.1.0** with scala v2.11 and **v2.12**) (all combinations)
+* kibana (**v6.2.4**)
+* opscenter (**v6.5.0**)
+* pig (**v0.17.0**)
+* presto (**v0.200**)
+* redis (**v4.0.9**)
+* spark (v2.2.1, v2.3.0, **v2.3.1** for hadoop **v2.7**)
+* storm (**v1.2.1**)
+* zookeeper (v3.4.10, v3.4.12, **v3.4.13**)
 
 All environment variables relating to technology folder paths are stored in `~/.profile` such as `HADOOP_HOME`, `SPARK_HOME` and so on.
 
-If you wish to install a different version of these technologies, go into the [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) script and update the technology version and technology binary download URL.
 
-Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech), writing the appropriate configurations in the `config` folder and writing the appropriate service scripts in the `service` folder if appropriate.
+All softwares and the given version are currently available in a S3 bucket. If you wish to install a different version of these technologies, go into the [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech) script and update the technology version and technology binary download URL.
+
+Additional technologies can be included into Pegasus by adding the technology version and url to [`install/download_tech`](https://github.com/InsightDataScience/pegasus/blob/master/install/download_tech), writing the appropriate configurations in the `config` folder and writing the appropriate service scripts in the `service` folder.
 
 # Starting and stopping services
 User the `service` option to start and stop distributed services easily without having to manually SSH into each node
 ```bash
 $ peg service <cluster-name> <technology> <start|stop>
 ```
+
+> Note: There are few services which require other services to be running beforehand. Please ensure you manually start all services that are required for a given service to run. For example, to run `spark`, you need to install and start `hadoop`. To run `kafka` you need to install and start `zookeeper`.
+
+> Another Note: On starting/stopping kafka, the console will pause and will not come back to the terminal. You may use `ctrl+c` to get out of it safely. Kafka will still run.
+
+
 
 # Uninstalling a technology
 A script has been provided to uninstall a specific technology from all nodes in the declared cluster
@@ -348,7 +360,7 @@ $ peg stop <cluster-name>
 ```
 
 # Port forwarding to a node
-Forward your local port to a remote node's port. This is useful if you have any services that can only be accessed through port-forwarding. 
+Forward your local port to a remote node's port. This is useful if you have any services that can only be accessed through port-forwarding.
 ```bash
 $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 ```
@@ -356,7 +368,7 @@ $ peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>
 # Deployment Pipelines
 If you'd like to automate this deployment process completely, you can write your own scripts. An example has been provided in the [`examples/spark_hadoop.sh`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_hadoop.sh) file.
 
-Here it shows how we can spin up a 4 node cluster (peg up) using the [`spark_master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_master.yml) and [`spark_workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by changine the subnet-id and security-group-ids in the instance-template-files and then running the following:
+Here it shows how we can spin up a 4 node cluster (peg up) using the [`master.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_master.yml) and [`workers.yml`](https://github.com/InsightDataScience/pegasus/blob/master/examples/spark/spark_workers.yml) instance templates, grab the cluster information using `peg fetch` and install all the technologies with `peg install` in one script. We can deploy this cluster simply by changing the `subnet-id` and `security-group-ids` in the instance-template-files, adding relavent keypair, a tag name for identifying your cluster and then running the following:
 ```bash
 $ examples/spark/spark_hadoop.sh
 ```
@@ -376,6 +388,23 @@ peg fetch $CLUSTER_NAME
 
 peg install ${CLUSTER_NAME} ssh
 peg install ${CLUSTER_NAME} aws
+peg install ${CLUSTER_NAME} environment
 peg install ${CLUSTER_NAME} hadoop
 peg install ${CLUSTER_NAME} spark
+```
+
+# Things to remember
+
+Pegasus has been a tool to set up clusters quickly and easily. However, it has its limitations in terms of the software version it supports, scaling up and scaling out of the infrastructure and the updates to the software. The current version of pegasus supports the listed software. Here are few things that you need to know if you want to add your own software or tech into pegasus.
+
+- `/install`: this folder has everything related to installing softwares in the cluster.
+- `install/download_tech`: This folder contains the version and the location of the software.
+- `config`: this folder should be created for any new software that you want to add to pegasus. This will help in configuring the software after installations.
+- `service`: this folder contains start, stop scripts that is required to start your software. Every software has a different way to start its service. Please created scripts here to aid that process.
+
+Be sure to run the three statements before you install any software.
+```bash
+$ peg isntall <cluster-name> ssh
+$ peg install <cluster-name> aws
+$ peg install <cluster-name> environment
 ```
