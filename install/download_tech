@@ -14,42 +14,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ALLUXIO_VER=1.3.0
-CASSANDRA_VER=3.11.1
-ELASTICSEARCH_VER=5.1.2
-FLINK_VER=1.4.0
+S3_BUCKET=https://s3-us-west-2.amazonaws.com/insight-tech
+
+CASSANDRA_VER=3.11.2
+ELASTICSEARCH_URL=6.2.4
+FLINK_VER=1.4.2
 FLINK_HADOOP_VER=27
 FLINK_SCALA_VER=2.11
 HADOOP_VER=2.7.6
-HBASE_VER=1.2.4
-HIVE_VER=2.1.1
-KAFKA_VER=1.0.0
-KAFKA_SCALA_VER=2.11
-KIBANA_VER=5.1.1
-PIG_VER=0.16.0
-PRESTO_VER=0.162
-REDIS_VER=3.2.6
-SPARK_VER=2.2.1
+HBASE_VER=1.2.6
+HIVE_VER=2.3.3
+KAFKA_VER=1.1.0
+KAFKA_SCALA_VER=2.12
+KIBANA_VER=6.2.4
+OPSCENTER_VER=6.5.0
+PIG_VER=0.17.0
+PRESTO_VER=0.200
+REDIS_VER=4.0.9
+SPARK_VER=2.3.1
 SPARK_HADOOP_VER=2.7
-STORM_VER=1.0.2
-ZOOKEEPER_VER=3.4.11
+STORM_VER=1.2.1
+ZOOKEEPER_VER=3.4.13
 
-ALLUXIO_URL=http://alluxio.org/downloads/files/${ALLUXIO_VER}/alluxio-${ALLUXIO_VER}-bin.tar.gz
-CASSANDRA_URL=http://www.us.apache.org/dist/cassandra/$CASSANDRA_VER/apache-cassandra-$CASSANDRA_VER-bin.tar.gz
-ELASTICSEARCH_URL=http://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTICSEARCH_VER.tar.gz
-FLINK_URL=https://archive.apache.org/dist/flink/flink-1.4.0/flink-1.4.0-bin-hadoop24-scala_2.11.tgz
-HADOOP_URL=http://www.us.apache.org/dist/hadoop/core/hadoop-$HADOOP_VER/hadoop-$HADOOP_VER.tar.gz
-HBASE_URL=http://www.us.apache.org/dist/hbase/$HBASE_VER/hbase-$HBASE_VER-bin.tar.gz
-HIVE_URL=http://www.us.apache.org/dist/hive/hive-$HIVE_VER/apache-hive-$HIVE_VER-bin.tar.gz
-KAFKA_URL=http://www.us.apache.org/dist/kafka/$KAFKA_VER/kafka_$KAFKA_SCALA_VER-$KAFKA_VER.tgz
-KIBANA_URL=http://artifacts.elastic.co/downloads/kibana/kibana-$KIBANA_VER-linux-x86_64.tar.gz
-OPSCENTER_URL=http://downloads.datastax.com/community/opscenter.tar.gz
-PIG_URL=http://www-us.apache.org/dist/pig/pig-$PIG_VER/pig-$PIG_VER.tar.gz
-PRESTO_URL=https://repo1.maven.org/maven2/com/facebook/presto/presto-server/$PRESTO_VER/presto-server-$PRESTO_VER.tar.gz
-REDIS_URL=http://download.redis.io/releases/redis-$REDIS_VER.tar.gz
-SPARK_URL=http://www.us.apache.org/dist/spark/spark-$SPARK_VER/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
-STORM_URL=http://www.us.apache.org/dist/storm/apache-storm-$STORM_VER/apache-storm-$STORM_VER.tar.gz
-ZOOKEEPER_URL=http://www.us.apache.org/dist/zookeeper/zookeeper-$ZOOKEEPER_VER/zookeeper-$ZOOKEEPER_VER.tar.gz
+
+CASSANDRA_URL=${S3_BUCKET}/cassandra/apache-cassandra-${CASSANDRA_VER}-bin.tar.gz
+ELASTICSEARCH_URL=${S3_BUCKET}/elasticsearch/elasticsearch-${ELASTICSEARCH_VER}.tar.gz
+FLINK_URL=${S3_BUCKET}/flink/flink-${FLINK_VER}-bin-hadoop${FLINK_HADOOP_VER}-scala_${FLINK_SCALA_VER}.tgz
+HADOOP_URL=${S3_BUCKET}/hadoop/hadoop-$HADOOP_VER.tar.gz
+HBASE_URL=${S3_BUCKET}/hbase/hbase-$HBASE_VER-bin.tar.gz
+HIVE_URL=${S3_BUCKET}/hive/apache-hive-$HIVE_VER-bin.tar.gz
+KAFKA_URL=${S3_BUCKET}/kafka/kafka_$KAFKA_SCALA_VER-$KAFKA_VER.tgz
+KIBANA_URL=${S3_BUCKET}/kibana/kibana-$KIBANA_VER-linux-x86_64.tar.gz
+OPSCENTER_URL=${S3_BUCKET}/cassandra/opscenter-${OPSCENTER_VER}.tar.gz
+PIG_URL=${S3_BUCKET}/pig/pig-$PIG_VER.tar.gz
+PRESTO_URL=${S3_BUCKET}/presto-server-$PRESTO_VER.tar.gz
+REDIS_URL=${S3_BUCKET}/redis/redis-$REDIS_VER.tar.gz
+SPARK_URL=${S3_BUCKET}/spark/spark-$SPARK_VER-bin-hadoop$SPARK_HADOOP_VER.tgz
+STORM_URL=${S3_BUCKET}/storm/apache-storm-$STORM_VER.tar.gz
+ZOOKEEPER_URL=${S3_BUCKET}/zookeeper/zookeeper-$ZOOKEEPER_VER.tar.gz
 
 cd $(dirname "${BASH_SOURCE}")
 
@@ -67,7 +69,7 @@ check_folder () {
     echo "$TECHNOLOGY installed."
   else
     echo "$TECHNOLOGY missing."
-    echo "installing $TECHNOLOGY ..."
+    echo "Installing $TECHNOLOGY ..."
     curl_tech
   fi
 }
@@ -80,6 +82,8 @@ curl_tech () {
     echo -e "export PATH=\$PATH:\$$TECHNOLOGY_HOME/bin\n" | cat >> ~/.profile
     sudo chown -R $USER /usr/local/$TECHNOLOGY
     eval "echo \$$(echo $TECHNOLOGY | tr [a-z] [A-Z])_VER" >> /usr/local/$TECHNOLOGY/tech_ver.txt
+  else 
+    echo "The software wasn't downloaded correctly from the URL ($TECHNOLOGY_URL). Check Pegasus GitHub README."
   fi
 }
 
