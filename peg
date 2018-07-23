@@ -25,7 +25,7 @@ source ${PEG_ROOT}/util.sh
 nargs="$#"
 
 if [ ${nargs} == 0 ]; then
-  echo "usage: peg [options] <command> [parameters]"
+  echo "Usage: peg [options] <command> [parameters]"
   echo "peg: error: too few arguments"
   echo "use the -h option for available commands"
   exit 1
@@ -52,12 +52,12 @@ while getopts ":h" opt; do
       echo "    - retag"
       echo "    - start"
       echo "    - stop"
-      echo "    - port-foward"
+      echo "    - port-forward"
       exit 1
       ;;
 
     *)
-      echo "invalid option flag: -${OPTARG}"
+      echo "Invalid option flag: -${OPTARG}"
       exit 1
       ;;
   esac
@@ -134,7 +134,7 @@ case ${command} in
         echo "Template validated successfully."
       fi
     else
-      echo "invalid number of arguments"
+      echo "Invalid number of arguments"
       exit 1
     fi
     ;;
@@ -156,8 +156,8 @@ case ${command} in
       store_pemkey ${CLUSTER_NAME}
       peg describe ${CLUSTER_NAME}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg fetch <cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg fetch <cluster-name>"
       exit 1
     fi
     ;;
@@ -168,8 +168,8 @@ case ${command} in
 
       describe_cluster ${CLUSTER_NAME}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg describe <cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg describe <cluster-name>"
       exit 1
     fi
     ;;
@@ -182,8 +182,8 @@ case ${command} in
       set_launch_config ${TEMPLATE_PATH}
       run_instances
     else
-      echo "invalid number of arguments"
-      echo "usage: peg up <template-path>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg up <template-path>"
       exit 1
     fi
     ;;
@@ -257,8 +257,8 @@ case ${command} in
 
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg install <cluster-name> <technology>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg install <cluster-name> <technology>"
     fi
     ;;
 
@@ -334,8 +334,8 @@ case ${command} in
 
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg uninstall <cluster-name> <technology>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg uninstall <cluster-name> <technology>"
     fi
     ;;
 
@@ -370,8 +370,8 @@ case ${command} in
 
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg service <cluster-name> <technology> <start|stop>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg service <cluster-name> <technology> <start|stop>"
     fi
     ;;
 
@@ -401,8 +401,8 @@ case ${command} in
           exit 1
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg down <cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg down <cluster-name>"
     fi
     ;;
 
@@ -416,8 +416,8 @@ case ${command} in
 
       ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
     else
-      echo "invalid number of arguments"
-      echo "usage: peg ssh <cluster-name> <node-number>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg ssh <cluster-name> <node-number>"
     fi
     ;;
 
@@ -433,8 +433,8 @@ case ${command} in
       PUBLIC_DNS=$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
       run_cmd_on_node ${PUBLIC_DNS} ${CMD}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg sshcmd-node <cluster-name> <node-number> \"<cmd>\""
+      echo "Invalid number of arguments"
+      echo "Usage: peg sshcmd-node <cluster-name> <node-number> \"<cmd>\""
     fi
     ;;
 
@@ -448,8 +448,8 @@ case ${command} in
 
       run_cmd_on_cluster ${CLUSTER_NAME} ${CMD}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg sshcmd-cluster <cluster-name> \"<cmd>\""
+      echo "Invalid number of arguments"
+      echo "Usage: peg sshcmd-cluster <cluster-name> \"<cmd>\""
     fi
     ;;
 
@@ -475,7 +475,7 @@ case ${command} in
           ;;
 
         *)
-          echo "invalid peg scp option"
+          echo "Invalid peg scp option"
           echo "valid options:"
           echo "  to-local"
           echo "  from-local"
@@ -485,8 +485,8 @@ case ${command} in
 
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg scp <to-local|to-rem|from-local|from-rem> <cluster-name> <node-number> <local-path> <remote-path>"
     fi
     ;;
 
@@ -500,8 +500,8 @@ case ${command} in
 
       peg fetch ${NEW_CLUSTER_NAME}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg retag <cluster-name> <new-cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg retag <cluster-name> <new-cluster-name>"
     fi
     ;;
 
@@ -516,8 +516,8 @@ case ${command} in
 
       port_forward ${CLUSTER_NAME} ${NODE_NUMBER} ${PORT_CMD}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg port-forward <cluster-name> <node-number> <local-port>:<remote-port>"
     fi
     ;;
 
@@ -529,8 +529,8 @@ case ${command} in
 
       start_instance ${CLUSTER_NAME}
     else
-      echo "invalid number of arguments"
-      echo "usage: peg start <cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg start <cluster-name>"
     fi
     ;;
 
@@ -557,13 +557,13 @@ case ${command} in
           exit 1
       esac
     else
-      echo "invalid number of arguments"
-      echo "usage: peg stop <cluster-name>"
+      echo "Invalid number of arguments"
+      echo "Usage: peg stop <cluster-name>"
     fi
     ;;
 
   *)
-    echo "invalid command. use -h to see available commands"
+    echo "Invalid command. use -h to see available commands"
     exit 1
 esac
 

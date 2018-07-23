@@ -1,11 +1,11 @@
-purchase_type: spot
-subnet_id: subnet-3a78835f
+purchase_type: on_demand
+subnet_id: subnet-2aceb053
 price: 0.13
 num_instances: 3
-key_name: insight-cluster
-security_group_ids: sg-9206aaf7
-instance_type: m4.large
-tag_name: spark-cluster
+key_name: sriram-pgtest
+security_group_ids: sg-0a60aa7a
+instance_type: m5.large
+tag_name: pgtest-spark-cluster
 vol_size: 100
 role: worker
 use_eips: true

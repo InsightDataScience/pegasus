@@ -1,10 +1,10 @@
 purchase_type: on_demand
-subnet_id: subnet-3a78835f
+subnet_id:
 num_instances: 1
-key_name: insight-cluster
-security_group_ids: sg-9206aaf7
-instance_type: m4.large
-tag_name: spark-cluster
+key_name:
+security_group_ids:
+instance_type: m5.large
+tag_name:
 vol_size: 100
 role: master
 use_eips: true

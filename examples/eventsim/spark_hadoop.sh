@@ -16,10 +16,10 @@
 
 PEG_ROOT=$(dirname ${BASH_SOURCE})/../..
 
-CLUSTER_NAME=spark-cluster
+CLUSTER_NAME=davids-eventsim-cluster
 
-peg up ${PEG_ROOT}/examples/spark/master.yml &
-peg up ${PEG_ROOT}/examples/spark/workers.yml &
+peg up ${PEG_ROOT}/examples/eventsim/master.yml &
+peg up ${PEG_ROOT}/examples/eventsim/workers.yml &
 
 wait
 
@@ -27,6 +27,10 @@ peg fetch ${CLUSTER_NAME}
 
 peg install ${CLUSTER_NAME} ssh
 peg install ${CLUSTER_NAME} aws
-peg install ${CLUSTER_NAME} environment
 peg install ${CLUSTER_NAME} hadoop
 peg install ${CLUSTER_NAME} spark
+
+wait
+
+peg service ${CLUSTER_NAME} hadoop start
+peg service ${CLUSTER_NAME} spark start
