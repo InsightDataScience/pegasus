@@ -3,7 +3,7 @@ subnet_id:
 num_instances: 1
 key_name:
 security_group_ids:
-instance_type: m5.large
+instance_type: m4.large
 tag_name:
 vol_size: 100
 role: master
