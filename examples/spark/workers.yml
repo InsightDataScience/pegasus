@@ -1,11 +1,10 @@
 purchase_type: on_demand
-subnet_id: subnet-2aceb053
-price: 0.13
+subnet_id: 
 num_instances: 3
-key_name: sriram-pgtest
-security_group_ids: sg-0a60aa7a
+key_name: 
+security_group_ids:
 instance_type: m5.large
-tag_name: pgtest-spark-cluster
+tag_name:
 vol_size: 100
 role: worker
 use_eips: true
