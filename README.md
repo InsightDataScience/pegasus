@@ -404,7 +404,7 @@ Pegasus has been a tool to set up clusters quickly and easily. However, it has i
 
 Be sure to run the three statements before you install any software.
 ```bash
-$ peg isntall <cluster-name> ssh
+$ peg install <cluster-name> ssh
 $ peg install <cluster-name> aws
 $ peg install <cluster-name> environment
 ```
