@@ -21,9 +21,9 @@ NUM_WORKERS=$2
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
-MAX_MEMORY_PER_NODE=$(printf "%.0f" $(echo "0.90 * ($TOTMEM - 6000) * 0.001" | bc -l))
+MAX_MEMORY_PER_NODE=$(printf "%.0f" $(echo "0.90 * ( $TOTMEM - 6000 ) * 0.001" | awk '{print $1 * ($4-$6) * $8}'))
 
-MAX_MEMORY=$(echo "$MAX_MEMORY_PER_NODE * $NUM_WORKERS" | bc -l)
+MAX_MEMORY=$(echo "$MAX_MEMORY_PER_NODE * $NUM_WORKERS" | awk '{$1 * $3}')
 
 PORT=8080
 
