@@ -21,9 +21,9 @@ NUM_WORKERS=$2
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
-TASKMANAGER_HEAP=$(printf "%.0f" $(echo "0.90 * ($TOTMEM - 1000)" | bc -l))
+TASKMANAGER_HEAP=$(printf "%.0f" $(echo "0.90 * ( $TOTMEM - 1000 )" | awk '{print $1*($4-$6)}'))
 TASK_SLOTS=$(nproc)
-PARALLELISM=$(echo "$TASK_SLOTS * $NUM_WORKERS" | bc -l)
+PARALLELISM=$(echo "$TASK_SLOTS * $NUM_WORKERS" | awk '{print $1*$3}')
 TMP_DIRS=/var/flink/tmp
 
 sudo mkdir -p $TMP_DIRS
