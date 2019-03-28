@@ -229,8 +229,10 @@ function store_pemkey {
 
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
 
-  sshagent_pid_cnt=$(pgrep ssh-agent | wc -l)
-  if [ "${sshagent_pid_cnt}" -ne "0" ]; then
+  if [ $SSH_AGENT_PID ]; then
+    if ! [ $SSH_AUTH_SOCK ]; then
+      eval $(ssh-agent -s)
+    fi
     ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
     echo "${unique_pemkeys}.pem has been added to your ssh-agent"
   else
