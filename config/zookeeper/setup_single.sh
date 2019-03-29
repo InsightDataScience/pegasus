@@ -25,8 +25,8 @@ cp $ZOOKEEPER_HOME/conf/zoo_sample.cfg $ZOOKEEPER_HOME/conf/zoo.cfg
 sed -i 's@/tmp/zookeeper@/var/lib/zookeeper@g' $ZOOKEEPER_HOME/conf/zoo.cfg
 
 for i in `seq $LEN`; do
-    SERVER_NUM=$(echo "$LEN-$i+1" | bc)
-    CURRENT_DNS=${DNS[$(echo "$SERVER_NUM-1" | bc)]}
+    SERVER_NUM=$(echo "$LEN - $i + 1" | awk '{print $1 - $3 + $5}')
+    CURRENT_DNS=${DNS[$(echo "$SERVER_NUM - 1" | awk '{print $1 - $3}' )]}
     sed -i '15i server.'"$SERVER_NUM"'='"$CURRENT_DNS"':2888:3888' $ZOOKEEPER_HOME/conf/zoo.cfg
 done
 

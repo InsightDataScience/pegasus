@@ -25,7 +25,7 @@ sed -i '18i export SPARK_HOME='$SPARK_HOME'' $ZEPPELIN_HOME/conf/zeppelin-env.sh
 
 MEMINFO=($(free -m | sed -n '2p' | sed -e "s/[[:space:]]\+/ /g"))
 TOTMEM=${MEMINFO[1]}
-EXECMEM=$(echo "0.90 * ($TOTMEM - 1000)" | bc -l)
+EXECMEM=$(echo "0.90 * ( $TOTMEM - 1000 )" | awk '{print $1 * ($4-$6)}')
 #sed -i '18i export SPARK_SUBMIT_OPTIONS="--driver-memory '${EXECMEM%.*}'M --executor-memory '${EXECMEM%.*}'M"' $ZEPPELIN_HOME/conf/zeppelin-env.sh
 
 sed -i 's@<value>8080</value>@<value>7888</value>@g' $ZEPPELIN_HOME/conf/zeppelin-site.xml

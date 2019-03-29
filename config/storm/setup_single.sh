@@ -32,7 +32,7 @@ done
 
 SUPERVISOR_PORTS=""
 for SLOT_NUM in `seq $NUM_WORKERS`; do
-  PORT_NUM=$(echo "$WORKER_PORT + $SLOT_NUM - 1" | bc -l)
+  PORT_NUM=$(echo "$WORKER_PORT + $SLOT_NUM - 1" | awk '{print $1 + $3 - $5}')
   SUPERVISOR_PORTS+="    - $PORT_NUM"$'\n'
 done
 
