@@ -413,6 +413,7 @@ case ${command} in
       NODE_NUM=${PARAMETER_ARR[1]}
 
       check_cluster_exists ${CLUSTER_NAME}
+      restart_sshagent_if_needed ${CLUSTER_NAME}
 
       ssh -A -o "StrictHostKeyChecking no" ${REM_USER}@$(sed -n ''"$NODE_NUM"'p' ${PEG_ROOT}/tmp/${CLUSTER_NAME}/public_dns)
     else

@@ -31,6 +31,8 @@ WORKER_DNS=$(fetch_cluster_worker_public_dns ${CLUSTER_NAME})
 
 HOSTNAMES=$(fetch_cluster_hostnames ${CLUSTER_NAME})
 
+restart_sshagent_if_needed ${CLUSTER_NAME}
+
 # Enable passwordless SSH from local to master
 if ! [ -f ~/.ssh/id_rsa ]; then
   ssh-keygen -f ~/.ssh/id_rsa -t rsa -P ""

@@ -224,14 +224,11 @@ function store_pemkey {
   fi
 
   pemkey_exists_locally ${unique_pemkeys}
-
   chmod 400 ~/.ssh/${unique_pemkeys}.pem
-
   cp ~/.ssh/${unique_pemkeys}.pem ${PEG_ROOT}/tmp/${cluster_name}
-
   if [ $SSH_AGENT_PID ]; then
     if ! [ $SSH_AUTH_SOCK ]; then
-      eval $(ssh-agent -s)
+      eval $(ssh-agent) > /dev/null
     fi
     ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
     echo "${unique_pemkeys}.pem has been added to your ssh-agent"
@@ -244,6 +241,27 @@ function store_pemkey {
     exit 1
   fi
 }
+
+function restart_sshagent_if_needed {
+  local cluster_name=$1
+  local unique_pemkeys=$(get_unique_pemkey ${cluster_name})
+
+  if [ ! -e ${PEG_ROOT}/tmp/${cluster_name} ]; then
+     store_pemkey ${cluster_name}
+  fi
+
+  if [ $SSH_AGENT_PID ]; then
+    if ! [ $SSH_AUTH_SOCK ]; then
+      eval $(ssh-agent) > /dev/null
+      ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
+      echo "${unique_pemkeys}.pem has been added to your ssh-agent"
+    fi
+  else
+    eval $(ssh-agent) > /dev/null
+    ssh-add ${PEG_ROOT}/tmp/${cluster_name}/${unique_pemkeys}.pem > /dev/null 2>&1
+    echo "${unique_pemkeys}.pem has been added to your ssh-agent"
+  fi
+} 
 
 function get_instance_type_histo_with_name {
   local cluster_name=$1
