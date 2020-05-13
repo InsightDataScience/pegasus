@@ -31,10 +31,12 @@ cp ${SPARK_HOME}/conf/spark-defaults.conf.template ${SPARK_HOME}/conf/spark-defa
 # configure spark-env.sh
 OVERSUBSCRIPTION_FACTOR=3
 WORKER_CORES=$(echo "$(nproc) * ${OVERSUBSCRIPTION_FACTOR}" | awk '{print $1 * $3}')
-sed -i '6i export JAVA_HOME=/usr' ${SPARK_HOME}/conf/spark-env.sh
-sed -i '7i export SPARK_PUBLIC_DNS="'$1'"' ${SPARK_HOME}/conf/spark-env.sh
-sed -i '8i export SPARK_WORKER_CORES='${WORKER_CORES}'' ${SPARK_HOME}/conf/spark-env.sh
-sed -i '9i export DEFAULT_HADOOP_HOME='${HADOOP_HOME}'' ${SPARK_HOME}/conf/spark-env.sh
+spark_env="${SPARK_HOME}/conf/spark-env.sh"
+sed -i '22i export PYSPARK_PYTHON=python3' ${spark_env}
+sed -i '23i export JAVA_HOME=/usr' ${spark_env}
+sed -i '24i export SPARK_PUBLIC_DNS="'$1'"' ${spark_env}
+sed -i '25i export SPARK_WORKER_CORES='${WORKER_CORES}'' ${spark_env}
+sed -i '26i export DEFAULT_HADOOP_HOME='${HADOOP_HOME}'' ${spark_env}
 
 
 # configure spark-defaults.conf
