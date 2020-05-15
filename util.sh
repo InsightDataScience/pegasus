@@ -315,7 +315,7 @@ function select_ami {
     us-west-2)
       #AWS_IMAGE=ami-c02ed2b8
       #AWS_IMAGE=ami-0d50a275
-      AWS_IMAGE= ami-003634241a8fcdec0 # Ubuntu 18.04
+      AWS_IMAGE=ami-003634241a8fcdec0 # Ubuntu 18.04
       #AWS_IMAGE=ami-09dd2e08d601bff67 # Ubuntu 20.04
       ;;
 
